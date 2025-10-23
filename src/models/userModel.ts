@@ -1,49 +1,8 @@
-import { model, models, Schema } from 'mongoose';
+import { Model, model, models, Schema, InferSchemaType } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
+import bcrypt from 'bcrypt';
 
-export type socialLinks = Partial<
-  Record<'website' | 'twitter' | 'github' | 'linkedin', string>
->;
-
-export interface IUser {
-  // Required at registration
-  email: string;
-  password: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  timezone: string;
-  language: string;
-  role: 'user' | 'admin';
-
-  // Optional profile fields
-  phoneNumber?: string;
-  profilePicture?: string;
-  bio?: string;
-  socialLinks?: socialLinks;
-
-  // Email verification
-  isEmailVerified?: boolean;
-  emailVerificationToken?: string;
-  emailVerificationExpires?: Date;
-
-  // Password reset
-  passwordResetToken?: string;
-  passwordResetExpires?: Date;
-
-  // Security & tracking
-  loginAttempts?: number;
-  lastLoginAt?: Date;
-  lastLoginIp?: string;
-  lockUntil?: Date;
-  isActive?: boolean;
-  refreshToken?: string;
-
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema(
   {
     email: {
       type: String,
@@ -74,14 +33,6 @@ const userSchema = new Schema<IUser>(
       required: true,
       trim: true,
     },
-    timezone: {
-      type: String,
-      required: true,
-    },
-    language: {
-      type: String,
-      required: true,
-    },
     role: {
       type: String,
       required: true,
@@ -96,6 +47,14 @@ const userSchema = new Schema<IUser>(
       twitter: String,
       github: String,
       linkedin: String,
+    },
+    timezone: {
+      type: String,
+      default: 'UTC',
+    },
+    language: {
+      type: String,
+      default: 'en',
     },
 
     isEmailVerified: {
@@ -124,9 +83,20 @@ const userSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
+type UserType = InferSchemaType<typeof userSchema>;
+
 // TODO: Add indexes, virtuals, hooks and methods
+
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+
+  const saltRounds = 10;
+  this.password = await bcrypt.hash(this.password, saltRounds);
+});
 
 userSchema.plugin(aggregatePaginate);
 
-const User = models.User || model<IUser>('User', userSchema);
+const User = (models.User ||
+  model<UserType>('User', userSchema)) as Model<UserType>;
+
 export default User;
