@@ -15,6 +15,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       minlength: 6,
+      select: false,
     },
     username: {
       type: String,
@@ -61,11 +62,23 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    emailVerificationToken: String,
-    emailVerificationExpires: Date,
+    emailVerificationToken: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpires: {
+      type: Date,
+      select: false,
+    },
 
-    passwordResetToken: String,
-    passwordResetExpires: Date,
+    passwordResetToken: {
+      type: String,
+      select: false,
+    },
+    passwordResetExpires: {
+      type: Date,
+      select: false,
+    },
 
     loginAttempts: {
       type: Number,
@@ -78,12 +91,15 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
-    refreshToken: String,
+    refreshToken: {
+      type: String,
+      select: false,
+    },
   },
   { timestamps: true },
 );
 
-type UserType = InferSchemaType<typeof userSchema>;
+export type UserType = InferSchemaType<typeof userSchema>;
 
 // TODO: Add indexes, virtuals, hooks and methods
 

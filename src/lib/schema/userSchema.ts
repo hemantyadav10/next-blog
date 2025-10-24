@@ -69,4 +69,9 @@ export const registerSchema = z.object({
   updatedAt: z.union([z.date(), z.iso.datetime()]).optional(),
 });
 
+export const loginSchema = z.object({
+  email: z.email('Invalid email address').trim(),
+  password: z.string().min(1, 'Password is required'),
+});
+
 export type IUser = z.infer<typeof registerSchema>;
