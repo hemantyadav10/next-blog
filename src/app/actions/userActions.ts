@@ -9,6 +9,7 @@ import { isMongoError } from '@/lib/utils';
 import User from '@/models/userModel';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
+import { COOKIE_NAMES } from '@/lib/constants';
 
 const cookieOptions = {
   httpOnly: true,
@@ -16,11 +17,6 @@ const cookieOptions = {
   sameSite: 'lax' as const,
   path: '/',
 };
-
-const COOKIE_NAMES = {
-  ACCESS_TOKEN: 'accessToken',
-  REFRESH_TOKEN: 'refreshToken',
-} as const;
 
 export type SafeUser = {
   id: string;

@@ -1,31 +1,7 @@
-import { Types, Schema, models, model } from 'mongoose';
+import { InferSchemaType, Model, Schema, Types, model, models } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-export interface IBlog {
-  authorId: Types.ObjectId;
-  banner?: string;
-  status?: 'published' | 'draft';
-  publishedAt?: Date;
-  title: string;
-  description: string;
-  metaDescription?: string;
-  content: string;
-  tags: Types.ObjectId[];
-  isFeatured?: boolean;
-  categoryId: Types.ObjectId;
-  slug: string;
-  views?: number;
-  isEdited?: boolean;
-  editedAt?: Date;
-  readTime: number;
-  commentsCount?: number;
-  isCommentsEnabled?: boolean;
-  likesCount?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const blogSchema = new Schema<IBlog>(
+const blogSchema = new Schema(
   {
     authorId: {
       type: Schema.Types.ObjectId,
@@ -109,7 +85,7 @@ const blogSchema = new Schema<IBlog>(
     },
     readTime: {
       type: Number,
-      default: 0,
+      default: 0, // stored in minutes
       min: 0,
       required: true,
     },
@@ -135,9 +111,13 @@ const blogSchema = new Schema<IBlog>(
   },
 );
 
+type BlogType = InferSchemaType<typeof blogSchema>;
+
 // TODO: Add indexes, virtuals, hooks and methods
 
 blogSchema.plugin(aggregatePaginate);
 
-const Blog = models.Blog || model<IBlog>('Blog', blogSchema);
+const Blog = (models.Blog ||
+  model<BlogType>('Blog', blogSchema)) as Model<BlogType>;
+
 export default Blog;
