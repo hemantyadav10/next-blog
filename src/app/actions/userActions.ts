@@ -4,12 +4,16 @@ import * as z from 'zod';
 
 import { generateTokens } from '@/lib/auth';
 import connectDb from '@/lib/connectDb';
-import { loginSchema, registerSchema } from '@/lib/schema/userSchema';
+import { COOKIE_NAMES } from '@/lib/constants';
+import {
+  LoginInput,
+  loginSchema,
+  registerSchema,
+} from '@/lib/schema/userSchema';
 import { isMongoError } from '@/lib/utils';
 import User from '@/models/userModel';
-import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import { COOKIE_NAMES } from '@/lib/constants';
+import { cookies } from 'next/headers';
 
 const cookieOptions = {
   httpOnly: true,
@@ -30,11 +34,13 @@ export type SafeUser = {
 export type ResponseState = {
   success: boolean;
   error?: string;
-  details?: Record<string, string[]>;
+  errors?: Record<string, string[] | undefined>;
   message?: string;
   userId?: string;
   user?: SafeUser;
-} | null;
+};
+
+export type InitialState = ResponseState | null;
 
 // Registers a new user
 export async function registerUser(
@@ -57,7 +63,7 @@ export async function registerUser(
       return {
         success: false,
         error: 'Validation failed',
-        details: errorDetails,
+        errors: errorDetails,
       };
     }
 
@@ -105,22 +111,17 @@ export async function registerUser(
 }
 
 // Authenticates user and creates secure session
-export async function loginUser(
-  _initialState: unknown,
-  formData: FormData,
-): Promise<ResponseState> {
+export async function loginUser(formData: LoginInput): Promise<ResponseState> {
   try {
     await connectDb();
-    const { success, data, error } = loginSchema.safeParse(
-      Object.fromEntries(formData),
-    );
+    const { success, data, error } = loginSchema.safeParse(formData);
 
     if (!success) {
       const errorDetails = z.flattenError(error).fieldErrors;
       return {
         success: false,
         error: 'Validation failed',
-        details: errorDetails,
+        errors: errorDetails,
       };
     }
 

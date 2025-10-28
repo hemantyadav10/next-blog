@@ -1,0 +1,174 @@
+'use client';
+
+import { GoogleIcon } from '@/components/icons/google-icon';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from '@/components/ui/field';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
+import { Spinner } from '@/components/ui/spinner';
+import { LoginInput, loginSchema } from '@/lib/schema/userSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircleIcon, Eye, EyeOff, LockIcon, Mail } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { loginUser } from '../actions/userActions';
+
+function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: 'onTouched',
+  });
+  const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] =
+    useState<Record<string, string[] | undefined>>();
+  const router = useRouter();
+
+  async function handleFormAction(data: LoginInput) {
+    setError('');
+    setFieldErrors(undefined);
+    startTransition(async () => {
+      const { success, error, errors } = await loginUser(data);
+
+      if (success) {
+        toast.success('Signed in successfully');
+        reset();
+        router.push('/');
+      } else if (error) {
+        setError(error);
+        setFieldErrors(errors);
+      }
+    });
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="w-full max-w-sm space-y-6"
+    >
+      <h1 className="text-3xl font-bold">Welcome Back</h1>
+      <p className="text-muted-foreground text-sm">
+        Don&apos;t have an account? <a href="#">Sign up</a>
+      </p>
+      <form onSubmit={handleSubmit(handleFormAction)} noValidate>
+        <FieldGroup>
+          <Field>
+            <Button
+              variant="outline"
+              type="button"
+              size={'lg'}
+              onClick={() => toast.info('Google login coming soon!')}
+            >
+              <GoogleIcon className="size-5" />
+              Login with Google
+            </Button>
+          </Field>
+          <FieldSeparator>Or continue with</FieldSeparator>
+          {error && (
+            <Alert variant={'destructive'}>
+              <AlertCircleIcon />
+              <AlertTitle>Authentication Error</AlertTitle>
+              <AlertDescription>
+                <p>{error}</p>
+              </AlertDescription>
+            </Alert>
+          )}
+          <Field>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <InputGroup>
+              <InputGroupInput
+                id="email"
+                type="email"
+                {...register('email')}
+                aria-invalid={!!errors.email || !!fieldErrors?.email?.[0]}
+                placeholder="example@email.com"
+              />
+              <InputGroupAddon>
+                <Mail />
+              </InputGroupAddon>
+            </InputGroup>
+            {(errors.email || fieldErrors?.email) && (
+              <FieldError>
+                {errors.email?.message || fieldErrors?.email?.[0]}
+              </FieldError>
+            )}
+          </Field>
+          <Field>
+            <div className="flex items-center">
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <a
+                href="#"
+                className="ml-auto text-sm underline-offset-4 hover:underline"
+              >
+                Forgot your password?
+              </a>
+            </div>
+            <InputGroup>
+              <InputGroupInput
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                {...register('password')}
+                aria-invalid={!!errors.password || !!fieldErrors?.password}
+                placeholder="********"
+              />
+              <InputGroupAddon>
+                <LockIcon />
+              </InputGroupAddon>
+              <InputGroupAddon align={'inline-end'}>
+                <InputGroupButton
+                  aria-label="Toggle password"
+                  title="Toggle password"
+                  size="icon-xs"
+                  onClick={() => {
+                    setShowPassword(!showPassword);
+                  }}
+                >
+                  {showPassword ? <Eye /> : <EyeOff />}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+            {(errors.password || fieldErrors?.password) && (
+              <FieldError>
+                {errors.password?.message || fieldErrors?.password?.[0]}
+              </FieldError>
+            )}
+          </Field>
+          <Field>
+            <Button disabled={isPending} type="submit" size={'lg'}>
+              {isPending && <Spinner />} Login
+            </Button>
+          </Field>
+          <FieldDescription className="text-center">
+            By clicking continue, you agree to our{' '}
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+          </FieldDescription>
+        </FieldGroup>
+      </form>
+    </motion.div>
+  );
+}
+
+export default LoginForm;
