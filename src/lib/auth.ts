@@ -1,10 +1,21 @@
 import User from '@/models/userModel';
 import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import connectDb from './connectDb';
 import { COOKIE_NAMES, IS_DEV } from './constants';
 
-type AuthResult =
-  | { isAuthenticated: true; user: { userId: string }; error: null }
+export type AuthResult =
+  | {
+      isAuthenticated: true;
+      user: {
+        userId: string;
+        email: string;
+        role: string;
+        fullName: string;
+        profilePicture: string | null | undefined;
+      };
+      error: null;
+    }
   | { isAuthenticated: false; user: null; error: string };
 
 // function to generate refresh and access token
@@ -43,10 +54,17 @@ export function generateTokens({
 // Verifies user authentication by validating JWT access token from cookies
 export async function verifyAuth(): Promise<AuthResult> {
   try {
+    await connectDb();
     const cookieStore = await cookies();
     const accessToken = cookieStore.get(COOKIE_NAMES.ACCESS_TOKEN)?.value;
 
-    if (!accessToken) throw new Error('Authentication required');
+    if (!accessToken) {
+      return {
+        isAuthenticated: false,
+        error: 'Authentication required',
+        user: null,
+      };
+    }
 
     const payload = jwt.verify(
       accessToken,
@@ -54,17 +72,35 @@ export async function verifyAuth(): Promise<AuthResult> {
     );
 
     if (typeof payload === 'string' || !payload?.userId) {
-      throw new Error('Invalid or expired token');
+      return {
+        isAuthenticated: false,
+        error: 'Invalid or expired token',
+        user: null,
+      };
     }
 
-    const userExists = await User.exists({ _id: payload.userId });
+    const user = await User.findById(payload.userId)
+      .select('email firstName lastName role profilePicture')
+      .lean();
 
-    if (!userExists) throw new Error('User not found');
+    if (!user) {
+      return {
+        isAuthenticated: false,
+        error: 'User not found',
+        user: null,
+      };
+    }
 
     return {
       isAuthenticated: true,
       error: null,
-      user: { userId: userExists._id.toString() },
+      user: {
+        userId: user._id.toString(),
+        email: user.email,
+        role: user.role,
+        fullName: `${user.firstName} ${user.lastName}`,
+        profilePicture: user.profilePicture,
+      },
     };
   } catch (error) {
     let errorMessage = 'Authentication failed';

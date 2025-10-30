@@ -8,6 +8,7 @@ import { COOKIE_NAMES } from '@/lib/constants';
 import {
   LoginInput,
   loginSchema,
+  RegisterInput,
   registerSchema,
 } from '@/lib/schema/userSchema';
 import { isMongoError } from '@/lib/utils';
@@ -44,19 +45,11 @@ export type InitialState = ResponseState | null;
 
 // Registers a new user
 export async function registerUser(
-  _initialState: ResponseState,
-  formData: FormData,
+  formData: RegisterInput,
 ): Promise<ResponseState> {
   try {
     await connectDb();
-    const body = {
-      firstName: formData.get('firstName'),
-      lastName: formData.get('lastName'),
-      email: formData.get('email'),
-      username: formData.get('username'),
-      password: formData.get('password'),
-    };
-    const { success, data, error } = registerSchema.safeParse(body);
+    const { success, data, error } = registerSchema.safeParse(formData);
 
     if (!success) {
       const errorDetails = z.flattenError(error).fieldErrors;

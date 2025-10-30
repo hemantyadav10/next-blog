@@ -15,7 +15,7 @@ export const registerSchema = z.object({
 
   password: z
     .string('Password is required')
-    .min(6, 'Password must be at least 6 characters long'),
+    .min(8, 'Password must be at least 8 characters long'),
 
   username: z
     .string('Username is required')
@@ -75,4 +75,5 @@ export const loginSchema = z.object({
 });
 
 export type IUser = z.infer<typeof registerSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

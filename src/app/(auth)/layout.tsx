@@ -1,20 +1,23 @@
-import Image from 'next/image';
-import LoginForm from './LoginForm';
 import authImage from '@/assets/auth.png';
+import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Login() {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <div className="flex min-h-screen">
-      <div className="flex flex-1 flex-col gap-6 p-4 md:p-8">
+      <div className="flex flex-1 flex-col gap-8 p-4 md:p-8">
         <div className="flex justify-start gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold">
             InfiniteInk
           </Link>
         </div>
         {/* Left Side - Login Form */}
-        <div className="flex flex-1 items-center justify-center">
-          <LoginForm />
+        <div className="flex flex-1 flex-col items-center justify-center gap-6">
+          {children}
         </div>
       </div>
 

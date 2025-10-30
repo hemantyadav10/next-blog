@@ -1,6 +1,6 @@
-import { Model, model, models, Schema, InferSchemaType } from 'mongoose';
-import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import bcrypt from 'bcrypt';
+import { InferSchemaType, Model, model, models, Schema } from 'mongoose';
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const userSchema = new Schema(
   {
@@ -14,7 +14,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
       select: false,
     },
     username: {
@@ -96,7 +96,11 @@ const userSchema = new Schema(
       select: false,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
 
 export type UserType = InferSchemaType<typeof userSchema>;
@@ -108,6 +112,10 @@ userSchema.pre('save', async function () {
 
   const saltRounds = 10;
   this.password = await bcrypt.hash(this.password, saltRounds);
+});
+
+userSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
 });
 
 userSchema.plugin(aggregatePaginate);

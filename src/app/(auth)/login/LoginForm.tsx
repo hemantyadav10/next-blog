@@ -5,7 +5,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -21,12 +20,12 @@ import { Spinner } from '@/components/ui/spinner';
 import { LoginInput, loginSchema } from '@/lib/schema/userSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircleIcon, Eye, EyeOff, LockIcon, Mail } from 'lucide-react';
-import { motion } from 'motion/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { loginUser } from '../actions/userActions';
+import { loginUser } from '../../actions/userActions';
 
 function LoginForm() {
   const {
@@ -63,30 +62,17 @@ function LoginForm() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="w-full max-w-sm space-y-6"
-    >
-      <h1 className="text-3xl font-bold">Welcome Back</h1>
-      <p className="text-muted-foreground text-sm">
-        Don&apos;t have an account? <a href="#">Sign up</a>
-      </p>
+    <div className="w-full max-w-sm space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-center text-2xl font-semibold">
+          Sign in to your account
+        </h1>
+        <p className="text-muted-foreground text-center text-sm">
+          Enter your email below to login to your account
+        </p>
+      </div>
       <form onSubmit={handleSubmit(handleFormAction)} noValidate>
         <FieldGroup>
-          <Field>
-            <Button
-              variant="outline"
-              type="button"
-              size={'lg'}
-              onClick={() => toast.info('Google login coming soon!')}
-            >
-              <GoogleIcon className="size-5" />
-              Login with Google
-            </Button>
-          </Field>
-          <FieldSeparator>Or continue with</FieldSeparator>
           {error && (
             <Alert variant={'destructive'}>
               <AlertCircleIcon />
@@ -119,12 +105,12 @@ function LoginForm() {
           <Field>
             <div className="flex items-center">
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <a
-                href="#"
-                className="ml-auto text-sm underline-offset-4 hover:underline"
+              <Link
+                href="/forgot-password"
+                className="ml-auto text-sm hover:underline"
               >
-                Forgot your password?
-              </a>
+                Forgot password?
+              </Link>
             </div>
             <InputGroup>
               <InputGroupInput
@@ -161,13 +147,31 @@ function LoginForm() {
               {isPending && <Spinner />} Login
             </Button>
           </Field>
-          <FieldDescription className="text-center">
-            By clicking continue, you agree to our{' '}
-            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-          </FieldDescription>
+          <FieldSeparator>Or continue with</FieldSeparator>
+          <Field>
+            <Button
+              variant="secondary"
+              type="button"
+              size={'lg'}
+              onClick={() => toast.info('Google login coming soon!')}
+            >
+              <GoogleIcon className="size-5" />
+              Login with Google
+            </Button>
+          </Field>
+
+          <p className="text-muted-foreground text-center text-sm">
+            Don&apos;t have an account?{' '}
+            <Link
+              href="/register"
+              className="text-foreground font-medium no-underline hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
         </FieldGroup>
       </form>
-    </motion.div>
+    </div>
   );
 }
 
