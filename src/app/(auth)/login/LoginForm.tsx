@@ -1,7 +1,7 @@
 'use client';
 
 import { GoogleIcon } from '@/components/icons/google-icon';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -54,6 +54,7 @@ function LoginForm() {
         toast.success('Signed in successfully');
         reset();
         router.push('/');
+        router.refresh();
       } else if (error) {
         setError(error);
         setFieldErrors(errors);
@@ -76,10 +77,7 @@ function LoginForm() {
           {error && (
             <Alert variant={'destructive'}>
               <AlertCircleIcon />
-              <AlertTitle>Authentication Error</AlertTitle>
-              <AlertDescription>
-                <p>{error}</p>
-              </AlertDescription>
+              <AlertTitle>{error}</AlertTitle>
             </Alert>
           )}
           <Field>

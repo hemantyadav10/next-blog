@@ -1,5 +1,5 @@
-import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ const alertVariants = cva(
       variant: {
         default: 'bg-card text-card-foreground',
         destructive:
-          'text-destructive border-destructive/80 bg-destructive/5 [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90',
+          'text-destructive border-destructive/80 bg-destructive/1 [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90',
       },
     },
     defaultVariants: {
@@ -63,4 +63,4 @@ function AlertDescription({
   );
 }
 
-export { Alert, AlertTitle, AlertDescription };
+export { Alert, AlertDescription, AlertTitle };
