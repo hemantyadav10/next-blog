@@ -58,7 +58,6 @@ export default function SignupForm({
   const router = useRouter();
 
   async function handleFormAction(data: RegisterInput) {
-    console.log(data);
     setError('');
     setFieldErrors(undefined);
     startTransition(async () => {

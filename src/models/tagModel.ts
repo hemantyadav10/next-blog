@@ -1,15 +1,13 @@
-import { Schema, model, models } from 'mongoose';
+import {
+  InferSchemaType,
+  Schema,
+  model,
+  models,
+  type AggregatePaginateModel,
+} from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-export interface ITag {
-  name: string;
-  slug: string;
-  blogsCount?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const tagSchema = new Schema<ITag>(
+const tagSchema = new Schema(
   {
     name: {
       type: String,
@@ -17,6 +15,8 @@ const tagSchema = new Schema<ITag>(
       trim: true,
       maxlength: 50,
       minlength: 2,
+      lowercase: true,
+      unique: true,
     },
     slug: {
       type: String,
@@ -30,13 +30,25 @@ const tagSchema = new Schema<ITag>(
       default: 0,
       min: 0,
     },
+    createdBy: {
+      required: true,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   { timestamps: true },
 );
+
+type TagType = InferSchemaType<typeof tagSchema>;
 
 // TODO: Add indexes, virtuals, hooks and methods
 
 tagSchema.plugin(aggregatePaginate);
 
-const Tag = models.Tag || model<ITag>('Tag', tagSchema);
+const Tag = (models.Tag ||
+  model<TagType, AggregatePaginateModel<TagType>>(
+    'Tag',
+    tagSchema,
+  )) as AggregatePaginateModel<TagType>;
+
 export default Tag;

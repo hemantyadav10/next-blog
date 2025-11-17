@@ -38,10 +38,12 @@ const blogSchema = new Schema(
       trim: true,
       maxlength: 160,
     },
-    content: {
-      type: String,
-      required: true,
-    },
+    content: [
+      {
+        type: Schema.Types.Mixed,
+        required: true,
+      },
+    ],
     tags: {
       type: [Schema.Types.ObjectId],
       ref: 'Tag',
@@ -102,6 +104,12 @@ const blogSchema = new Schema(
       type: Number,
       default: 0,
       min: 0,
+    },
+    bannerPublicId: {
+      type: String,
+    },
+    blurDataUrl: {
+      type: String,
     },
   },
   {

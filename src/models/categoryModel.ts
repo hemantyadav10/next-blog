@@ -1,17 +1,7 @@
-import { Schema, Types, model, models } from 'mongoose';
+import { InferSchemaType, Model, Schema, model, models } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-export interface ICategory {
-  name: string;
-  description: string;
-  slug: string;
-  createdBy: Types.ObjectId;
-  blogsCount?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const categorySchema = new Schema<ICategory>(
+const categorySchema = new Schema(
   {
     name: {
       type: String,
@@ -44,11 +34,20 @@ const categorySchema = new Schema<ICategory>(
   { timestamps: true },
 );
 
+export type CategoryFromSchema = InferSchemaType<typeof categorySchema>;
+
 // TODO: Add indexes, virtuals, hooks and methods
+categorySchema.index(
+  { name: 1 },
+  { unique: true, collation: { locale: 'en', strength: 2 } },
+);
 
 categorySchema.plugin(aggregatePaginate);
 
-const Category =
-  models.Category || model<ICategory>('Category', categorySchema);
+const Category = (models.Category ||
+  model<CategoryFromSchema>(
+    'Category',
+    categorySchema,
+  )) as Model<CategoryFromSchema>;
 
 export default Category;

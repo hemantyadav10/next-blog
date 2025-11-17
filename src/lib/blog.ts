@@ -1,4 +1,6 @@
 import { nanoid } from 'nanoid';
+import { Value } from 'platejs';
+import { Node } from 'slate';
 import slugify from 'slugify';
 
 // Generates a unique URL-friendly slug from title with random suffix
@@ -14,22 +16,30 @@ export function generateUniqueSlug(title: string): string {
   return `${baseSlug}-${id}`;
 }
 
-// Calculates estimated read time based on average reading speed (≈200 words per minute)
-export function calculateReadTime(content: string): number {
-  // Strip HTML tags if present
-  const plainText = content.replace(/<[^>]*>/g, ' ');
-  const words = plainText.trim().split(/\s+/).length;
+export function generateSimpleSlug(title: string): string {
+  return slugify(title, {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
+}
 
-  // Estimate base reading time
+export function calculateReadTime(blocks: Value): number {
+  const plainText = blocks
+    .map((n) => Node.string(n))
+    .join('\n')
+    .trim();
+
+  // Count words using regex
+  const wordCount = plainText
+    .split(/\s+/)
+    .filter((word) => word.length > 0).length;
+
   const wordsPerMinute = 225;
-  let minutes = words / wordsPerMinute;
+  const minutes = wordCount / wordsPerMinute;
 
-  // Estimate image impact
-  const imageCount = (content.match(/<img[^>]*>/g) || []).length;
-  const imageTime = imageCount * 12; // 12 sec per image
-  minutes += imageTime / 60;
-
-  return Math.ceil(minutes);
+  // Always at least 1 min
+  return Math.max(1, Math.ceil(minutes));
 }
 
 // Generates a meta description from content

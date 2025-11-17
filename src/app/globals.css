@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@plugin 'tailwind-scrollbar';
+@import 'tailwind-scrollbar-hide/v4';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -67,6 +69,8 @@
   --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite
     alternate;
   --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  --color-highlight: var(--highlight);
+  --color-brand: var(--brand);
   @keyframes shimmer-slide {
     to {
       transform: translate(calc(100cqw - 100%), 0);
@@ -112,6 +116,8 @@
 }
 
 :root {
+  --brand: oklch(0.623 0.214 259.815);
+
   --radius: 0.65rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -145,9 +151,12 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --highlight: oklch(0.852 0.199 91.936);
 }
 
 .dark {
+  --brand: oklch(0.707 0.165 254.624);
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -163,7 +172,7 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --border: #30363d;
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
@@ -177,8 +186,9 @@
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: #30363d;
   --sidebar-ring: oklch(0.556 0 0);
+  --highlight: oklch(0.852 0.199 91.936);
 }
 
 @layer base {
@@ -195,5 +205,9 @@
   html,
   :host {
     -webkit-tap-highlight-color: revert;
+  }
+
+  .custom_scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent;
   }
 }

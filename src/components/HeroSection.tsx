@@ -26,7 +26,7 @@ function HeroSection() {
           </span>
         </h1>
       </BlurFade>
-      <BlurFade delay={0.25} direction="up" blur={'0px'} offset={8} inView>
+      <BlurFade delay={0.25} direction="up" offset={8} inView>
         <p className="text-muted-foreground mx-auto max-w-lg text-center text-base leading-relaxed font-medium md:text-xl">
           Join Infinite Ink to explore ideas, share your creativity, and
           discover endless possibilities in storytelling and writing
@@ -35,7 +35,7 @@ function HeroSection() {
       <BlurFade
         delay={0.5}
         direction="up"
-        blur={'0px'}
+        // blur={'0px'}
         className="flex justify-center"
         offset={8}
         inView
