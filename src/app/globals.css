@@ -71,6 +71,8 @@
   --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
   --color-highlight: var(--highlight);
   --color-brand: var(--brand);
+  --color-link: var(--link);
+
   @keyframes shimmer-slide {
     to {
       transform: translate(calc(100cqw - 100%), 0);
@@ -152,6 +154,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --highlight: oklch(0.852 0.199 91.936);
+  --link: oklch(42.976% 0.14925 257.011);
 }
 
 .dark {
@@ -189,6 +192,7 @@
   --sidebar-border: #30363d;
   --sidebar-ring: oklch(0.556 0 0);
   --highlight: oklch(0.852 0.199 91.936);
+  --link: oklch(83.834% 0.08114 252.159);
 }
 
 @layer base {

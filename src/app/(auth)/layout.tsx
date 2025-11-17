@@ -9,7 +9,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className="flex min-h-screen">
-      <div className="flex flex-1 flex-col gap-8 p-4 md:p-8">
+      <div className="flex flex-1 flex-col gap-8 px-4 py-8 md:px-8">
         <div className="flex justify-start gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold">
             InfiniteInk
