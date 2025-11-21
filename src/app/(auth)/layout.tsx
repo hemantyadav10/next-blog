@@ -1,6 +1,6 @@
 import authImage from '@/assets/auth.png';
+import { Logo } from '@/components/Logo';
 import Image from 'next/image';
-import Link from 'next/link';
 
 export default function RootLayout({
   children,
@@ -10,11 +10,7 @@ export default function RootLayout({
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-1 flex-col gap-8 px-4 py-8 md:px-8">
-        <div className="flex justify-start gap-2">
-          <Link href="/" className="flex items-center gap-2 font-bold">
-            InfiniteInk
-          </Link>
-        </div>
+        <Logo textClassName="block" />
         {/* Left Side - Login Form */}
         <div className="flex flex-1 flex-col items-center justify-center gap-6">
           {children}

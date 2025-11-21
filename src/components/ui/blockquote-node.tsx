@@ -6,7 +6,7 @@ export function BlockquoteElement(props: PlateElementProps) {
   return (
     <PlateElement
       as="blockquote"
-      className="my-1 border-l-2 pl-6 italic"
+      className="border-border my-1 border-l-4 py-2 pl-6 italic"
       {...props}
     />
   );

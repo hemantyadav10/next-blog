@@ -39,16 +39,16 @@ const tagSchema = new Schema(
   { timestamps: true },
 );
 
-type TagType = InferSchemaType<typeof tagSchema>;
+export type TagDocument = InferSchemaType<typeof tagSchema>;
 
 // TODO: Add indexes, virtuals, hooks and methods
 
 tagSchema.plugin(aggregatePaginate);
 
 const Tag = (models.Tag ||
-  model<TagType, AggregatePaginateModel<TagType>>(
+  model<TagDocument, AggregatePaginateModel<TagDocument>>(
     'Tag',
     tagSchema,
-  )) as AggregatePaginateModel<TagType>;
+  )) as AggregatePaginateModel<TagDocument>;
 
 export default Tag;

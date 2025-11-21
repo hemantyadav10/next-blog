@@ -32,6 +32,7 @@ import {
   Mail,
   User,
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -87,7 +88,12 @@ export default function SignupForm() {
   }
 
   return (
-    <div className="w-full max-w-lg">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="w-full max-w-lg"
+    >
       <FieldSet>
         <FieldContent className="gap-2">
           <FieldLabel className="text-2xl font-semibold">
@@ -291,6 +297,6 @@ export default function SignupForm() {
           </FieldGroup>
         </form>
       </FieldSet>
-    </div>
+    </motion.div>
   );
 }

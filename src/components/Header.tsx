@@ -37,6 +37,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
 import { Kbd } from './ui/kbd';
 import { Spinner } from './ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Logo } from './Logo';
 
 type NavItems = {
   name: string;
@@ -151,13 +152,13 @@ function Header({ user }: { user: AuthResult }) {
       >
         {/* Left: App Name */}
         <div className="mx-auto flex h-16 max-w-[96rem] items-center justify-between px-4 md:px-8">
-          <nav className="flex items-center gap-12 text-sm">
+          <nav className="flex items-center gap-8 text-sm">
             <div className="flex items-center gap-2">
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => setToggleMenu(!toggleMenu)}
                 size="icon-sm"
-                className="-ml-2 flex sm:hidden"
+                className="flex sm:hidden"
               >
                 <div className="relative flex h-8 w-4 items-center justify-center">
                   <div className="relative size-4">
@@ -177,9 +178,7 @@ function Header({ user }: { user: AuthResult }) {
                   <span className="sr-only">Toggle Menu</span>
                 </div>
               </Button>
-              <Link href="/" className="text-xl font-bold">
-                InfiniteInk
-              </Link>
+              <Logo />
             </div>
 
             <div className="flex items-center gap-6">

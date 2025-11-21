@@ -34,7 +34,7 @@ const categorySchema = new Schema(
   { timestamps: true },
 );
 
-export type CategoryFromSchema = InferSchemaType<typeof categorySchema>;
+export type CategoryDocument = InferSchemaType<typeof categorySchema>;
 
 // TODO: Add indexes, virtuals, hooks and methods
 categorySchema.index(
@@ -45,9 +45,9 @@ categorySchema.index(
 categorySchema.plugin(aggregatePaginate);
 
 const Category = (models.Category ||
-  model<CategoryFromSchema>(
+  model<CategoryDocument>(
     'Category',
     categorySchema,
-  )) as Model<CategoryFromSchema>;
+  )) as Model<CategoryDocument>;
 
 export default Category;

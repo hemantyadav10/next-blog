@@ -23,6 +23,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { LoginInput, loginSchema } from '@/lib/schema/userSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircleIcon, Eye, EyeOff, LockIcon, Mail } from 'lucide-react';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -78,7 +79,12 @@ function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-sm">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="w-full max-w-sm"
+    >
       <FieldSet>
         <FieldContent className="gap-2 text-center">
           <FieldLabel className="mx-auto text-2xl font-semibold">
@@ -204,7 +210,7 @@ function LoginForm() {
           </FieldGroup>
         </form>
       </FieldSet>
-    </div>
+    </motion.div>
   );
 }
 
