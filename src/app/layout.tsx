@@ -40,7 +40,7 @@ export default function RootLayout({
           >
             <NextTopLoader showSpinner={false} shadow={false} />
             <Toaster />
-            {children}
+            <main>{children}</main>
           </ThemeProvider>
         </Providers>
       </body>

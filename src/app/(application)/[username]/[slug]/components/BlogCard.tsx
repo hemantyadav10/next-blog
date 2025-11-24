@@ -6,7 +6,7 @@ function BlogCard({
   title?: string;
 }) {
   return (
-    <Link href="#" className="group block space-y-1">
+    <Link href="#" className="group block space-y-1 text-sm">
       <h3 className="text-link line-clamp-2">
         <span className="from-link to-link bg-gradient-to-r bg-[length:0px_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 group-hover:bg-[length:100%_2px]">
           {title}

@@ -21,23 +21,18 @@ import {
   SquarePen,
   User,
 } from 'lucide-react';
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useScroll,
-} from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { Logo } from './Logo';
 import { ModeToggle } from './ModeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
 import { Kbd } from './ui/kbd';
 import { Spinner } from './ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { Logo } from './Logo';
 
 type NavItems = {
   name: string;
@@ -46,10 +41,8 @@ type NavItems = {
 };
 
 function Header({ user }: { user: AuthResult }) {
-  const [hidden, setHidden] = useState(false);
   const { isAuthenticated, user: userDetails } = user;
   const [isPending, startTransition] = useTransition();
-  const { scrollY } = useScroll();
   const pathname = usePathname();
   const router = useRouter();
   const [toggleMenu, setToggleMenu] = useState(false);
@@ -68,15 +61,6 @@ function Header({ user }: { user: AuthResult }) {
       href: '/write',
     },
   ];
-
-  useMotionValueEvent(scrollY, 'change', (latest) => {
-    const previous = scrollY.getPrevious();
-    if (previous !== undefined && latest > previous && latest > 150) {
-      setHidden(true);
-    } else if (previous !== undefined && latest < previous) {
-      setHidden(false);
-    }
-  });
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -139,15 +123,9 @@ function Header({ user }: { user: AuthResult }) {
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.header
-        variants={{
-          visible: { y: 0 },
-          hidden: { y: '-100%' },
-        }}
-        animate={hidden ? 'hidden' : 'visible'}
-        transition={{ duration: 0.35, ease: 'easeInOut' }}
+      <header
         className={cn(
-          'bg-background/70 fixed top-0 right-0 left-0 z-50 backdrop-blur-sm',
+          'bg-background/80 fixed top-0 right-0 left-0 z-50 backdrop-blur-lg',
         )}
       >
         {/* Left: App Name */}
@@ -313,7 +291,7 @@ function Header({ user }: { user: AuthResult }) {
             )}
           </div>
         </div>
-      </motion.header>
+      </header>
     </>
   );
 }

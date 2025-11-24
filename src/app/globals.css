@@ -72,6 +72,7 @@
   --color-highlight: var(--highlight);
   --color-brand: var(--brand);
   --color-link: var(--link);
+  --color-contrast: var(--contrast);
 
   @keyframes shimmer-slide {
     to {
@@ -155,6 +156,7 @@
   --sidebar-ring: oklch(0.708 0 0);
   --highlight: oklch(0.852 0.199 91.936);
   --link: oklch(42.976% 0.14925 257.011);
+  --contrast: oklch(0.985 0 0);
 }
 
 .dark {
@@ -193,6 +195,7 @@
   --sidebar-ring: oklch(0.556 0 0);
   --highlight: oklch(0.852 0.199 91.936);
   --link: oklch(83.834% 0.08114 252.159);
+  --contrast: oklch(0.985 0 0);
 }
 
 @layer base {

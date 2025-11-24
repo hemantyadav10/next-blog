@@ -110,9 +110,9 @@ async function page({
 
       <div className="flex flex-col gap-8 xl:flex-row">
         {/* Blog Content */}
-        <div className="flex flex-col gap-8">
-          <div className="w-full max-w-2xl space-y-6">
-            <h1 className="text-4xl leading-tight font-extrabold md:text-5xl">
+        <div className="flex w-full max-w-2xl flex-col gap-8">
+          <div className="space-y-6">
+            <h1 className="text-4xl leading-tight font-semibold md:text-5xl">
               {blog.title}
             </h1>
             <p className="text-muted-foreground text-sm">
@@ -136,16 +136,14 @@ async function page({
                 src={blog.banner}
                 alt={blog.title}
                 width={672}
-                height={378}
+                height={448}
                 style={{ width: '100%', height: 'auto' }}
                 placeholder="blur"
                 blurDataURL={blog.blurDataUrl || ''}
                 priority
               />
             )}
-            <p className="text-muted-foreground text-lg md:text-xl">
-              {blog.description}
-            </p>
+            <p className="text-muted-foreground text-lg">{blog.description}</p>
 
             <Separator />
 
@@ -165,9 +163,9 @@ async function page({
             </div>
           </div>
           <Separator />
-          <p className="text-xl font-bold">Comments (12)</p>
+          <p className="text-xl font-medium">Comments (12)</p>
           <div className="space-y-4">
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-2">
               <Avatar className="size-10">
                 <AvatarImage src={blog.authorId.profilePicture ?? ''} />
                 <AvatarFallback className="uppercase">
@@ -218,7 +216,7 @@ async function page({
 
           {/* More from this author */}
           <div className="space-y-6">
-            <h2 className="text-lg font-bold">
+            <h2 className="text-lg font-medium">
               More from {blog.authorId.firstName} {blog.authorId.lastName}
             </h2>
             <div className="space-y-4">
