@@ -73,6 +73,7 @@
   --color-brand: var(--brand);
   --color-link: var(--link);
   --color-contrast: var(--contrast);
+  --color-progress: var(--progress);
 
   @keyframes shimmer-slide {
     to {
@@ -155,8 +156,9 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --highlight: oklch(0.852 0.199 91.936);
-  --link: oklch(42.976% 0.14925 257.011);
+  --link: oklch(57.371% 0.19468 257.874);
   --contrast: oklch(0.985 0 0);
+  --progress: oklch(56.455% 0.16342 253.289);
 }
 
 .dark {
@@ -194,8 +196,9 @@
   --sidebar-border: #30363d;
   --sidebar-ring: oklch(0.556 0 0);
   --highlight: oklch(0.852 0.199 91.936);
-  --link: oklch(83.834% 0.08114 252.159);
+  --link: oklch(80.926% 0.09672 257.313);
   --contrast: oklch(0.985 0 0);
+  --progress: oklch(81.634% 0.0897 243.654);
 }
 
 @layer base {

@@ -22,6 +22,7 @@ import { useTransition } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
 import EditorSidebar from './EditorSidebar';
+import { useRouter } from 'next/navigation';
 
 function BlogActions({ categories }: { categories: CategoryListItem[] }) {
   return (
@@ -71,6 +72,7 @@ function BlogActionButton({ className }: { className?: string }) {
   const { handleSubmit, watch, setError, reset } =
     useFormContext<CreateBlogInput>();
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   async function handleSubmitAction(blogData: CreateBlogInput) {
     const isPublishing = blogData.status === 'published';
@@ -109,6 +111,7 @@ function BlogActionButton({ className }: { className?: string }) {
           });
         }
       } else {
+        router.push('/');
         reset();
       }
     });

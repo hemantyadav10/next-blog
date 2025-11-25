@@ -36,7 +36,10 @@ function Dropzone() {
   const {
     setValue,
     formState: { errors },
+    resetField,
   } = useFormContext<CreateBlogInput>();
+
+  const hasError = errors.banner?.message;
 
   const handleDropRejected = (fileRejection: FileRejection[]) => {
     if (fileRejection.length) {
@@ -197,11 +200,7 @@ function Dropzone() {
     setCroppedBlob(null);
     setCroppedArea(null);
 
-    // Clear the form field
-    setValue('banner', undefined, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    resetField('banner', { defaultValue: undefined });
   };
 
   const handleCancel = () => {
@@ -239,14 +238,16 @@ function Dropzone() {
     <Field>
       <div
         className={cn(
-          'relative z-10 flex aspect-video cursor-pointer flex-col items-center justify-center gap-1 border-2 p-8 transition-colors',
+          'relative z-10 flex aspect-3/2 cursor-pointer flex-col items-center justify-center gap-1 border-2 p-8 transition-colors',
           isDragActive
             ? isDragReject
               ? 'border-destructive/50 bg-destructive/15'
               : 'border-brand/50 bg-brand/15'
-            : 'border-input',
+            : hasError
+              ? 'border-destructive/50'
+              : 'border-input',
           isFileDialogActive && 'border-brand/50 bg-brand/15',
-          !(isDragActive || isDragReject || isFileDialogActive) &&
+          !(isDragActive || isDragReject || isFileDialogActive || hasError) &&
             'hover:bg-input/20',
           croppedImage && 'p-0',
         )}
@@ -299,7 +300,7 @@ function Dropzone() {
                   Drag & drop your cover image here
                 </p>
                 <p className="text-muted-foreground text-center text-xs">
-                  Or click to browse (max 3MB, 16:9 recommended)
+                  Or click to browse (max 3MB, 3:2 recommended)
                 </p>
 
                 <Button size="sm" className="mt-2 w-fit">
@@ -381,10 +382,10 @@ function Dropzone() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="bg-background relative aspect-video">
+          <div className="bg-background relative aspect-3/2">
             <Cropper
               image={image}
-              aspect={16 / 9}
+              aspect={3 / 2}
               crop={crop}
               zoom={zoom}
               onCropChange={setCrop}

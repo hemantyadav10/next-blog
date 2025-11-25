@@ -1,5 +1,14 @@
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,7 +23,9 @@ import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { formatDate } from 'date-fns';
 import {
   Bookmark,
+  Ellipsis,
   Heart,
+  HomeIcon,
   MessageCircleIcon,
   Share2,
   UserPlus,
@@ -62,7 +73,7 @@ async function page({
   return (
     <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8">
       {/* Blog Actions */}
-      <div className="sticky top-24 hidden w-16 flex-col items-center space-y-6 self-start md:flex">
+      <div className="sticky top-24 hidden w-25 flex-col items-center space-y-6 self-start md:flex">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -106,31 +117,95 @@ async function page({
           </TooltipTrigger>
           <TooltipContent side="bottom">Share</TooltipContent>
         </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button aria-label="Share" variant={'ghost'} size={'icon'}>
+              <Ellipsis />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">More</TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex flex-col gap-8 xl:flex-row">
         {/* Blog Content */}
         <div className="flex w-full max-w-2xl flex-col gap-8">
           <div className="space-y-6">
+            <Breadcrumb>
+              <BreadcrumbList className="flex-nowrap">
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/explore">Explore</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href={`/category/${blog.categoryId.slug}`}>
+                      {blog.categoryId.name}
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="line-clamp-1 max-w-40">
+                    {blog.title}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
             <h1 className="text-4xl leading-tight font-semibold md:text-5xl">
               {blog.title}
             </h1>
-            <p className="text-muted-foreground text-sm">
-              {blog?.publishedAt ? (
-                <>
-                  Published on{' '}
-                  {formatDate(new Date(blog.publishedAt), 'MMM d, yyyy')}{' '}
-                  &middot;{' '}
-                </>
-              ) : null}
-              {blog.readTime} min read &middot;{' '}
+
+            <div className="text-muted-foreground text-lg italic">
+              <p>{blog.description}</p>
+            </div>
+
+            <div className="space-y-3">
               <Link
-                href={`/category/${blog.categoryId.slug}`}
-                className="text-link underline-offset-2 hover:underline"
+                href={`/${blog.authorId.username}`}
+                className="group group flex w-fit items-center gap-2 text-sm font-medium"
               >
-                {blog.categoryId.name}
+                <Avatar className="size-8">
+                  <AvatarImage
+                    src={blog.authorId.profilePicture ?? ''}
+                    alt={blog.authorId.firstName}
+                  />
+                  <AvatarFallback className="uppercase">
+                    {blog.authorId.firstName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="group-hover:underline">
+                  {blog.authorId.firstName} {blog.authorId.lastName}
+                </span>
               </Link>
-            </p>
+              <p className="text-muted-foreground text-sm">
+                {blog?.publishedAt ? (
+                  <>
+                    Published on{' '}
+                    {formatDate(new Date(blog.publishedAt), 'MMM d, yyyy')}{' '}
+                    &middot;{' '}
+                  </>
+                ) : null}
+                {blog.readTime} min read &middot;{' '}
+                <Link
+                  href={`/category/${blog.categoryId.slug}`}
+                  className="text-link underline-offset-2 hover:underline"
+                >
+                  {blog.categoryId.name}
+                </Link>
+              </p>
+            </div>
+
             {blog.banner && (
               <Image
                 src={blog.banner}
@@ -143,9 +218,6 @@ async function page({
                 priority
               />
             )}
-            <p className="text-muted-foreground text-lg">{blog.description}</p>
-
-            <Separator />
 
             <div dangerouslySetInnerHTML={{ __html: html }} />
 
@@ -163,21 +235,39 @@ async function page({
             </div>
           </div>
           <Separator />
-          <p className="text-xl font-medium">Comments (12)</p>
-          <div className="space-y-4">
-            <div className="flex items-start gap-2">
-              <Avatar className="size-10">
-                <AvatarImage src={blog.authorId.profilePicture ?? ''} />
-                <AvatarFallback className="uppercase">
-                  {blog.authorId.firstName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <Textarea placeholder="Leave a comment..." />
-            </div>
-            <div className="flex justify-end">
-              <Button>Add Comment</Button>
-            </div>
-          </div>
+          <section className="space-y-8">
+            <p className="text-xl font-medium">Comments (12)</p>
+
+            {blog.isCommentsEnabled ? (
+              // Show comment form
+              <>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-2">
+                    <Avatar className="size-10">
+                      <AvatarImage src={blog.authorId.profilePicture ?? ''} />
+                      <AvatarFallback className="uppercase">
+                        {blog.authorId.firstName.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <Textarea placeholder="Leave a comment..." />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button>Add Comment</Button>
+                  </div>
+                </div>
+
+                {/* Display existing comments */}
+                <div className="space-y-4">{/* Comment list */}</div>
+              </>
+            ) : (
+              // Show disabled state with explanation
+              <Alert>
+                <AlertTitle className="text-center">
+                  Comments are disabled for this post.
+                </AlertTitle>
+              </Alert>
+            )}
+          </section>
         </div>
 
         <Separator className="block xl:hidden" />

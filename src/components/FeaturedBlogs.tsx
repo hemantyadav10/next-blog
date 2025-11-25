@@ -17,19 +17,23 @@ type PopulatedCategory = Pick<CategoryDocument, 'name' | 'slug'> & {
 const fetchFeaturedBlogs = async () => {
   await connectDb();
 
-  const blogs = await Blog.find({ isFeatured: true })
+  const blogs = await Blog.find({ isFeatured: true, status: 'published' })
     .populate<{
       authorId: PopulatedAuthor;
     }>('authorId', 'username firstName lastName profilePicture')
     .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug')
-    .limit(3);
+    .limit(3)
+    .sort({ publishedAt: -1 });
 
   return blogs;
 };
 
 async function FeaturedBlogs() {
   const featuredBlogs = await fetchFeaturedBlogs();
-  const [secondBlog, firstBlog, thirdBlog] = featuredBlogs;
+
+  if (featuredBlogs.length === 0) return null;
+
+  const [firstBlog, secondBlog, thirdBlog] = featuredBlogs;
 
   return (
     <section className="mx-auto max-w-7xl space-y-6">
@@ -43,7 +47,7 @@ async function FeaturedBlogs() {
             title={firstBlog.title}
             description={firstBlog.description}
             className="col-span-12 aspect-[3/2] md:col-span-6"
-            descriptionClassName="hidden sm:block"
+            descriptionClassName="line-clamp-1 sm:line-clamp-2"
           />
         )}
         {secondBlog && (

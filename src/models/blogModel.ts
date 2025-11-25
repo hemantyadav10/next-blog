@@ -11,6 +11,7 @@ const blogSchema = new Schema(
     },
     banner: {
       type: String,
+      required: true,
     },
     status: {
       type: String,
@@ -110,6 +111,7 @@ const blogSchema = new Schema(
     },
     blurDataUrl: {
       type: String,
+      default: null,
     },
   },
   {

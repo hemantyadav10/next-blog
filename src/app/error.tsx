@@ -9,8 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 
 export default function Error({
   error,
@@ -19,6 +22,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   console.error(error);
 
   return (
@@ -66,11 +71,17 @@ export default function Error({
 
         <CardFooter className="flex flex-col gap-2 sm:flex-row">
           <Button
-            onClick={reset}
+            onClick={() => {
+              startTransition(() => {
+                router.refresh();
+                reset();
+              });
+            }}
+            disabled={isPending}
             className="w-full sm:w-auto"
             variant="default"
           >
-            <RefreshCcw /> Try Again
+            {isPending ? <Spinner /> : <RefreshCcw />} Try Again
           </Button>
           <Button className="w-full sm:w-auto" variant="outline" asChild>
             <Link href={'/'}>Go Home</Link>

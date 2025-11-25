@@ -13,7 +13,8 @@ const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
 export const createBlogSchema = z.object({
   banner: z
-    .instanceof(File)
+    .instanceof(File, { message: 'Banner image is required' })
+    .refine((file) => file.size > 0, 'Banner image is required')
     .refine(
       (file) => file.size <= MAX_FILE_SIZE,
       `File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB`,
@@ -21,8 +22,7 @@ export const createBlogSchema = z.object({
     .refine(
       (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
       'Only JPEG, PNG, and WebP images are allowed',
-    )
-    .optional(),
+    ),
 
   status: z.enum(['published', 'draft']),
 

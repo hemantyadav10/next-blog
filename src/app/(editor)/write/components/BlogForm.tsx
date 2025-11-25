@@ -24,6 +24,7 @@ function BlogForm({ categories }: { categories: CategoryListItem[] }) {
       isCommentsEnabled: false,
       content: [],
       title: '',
+      banner: undefined,
     },
   });
 
