@@ -11,10 +11,11 @@ import { uploadOnCloudinary } from '@/lib/cloudinary';
 import connectDb from '@/lib/connectDb';
 import { CreateBlogInput, createBlogSchema } from '@/lib/schema/blogSchema';
 import { isMongoError } from '@/lib/utils';
-import Blog from '@/models/blogModel';
-import Category from '@/models/categoryModel';
-import Tag from '@/models/tagModel';
+import { Blog, Category, Tag } from '@/models';
+import { ActionResponse } from '@/types/api.types';
+import { BlogListItem } from '@/types/blog.types';
 import { v2 as cloudinary } from 'cloudinary';
+import { AggregatePaginateResult, PipelineStage, SortValues } from 'mongoose';
 import * as z from 'zod';
 
 type ResponseState =
@@ -209,3 +210,109 @@ export async function deleteBlog(blogId: string): Promise<ResponseState> {
     };
   }
 }
+
+// Fetches all blogs wiith searching, filtering and sorting functionality
+export const getAllBlogs = async ({
+  query,
+  sortBy,
+  sortOrder,
+  limit = 12,
+  page = 1,
+}: {
+  query?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  limit?: number;
+  page?: number;
+}): Promise<ActionResponse<AggregatePaginateResult<BlogListItem>>> => {
+  try {
+    await connectDb();
+    let sortOption: Record<string, SortValues | { $meta: string }> = {};
+
+    if (sortBy && sortOrder) {
+      const order = sortOrder === 'asc' ? 1 : -1;
+
+      if (sortBy === 'popularity') {
+        // TODO: Implement popularity sorting based on engagement metrics (views/likes/comments)
+        sortOption = { title: 1 };
+      } else if (sortBy === 'publishedAt') {
+        sortOption = { publishedAt: order };
+      } else {
+        sortOption = { publishedAt: -1 };
+      }
+    } else if (query) {
+      sortOption = { score: { $meta: 'textScore' } };
+    } else {
+      sortOption = { publishedAt: -1 };
+    }
+
+    const pipeline: PipelineStage[] = [];
+
+    if (query && typeof query === 'string') {
+      pipeline.push({
+        $match: {
+          $text: { $search: query },
+        },
+      });
+    }
+
+    pipeline.push(
+      { $match: { status: 'published' } },
+      {
+        $lookup: {
+          from: 'users',
+          foreignField: '_id',
+          localField: 'authorId',
+          as: 'authorId',
+          pipeline: [
+            {
+              $project: {
+                username: 1,
+                firstName: 1,
+                lastName: 1,
+                profilePicture: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          authorId: { $first: '$authorId' },
+        },
+      },
+      {
+        $project: {
+          authorId: 1,
+          banner: 1,
+          blurDataUrl: 1,
+          description: 1,
+          publishedAt: 1,
+          readTime: 1,
+          slug: 1,
+          title: 1,
+        },
+      },
+    );
+
+    const aggregate = Blog.aggregate<BlogListItem>(pipeline);
+
+    const result = await Blog.aggregatePaginate(aggregate, {
+      sort: sortOption,
+      limit,
+      page,
+    });
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(result)),
+    };
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+
+    return {
+      success: false,
+      error: 'Failed to fetch blogs. Please try again.',
+    };
+  }
+};

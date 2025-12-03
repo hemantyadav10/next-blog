@@ -35,7 +35,7 @@ export function FeaturedBlogCard({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 from-10% to-transparent to-80%" />
 
-      <div className="absolute bottom-0 flex flex-col gap-3 p-4 md:p-6">
+      <div className="absolute bottom-0 flex flex-col gap-2 p-4 md:p-6">
         <h3
           title={title}
           className="text-contrast line-clamp-3 text-lg font-medium md:text-xl"

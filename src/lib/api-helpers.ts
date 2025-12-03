@@ -1,4 +1,4 @@
-import { ApiErrorResponse, ApiResponse } from '@/types/api';
+import { ApiErrorResponse, ApiResponse } from '@/types/api.types';
 import { NextResponse } from 'next/server';
 import { IS_DEV } from './constants';
 

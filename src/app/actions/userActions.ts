@@ -12,8 +12,11 @@ import {
   registerSchema,
 } from '@/lib/schema/userSchema';
 import { isMongoError } from '@/lib/utils';
-import User from '@/models/userModel';
+import User, { UserType } from '@/models/userModel';
+import type { ActionResponse } from '@/types/api.types';
+import { UsersResponse } from '@/types/user.types';
 import jwt from 'jsonwebtoken';
+import { FilterQuery, SortValues } from 'mongoose';
 import { cookies } from 'next/headers';
 
 const cookieOptions = {
@@ -216,3 +219,74 @@ export async function logoutUser(): Promise<ResponseState> {
     return { success: false, error: 'Something went wrong. Please try again.' };
   }
 }
+
+export const getAllUsers = async ({
+  query,
+  sortBy,
+  sortOrder,
+  limit = 12,
+  page = 1,
+}: {
+  query?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  limit?: number;
+  page?: number;
+}): Promise<ActionResponse<UsersResponse>> => {
+  try {
+    await connectDb();
+    const filter: FilterQuery<UserType> = {};
+
+    if (query && typeof query === 'string') {
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.$or = [
+        { username: { $regex: `^${escapedQuery}`, $options: 'i' } },
+        { firstName: { $regex: `^${escapedQuery}`, $options: 'i' } },
+        { lastName: { $regex: `^${escapedQuery}`, $options: 'i' } },
+      ];
+    }
+
+    let sortOption: Record<string, SortValues> = {};
+
+    if (sortBy && sortOrder) {
+      const order = sortOrder === 'asc' ? 1 : -1;
+
+      if (sortBy === 'popularity') {
+        // TODO: Implement popularity sorting
+        sortOption = { firstName: 1 };
+      } else if (sortBy === 'publishedAt') {
+        sortOption = { createdAt: order };
+      } else {
+        sortOption = { createdAt: -1 };
+      }
+    } else {
+      sortOption = { createdAt: -1 };
+    }
+
+    const skip = (page - 1) * limit;
+    const totalDocs = await User.countDocuments(filter);
+
+    const users = await User.find(filter)
+      .select('firstName lastName username bio profilePicture')
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    return {
+      success: true,
+      data: {
+        docs: JSON.parse(JSON.stringify(users)),
+        hasNextPage: skip + limit < totalDocs,
+        nextPage: skip + limit < totalDocs ? page + 1 : null,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching users:', error);
+
+    return {
+      success: false,
+      error: 'Failed to fetch users. Please try again.',
+    };
+  }
+};

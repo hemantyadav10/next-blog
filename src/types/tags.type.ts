@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { apiResponseSchema } from './api';
+import { apiResponseSchema } from './api.types';
 
 export const TagSchema = z.object({
   _id: z.string(),
@@ -34,3 +34,15 @@ export type PaginationMeta = z.infer<typeof PaginationMetaSchema>;
 export type TagsData = z.infer<typeof TagsDataSchema>;
 export const TagsApiResponseSchema = apiResponseSchema(TagsDataSchema);
 export type TagsApiResponse = z.infer<typeof TagsApiResponseSchema>;
+
+export type TagPreview = {
+  _id: string;
+  name: string;
+  slug: string;
+};
+
+export type TagsListResponse = {
+  docs: TagPreview[];
+  hasNextPage: boolean;
+  nextPage: number | null;
+};

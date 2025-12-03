@@ -20,3 +20,11 @@ export type ApiResponse<T> = {
   message: string;
   data?: T;
 };
+
+export type ActionResponse<T, V extends string = string> =
+  | { success: true; data: T; message?: string }
+  | {
+      success: false;
+      error: string;
+      errors?: Partial<Record<V, string[]>>;
+    };

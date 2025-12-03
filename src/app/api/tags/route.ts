@@ -9,7 +9,7 @@ import connectDb from '@/lib/connectDb';
 import { createTagSchema } from '@/lib/schema/tagSchema';
 import { isMongoError } from '@/lib/utils';
 import Tag from '@/models/tagModel';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse } from '@/types/api.types';
 import { TagsData } from '@/types/tags.type';
 import { PipelineStage } from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';

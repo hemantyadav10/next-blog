@@ -25,7 +25,6 @@ import {
   Bookmark,
   Ellipsis,
   Heart,
-  HomeIcon,
   MessageCircleIcon,
   Share2,
   UserPlus,
@@ -71,9 +70,9 @@ async function page({
   const html = await getMyHtml({ value: blog.content });
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8">
+    <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8 md:px-8 md:py-12">
       {/* Blog Actions */}
-      <div className="sticky top-24 hidden w-25 flex-col items-center space-y-6 self-start md:flex">
+      <div className="sticky top-28 hidden w-16 flex-col items-center space-y-6 self-start md:flex">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -133,7 +132,7 @@ async function page({
         <div className="flex w-full max-w-2xl flex-col gap-8">
           <div className="space-y-6">
             <Breadcrumb>
-              <BreadcrumbList className="flex-nowrap">
+              <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
                     <Link href="/">Home</Link>
@@ -161,16 +160,16 @@ async function page({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-
-            <h1 className="text-4xl leading-tight font-semibold md:text-5xl">
+            {/* title */}
+            <h1 className="text-3xl leading-tight font-semibold md:text-5xl">
               {blog.title}
             </h1>
-
+            {/* description */}
             <div className="text-muted-foreground text-lg italic">
               <p>{blog.description}</p>
             </div>
-
             <div className="space-y-3">
+              {/* author */}
               <Link
                 href={`/${blog.authorId.username}`}
                 className="group group flex w-fit items-center gap-2 text-sm font-medium"
@@ -188,6 +187,7 @@ async function page({
                   {blog.authorId.firstName} {blog.authorId.lastName}
                 </span>
               </Link>
+              {/* mete data */}
               <p className="text-muted-foreground text-sm">
                 {blog?.publishedAt ? (
                   <>
@@ -206,6 +206,7 @@ async function page({
               </p>
             </div>
 
+            {/* banner */}
             {blog.banner && (
               <Image
                 src={blog.banner}
@@ -219,8 +220,10 @@ async function page({
               />
             )}
 
+            {/* main content */}
             <div dangerouslySetInnerHTML={{ __html: html }} />
 
+            {/* tags */}
             <div className="flex items-center gap-2">
               {blog.tags.map((tag) => (
                 <Badge
@@ -249,7 +252,10 @@ async function page({
                         {blog.authorId.firstName.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <Textarea placeholder="Leave a comment..." />
+                    <Textarea
+                      placeholder="Leave a comment..."
+                      className="flex-1"
+                    />
                   </div>
                   <div className="flex justify-end">
                     <Button>Add Comment</Button>
@@ -257,7 +263,6 @@ async function page({
                 </div>
 
                 {/* Display existing comments */}
-                <div className="space-y-4">{/* Comment list */}</div>
               </>
             ) : (
               // Show disabled state with explanation

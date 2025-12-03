@@ -15,3 +15,7 @@ export function isMongoError(
     'keyPattern' in error
   );
 }
+
+export function sleep(time: number = 3000): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}

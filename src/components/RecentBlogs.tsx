@@ -76,7 +76,6 @@ async function RecentBlogs() {
         {blogs.map((blog) => {
           const {
             _id,
-            categoryId,
             title,
             description,
             readTime,
@@ -89,7 +88,6 @@ async function RecentBlogs() {
           return (
             <React.Fragment key={_id.toString()}>
               <BlogCard
-                categoryName={categoryId.name}
                 title={title}
                 description={description}
                 readTime={readTime}

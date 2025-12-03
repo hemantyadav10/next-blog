@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { InferSchemaType, Model, model, models, Schema } from 'mongoose';
+import { InferSchemaType, Model, model, models, Schema, Types } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const userSchema = new Schema(
@@ -28,11 +28,13 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
     lastName: {
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
     role: {
       type: String,
@@ -103,7 +105,9 @@ const userSchema = new Schema(
   },
 );
 
-export type UserType = InferSchemaType<typeof userSchema>;
+export type UserType = InferSchemaType<typeof userSchema> & {
+  _id: Types.ObjectId;
+};
 
 // TODO: Add indexes, virtuals, hooks and methods
 

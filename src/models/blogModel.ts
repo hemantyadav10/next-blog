@@ -1,4 +1,11 @@
-import { InferSchemaType, Model, Schema, Types, model, models } from 'mongoose';
+import {
+  AggregatePaginateModel,
+  InferSchemaType,
+  Schema,
+  Types,
+  model,
+  models,
+} from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const blogSchema = new Schema(
@@ -121,13 +128,18 @@ const blogSchema = new Schema(
   },
 );
 
-type BlogType = InferSchemaType<typeof blogSchema>;
+export type BlogDocument = InferSchemaType<typeof blogSchema> & {
+  _id: Types.ObjectId;
+};
 
 // TODO: Add indexes, virtuals, hooks and methods
 
 blogSchema.plugin(aggregatePaginate);
 
 const Blog = (models.Blog ||
-  model<BlogType>('Blog', blogSchema)) as Model<BlogType>;
+  model<BlogDocument, AggregatePaginateModel<BlogDocument>>(
+    'Blog',
+    blogSchema,
+  )) as AggregatePaginateModel<BlogDocument>;
 
 export default Blog;

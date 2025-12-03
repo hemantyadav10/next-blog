@@ -125,7 +125,7 @@ function Header({ user }: { user: AuthResult }) {
       </AnimatePresence>
       <header
         className={cn(
-          'bg-background/80 fixed top-0 right-0 left-0 z-50 backdrop-blur-lg',
+          'bg-background/90 fixed top-0 right-0 left-0 z-50 backdrop-blur-lg',
         )}
       >
         {/* Left: App Name */}
@@ -185,7 +185,7 @@ function Header({ user }: { user: AuthResult }) {
           {/* Right: Theme Toggle + Auth */}
           <div className="flex items-center gap-4">
             {/* Search */}
-            <InputGroup className="hidden h-9 lg:flex">
+            <InputGroup className="hidden h-9 rounded-full lg:flex lg:min-w-sm">
               <InputGroupInput placeholder="Search..." />
               <InputGroupAddon>
                 <SearchIcon />
@@ -196,7 +196,7 @@ function Header({ user }: { user: AuthResult }) {
             </InputGroup>
 
             {/* Theme toggle */}
-            <ModeToggle />
+            <ModeToggle allOptions={false} />
 
             {/* Auth buttons */}
             {isAuthenticated ? (
