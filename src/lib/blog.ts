@@ -1,6 +1,5 @@
 import { Blog } from '@/models';
-import type { BlogListItem } from '@/types/blog.types';
-import { AggregatePaginateResult, PipelineStage, SortValues } from 'mongoose';
+import type { PopulatedAuthor, PopulatedCategory } from '@/types/blog.types';
 import { nanoid } from 'nanoid';
 import { Value } from 'platejs';
 import { Node } from 'slate';
@@ -59,97 +58,21 @@ export function generateMetaDescription(content: string, maxLength = 160) {
   return text.slice(0, maxLength).replace(/\s+\S*$/, '');
 }
 
-// Fetches all blogs wiith searching, filtering and sorting functionality
-export const getAllBlogs = async ({
-  query,
-  sortBy,
-  sortOrder,
-  limit = 12,
-  page = 1,
+// TODO: implement the logic to fetch popular blogs of a category
+export const getCategoryPopularBlogs = async ({
+  categoryId,
 }: {
-  query?: string;
-  sortBy?: string;
-  sortOrder?: string;
-  limit?: number;
-  page?: number;
-}): Promise<AggregatePaginateResult<BlogListItem>> => {
+  categoryId: string;
+}) => {
   await connectDb();
 
-  let sortOption: Record<string, SortValues | { $meta: string }> = {};
+  const blogs = await Blog.find({ status: 'published', categoryId })
+    .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug')
+    .populate<{
+      authorId: PopulatedAuthor;
+    }>('authorId', 'username firstName lastName profilePicture')
+    .limit(4)
+    .sort({ publishedAt: -1 });
 
-  if (sortBy && sortOrder) {
-    const order = sortOrder === 'asc' ? 1 : -1;
-
-    if (sortBy === 'popularity') {
-      // TODO: Implement popularity sorting based on engagement metrics (views/likes/comments)
-      sortOption = { title: 1 };
-    } else if (sortBy === 'publishedAt') {
-      sortOption = { publishedAt: order };
-    } else {
-      sortOption = { publishedAt: -1 };
-    }
-  } else if (query) {
-    sortOption = { score: { $meta: 'textScore' } };
-  } else {
-    sortOption = { publishedAt: -1 };
-  }
-
-  const pipeline: PipelineStage[] = [];
-
-  if (query && typeof query === 'string') {
-    pipeline.push({
-      $match: {
-        $text: { $search: query },
-      },
-    });
-  }
-
-  pipeline.push(
-    { $match: { status: 'published' } },
-    {
-      $lookup: {
-        from: 'users',
-        foreignField: '_id',
-        localField: 'authorId',
-        as: 'authorId',
-        pipeline: [
-          {
-            $project: {
-              username: 1,
-              firstName: 1,
-              lastName: 1,
-              profilePicture: 1,
-            },
-          },
-        ],
-      },
-    },
-    {
-      $addFields: {
-        authorId: { $first: '$authorId' },
-      },
-    },
-    {
-      $project: {
-        authorId: 1,
-        banner: 1,
-        blurDataUrl: 1,
-        description: 1,
-        publishedAt: 1,
-        readTime: 1,
-        slug: 1,
-        title: 1,
-      },
-    },
-  );
-
-  const aggregate = Blog.aggregate<BlogListItem>(pipeline);
-
-  const result = await Blog.aggregatePaginate(aggregate, {
-    sort: sortOption,
-    limit,
-    page,
-  });
-
-  return result;
+  return blogs;
 };

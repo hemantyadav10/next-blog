@@ -5,6 +5,7 @@ import Categories from './Categories';
 
 async function getCategories(): Promise<PopulatedCategory[]> {
   await connectDb();
+
   const categories = await Category.find()
     .sort({ name: 1 })
     .select('name slug _id')
@@ -15,6 +16,7 @@ async function getCategories(): Promise<PopulatedCategory[]> {
   }));
 }
 
+// TODO: complete error handling for categories
 async function CategorySection() {
   const categories = await getCategories();
   return <Categories categories={categories} />;

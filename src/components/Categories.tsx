@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { PopulatedCategory } from '@/types/category.types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 type CategoriesProps = {
@@ -15,6 +16,8 @@ function Categories({ categories }: CategoriesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
+  const pathname = usePathname();
+  const selectedCategory = pathname.split('/')[2];
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -27,6 +30,22 @@ function Categories({ categories }: CategoriesProps) {
   useEffect(() => {
     checkScroll();
   }, [categories]);
+
+  // Scroll active category into view
+  useEffect(() => {
+    if (selectedCategory && scrollRef.current) {
+      const activeElement = scrollRef.current.querySelector(
+        '[data-active="true"]',
+      );
+      if (activeElement) {
+        activeElement.scrollIntoView({
+          behavior: 'instant',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
+    }
+  }, [selectedCategory]);
 
   const scroll = (direction: number) => {
     scrollRef.current?.scrollBy({ left: direction, behavior: 'smooth' });
@@ -51,14 +70,17 @@ function Categories({ categories }: CategoriesProps) {
       <section
         ref={scrollRef}
         onScroll={checkScroll}
-        className="scrollbar-hide flex items-center gap-2 overflow-x-auto"
+        className="scrollbar-hide flex items-center gap-2 overflow-x-auto p-1"
       >
         {categories.map((category) => (
           <Badge
-            className="h-9 px-4 font-normal whitespace-nowrap md:text-sm"
+            className="h-9 px-4 whitespace-nowrap md:text-sm"
             asChild
-            variant="secondary"
+            variant={
+              category.slug === selectedCategory ? 'default' : 'secondary'
+            }
             key={category._id}
+            data-active={category.slug === selectedCategory}
           >
             <Link href={`/category/${category.slug}`}>{category.name}</Link>
           </Badge>

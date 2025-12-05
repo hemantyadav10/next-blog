@@ -106,7 +106,7 @@ function Header({ user }: { user: AuthResult }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.02, animationDuration: 1 }}
             transition={{ duration: 0.1, ease: 'easeInOut' }}
-            className="bg-background/90 fixed inset-0 z-40 overflow-y-auto px-4 py-8 pt-24 backdrop-blur-sm"
+            className="bg-background/90 fixed inset-0 z-50 overflow-y-auto px-4 py-8 pt-24 backdrop-blur-sm"
           >
             <nav className="flex flex-col gap-4">
               {navItems.map(({ name, href }) => (

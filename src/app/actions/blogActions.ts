@@ -12,10 +12,17 @@ import connectDb from '@/lib/connectDb';
 import { CreateBlogInput, createBlogSchema } from '@/lib/schema/blogSchema';
 import { isMongoError } from '@/lib/utils';
 import { Blog, Category, Tag } from '@/models';
+import { BlogDocument } from '@/models/blogModel';
 import { ActionResponse } from '@/types/api.types';
-import { BlogListItem } from '@/types/blog.types';
+import { BlogListItem, CategoryBlogsResponse } from '@/types/blog.types';
 import { v2 as cloudinary } from 'cloudinary';
-import { AggregatePaginateResult, PipelineStage, SortValues } from 'mongoose';
+import {
+  AggregatePaginateResult,
+  FilterQuery,
+  isValidObjectId,
+  PipelineStage,
+  SortValues,
+} from 'mongoose';
 import * as z from 'zod';
 
 type ResponseState =
@@ -313,6 +320,60 @@ export const getAllBlogs = async ({
     return {
       success: false,
       error: 'Failed to fetch blogs. Please try again.',
+    };
+  }
+};
+
+export const getCategoryLatestBlogs = async ({
+  limit = 12,
+  page = 1,
+  categoryId,
+}: {
+  limit?: number;
+  page?: number;
+  categoryId: string;
+}): Promise<ActionResponse<CategoryBlogsResponse>> => {
+  try {
+    await connectDb();
+
+    if (!isValidObjectId(categoryId)) {
+      return {
+        success: false,
+        error: 'Invalid Category Id',
+      };
+    }
+
+    const filter: FilterQuery<BlogDocument> = {
+      categoryId: categoryId,
+      status: 'published',
+    };
+
+    const skip = (page - 1) * limit;
+    const totalDocs = await Blog.countDocuments(filter);
+    const blogs = await Blog.find(filter)
+      .populate('authorId', 'username  firstName  lastName profilePicture')
+      .select(
+        'authorId banner blurDataUrl description publishedAt readTime slug title',
+      )
+      .sort({ publishedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    return {
+      success: true,
+      data: {
+        docs: JSON.parse(JSON.stringify(blogs)),
+        hasNextPage: skip + limit < totalDocs,
+        nextPage: skip + limit < totalDocs ? page + 1 : null,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+
+    return {
+      success: false,
+      error: 'Failed to load blogs. Please try again.',
     };
   }
 };

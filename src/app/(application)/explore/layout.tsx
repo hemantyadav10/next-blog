@@ -1,6 +1,6 @@
+import CategorySection from '@/components/CategorySection';
 import CategoriesSkeleton from '@/components/skeletons/CategoriesSkeleton';
 import { Suspense } from 'react';
-import CategorySection from './components/CategorySection';
 import FilterSection from './components/FilterSection';
 import SearchResultsHeader from './components/SearchResultsHeader';
 import SearchSection from './components/SearchSection';
@@ -36,8 +36,10 @@ export default async function RootLayout({
       </Suspense>
 
       <section className="grid grid-cols-12 gap-4">
-        <section className="col-span-full flex overflow-x-auto md:col-span-3 md:flex-col">
-          <FilterSection />
+        <section className="bg-background sticky top-16 z-40 col-span-full flex self-start overflow-x-auto md:col-span-3 md:flex-col">
+          <Suspense>
+            <FilterSection />
+          </Suspense>
         </section>
 
         <section className="col-span-full space-y-4 md:col-span-9">

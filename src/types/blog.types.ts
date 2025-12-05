@@ -1,4 +1,5 @@
 import { BlogDocument } from '@/models/blogModel';
+import { CategoryDocument } from '@/models/categoryModel';
 import { UserType } from '@/models/userModel';
 
 type BlogAuthor = Pick<
@@ -18,4 +19,23 @@ type BlogListItem = Pick<
   | 'title'
 > & { authorId: BlogAuthor };
 
-export type { BlogAuthor, BlogListItem };
+type CategoryBlogsResponse = {
+  docs: BlogListItem[];
+  hasNextPage: boolean;
+  nextPage: number | null;
+};
+
+type PopulatedAuthor = Pick<
+  UserType,
+  'username' | 'firstName' | 'lastName' | 'profilePicture' | '_id'
+>;
+
+type PopulatedCategory = Pick<CategoryDocument, 'name' | 'slug' | '_id'>;
+
+export type {
+  BlogAuthor,
+  BlogListItem,
+  CategoryBlogsResponse,
+  PopulatedAuthor,
+  PopulatedCategory,
+};

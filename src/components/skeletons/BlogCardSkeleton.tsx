@@ -1,15 +1,31 @@
+import { cn } from '@/lib/utils';
 import { Skeleton } from '../ui/skeleton';
 
-function BlogCardSkeleton() {
+type BlogCardSkeletonProps = {
+  orientation?: 'vertical' | 'horizontal';
+};
+
+function BlogCardSkeleton({
+  orientation = 'horizontal',
+}: BlogCardSkeletonProps) {
   return (
     <div className="grid grid-cols-12 gap-x-4 gap-y-3">
       {/* Image skeleton */}
-      <div className="col-span-4">
+      <div
+        className={cn(
+          orientation === 'vertical' ? 'col-span-full' : 'col-span-4',
+        )}
+      >
         <Skeleton className="aspect-[3/2] w-full rounded-none" />
       </div>
 
       {/* Content skeleton */}
-      <div className="col-span-8 space-y-4">
+      <div
+        className={cn(
+          'space-y-4',
+          orientation === 'vertical' ? 'col-span-full' : 'col-span-8',
+        )}
+      >
         {/* Title - 2 lines */}
         <div className="space-y-2">
           <Skeleton className="h-5 w-3/4 sm:h-6" />

@@ -1,4 +1,4 @@
-import { InferSchemaType, Model, Schema, model, models } from 'mongoose';
+import { InferSchemaType, Model, Schema, Types, model, models } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const categorySchema = new Schema(
@@ -34,7 +34,9 @@ const categorySchema = new Schema(
   { timestamps: true },
 );
 
-export type CategoryDocument = InferSchemaType<typeof categorySchema>;
+export type CategoryDocument = InferSchemaType<typeof categorySchema> & {
+  _id: Types.ObjectId;
+};
 
 // TODO: Add indexes, virtuals, hooks and methods
 categorySchema.index(

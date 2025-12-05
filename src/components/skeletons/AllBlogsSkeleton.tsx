@@ -1,10 +1,18 @@
 import BlogCardSkeleton from './BlogCardSkeleton';
 
-function AllBlogsSkeleton({ count = 4 }: { count?: number }) {
+type AllBlogsSkeletonProps = {
+  count?: number;
+  orientation?: 'horizontal' | 'vertical';
+};
+
+function AllBlogsSkeleton({
+  count = 4,
+  orientation = 'horizontal',
+}: AllBlogsSkeletonProps) {
   return (
     <section className="space-y-8">
       {Array.from({ length: count }).map((_, index) => (
-        <BlogCardSkeleton key={index} />
+        <BlogCardSkeleton key={index} orientation={orientation} />
       ))}
     </section>
   );
