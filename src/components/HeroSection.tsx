@@ -13,16 +13,16 @@ function HeroSection() {
       <BlurFade inView direction="up" offset={8}>
         <h1 className="max-w-lg text-4xl font-semibold md:text-6xl">
           <AuroraText>Infinite</AuroraText>
-          <span className="from-primary to-primary/70 text-primary bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
+          <span className="from-foreground to-foreground/70 text-foreground bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
             Ink:{' '}
           </span>
-          <span className="from-primary to-primary/70 text-primary bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
+          <span className="from-foreground to-foreground/70 text-foreground bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
             Where{' '}
           </span>
-          <span className="from-primary to-primary/70 text-primary bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
+          <span className="from-foreground to-foreground/70 text-foreground bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
             Ideas{' '}
           </span>
-          <span className="from-primary to-primary/70 text-primary bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
+          <span className="from-foreground to-foreground/70 text-foreground bg-clip-text dark:bg-gradient-to-b dark:text-transparent">
             Flow
           </span>
         </h1>
@@ -34,7 +34,7 @@ function HeroSection() {
         </p>
       </BlurFade>
       <BlurFade delay={0.5} direction="up" offset={8} inView>
-        <Button size={'lg'} className="rounded-full" asChild>
+        <Button variant={'raised'} size={'lg'} className="rounded-full" asChild>
           <Link href={'/explore'}>Explore Blogs</Link>
         </Button>
       </BlurFade>

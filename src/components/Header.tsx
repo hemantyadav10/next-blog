@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { AuthResult } from '@/lib/auth';
 import { cn } from '@/lib/utils';
+import type { NavItems } from '@/types/navigation.types';
 import {
   LayoutDashboard,
   LogOut,
@@ -27,18 +28,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Logo } from './Logo';
+import MobileMenu from './MobileMenu';
 import { ModeToggle } from './ModeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
 import { Kbd } from './ui/kbd';
 import { Spinner } from './ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-
-type NavItems = {
-  name: string;
-  href: string;
-  active?: boolean;
-};
 
 function Header({ user }: { user: AuthResult }) {
   const { isAuthenticated, user: userDetails } = user;
@@ -97,40 +93,26 @@ function Header({ user }: { user: AuthResult }) {
     });
   }
 
+  const handleCloseMenu = () => {
+    setToggleMenu(false);
+  };
+
   return (
     <>
       <AnimatePresence>
         {toggleMenu && (
-          <motion.div
-            initial={{ opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.02, animationDuration: 1 }}
-            transition={{ duration: 0.1, ease: 'easeInOut' }}
-            className="bg-background/90 fixed inset-0 z-50 overflow-y-auto px-4 py-8 pt-24 backdrop-blur-sm"
-          >
-            <nav className="flex flex-col gap-4">
-              {navItems.map(({ name, href }) => (
-                <Link
-                  href={href}
-                  key={name}
-                  className={cn('text-primary text-2xl font-medium')}
-                  onClick={() => setToggleMenu(false)}
-                >
-                  {name}
-                </Link>
-              ))}
-            </nav>
-          </motion.div>
+          <MobileMenu closeMenu={handleCloseMenu} navItems={navItems} />
         )}
       </AnimatePresence>
+
       <header
         className={cn(
           'bg-background/90 fixed top-0 right-0 left-0 z-50 backdrop-blur-lg',
         )}
       >
         {/* Left: App Name */}
-        <div className="mx-auto flex h-16 max-w-[96rem] items-center justify-between px-4 md:px-8">
-          <nav className="flex items-center gap-8 text-sm">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
+          <nav className="flex items-center gap-8">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -159,7 +141,7 @@ function Header({ user }: { user: AuthResult }) {
               <Logo />
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center">
               {/* Center: Navigation Links */}
               {navItems.map(({ name, href }) => {
                 const isActive =
@@ -171,11 +153,25 @@ function Header({ user }: { user: AuthResult }) {
                     href={href}
                     key={name}
                     className={cn(
-                      'text-muted-foreground hover:text-primary hidden sm:flex',
-                      isActive ? 'text-primary font-semibold' : '',
+                      'relative hidden items-center px-4 py-3 font-medium sm:flex',
+                      isActive
+                        ? 'text-primary'
+                        : 'text-foreground hover:text-primary transition-colors',
                     )}
                   >
                     {name}
+                    {isActive && (
+                      <motion.div
+                        style={{ originY: '0px' }}
+                        layoutId="underline"
+                        className="via-primary absolute inset-x-0 -bottom-1.5 h-0.5 bg-gradient-to-r from-transparent to-transparent blur-[0.5px]"
+                        transition={{
+                          type: 'spring',
+                          stiffness: 400,
+                          damping: 25,
+                        }}
+                      />
+                    )}
                   </Link>
                 );
               })}

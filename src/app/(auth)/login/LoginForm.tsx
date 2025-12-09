@@ -180,7 +180,12 @@ function LoginForm() {
 
             {/* Login Button */}
             <Field>
-              <Button disabled={isPending} type="submit" size={'lg'}>
+              <Button
+                disabled={isPending}
+                type="submit"
+                size={'lg'}
+                variant={'raised'}
+              >
                 {isPending && <Spinner />} Login
               </Button>
             </Field>

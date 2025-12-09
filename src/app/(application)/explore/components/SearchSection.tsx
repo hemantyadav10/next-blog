@@ -63,10 +63,7 @@ function SearchSection() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <InputGroup className="mx-auto h-12 max-w-lg rounded-full shadow-xs">
-        <InputGroupAddon>
-          {isPending ? <Spinner /> : <SearchIcon />}
-        </InputGroupAddon>
+      <InputGroup className="mx-auto h-12 max-w-lg rounded-full shadow-sm">
         <InputGroupInput
           value={searchValue}
           onChange={handleChange}
@@ -93,8 +90,9 @@ function SearchSection() {
             size={'icon'}
             className="rounded-full"
             aria-label="Search blogs"
+            variant={'secondary'}
           >
-            <SearchIcon />
+            {isPending ? <Spinner /> : <SearchIcon />}
           </Button>
         </InputGroupAddon>
       </InputGroup>

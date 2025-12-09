@@ -23,10 +23,14 @@ import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { formatDate } from 'date-fns';
 import {
   Bookmark,
+  Calendar,
+  Clock,
   Ellipsis,
+  Folder,
   Heart,
   MessageCircleIcon,
   Share2,
+  TagIcon,
   UserPlus,
 } from 'lucide-react';
 import { Types } from 'mongoose';
@@ -165,16 +169,16 @@ async function page({
               {blog.title}
             </h1>
             {/* description */}
-            <div className="text-muted-foreground text-lg italic">
+            <div className="text-lg">
               <p>{blog.description}</p>
             </div>
-            <div className="space-y-3">
+            <div className="text-muted-foreground flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
               {/* author */}
               <Link
                 href={`/${blog.authorId.username}`}
-                className="group group flex w-fit items-center gap-2 text-sm font-medium"
+                className="group text-foreground flex w-fit items-center gap-2 text-sm"
               >
-                <Avatar className="size-8">
+                <Avatar className="text-foreground size-8">
                   <AvatarImage
                     src={blog.authorId.profilePicture ?? ''}
                     alt={blog.authorId.firstName}
@@ -187,23 +191,29 @@ async function page({
                   {blog.authorId.firstName} {blog.authorId.lastName}
                 </span>
               </Link>
+
               {/* mete data */}
-              <p className="text-muted-foreground text-sm">
-                {blog?.publishedAt ? (
-                  <>
-                    Published on{' '}
-                    {formatDate(new Date(blog.publishedAt), 'MMM d, yyyy')}{' '}
-                    &middot;{' '}
-                  </>
-                ) : null}
-                {blog.readTime} min read &middot;{' '}
-                <Link
-                  href={`/category/${blog.categoryId.slug}`}
-                  className="text-link underline-offset-2 hover:underline"
-                >
-                  {blog.categoryId.name}
-                </Link>
-              </p>
+
+              {/* Publishing date */}
+              {blog?.publishedAt ? (
+                <span className="flex items-center gap-1">
+                  <Calendar className="size-3.5" />{' '}
+                  {formatDate(new Date(blog.publishedAt), 'MMM d, yyyy')}{' '}
+                </span>
+              ) : null}
+              {/* read time */}
+              <span className="flex items-center gap-1">
+                <Clock className="size-3.5" />
+                {blog.readTime} min read
+              </span>
+              {/* category */}
+              <Link
+                href={`/category/${blog.categoryId.slug}`}
+                className="hover:text-foreground flex items-center gap-1 underline-offset-2 hover:underline"
+              >
+                <Folder className="size-3.5" />
+                {blog.categoryId.name}
+              </Link>
             </div>
 
             {/* banner */}
@@ -225,6 +235,7 @@ async function page({
 
             {/* tags */}
             <div className="flex items-center gap-2">
+              <TagIcon className="size-4" />
               {blog.tags.map((tag) => (
                 <Badge
                   className="px-4 py-2"
@@ -302,7 +313,7 @@ async function page({
                 <p>Freelancer IT specialist web developer</p>
               </div>
             </div>
-            <Button className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto" variant={'raised'}>
               <UserPlus /> Follow
             </Button>
           </div>

@@ -279,7 +279,12 @@ export default function SignupForm() {
               )}
             />
             <Field>
-              <Button disabled={isPending} type="submit" size={'lg'}>
+              <Button
+                disabled={isPending}
+                type="submit"
+                size={'lg'}
+                variant={'raised'}
+              >
                 {isPending && <Spinner />} Create Account
               </Button>
             </Field>

@@ -2,14 +2,9 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import Providers from '@/provider';
 import type { Metadata } from 'next';
-import { Bitter, Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
-
-const bitterFont = Bitter({
-  subsets: ['latin'],
-  variable: '--font-bitter',
-});
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${bitterFont.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
           <ThemeProvider

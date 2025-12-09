@@ -74,7 +74,7 @@ function Categories({ categories }: CategoriesProps) {
       >
         {categories.map((category) => (
           <Badge
-            className="h-9 px-4 whitespace-nowrap md:text-sm"
+            className="h-9 px-4 font-medium whitespace-nowrap md:text-sm"
             asChild
             variant={
               category.slug === selectedCategory ? 'default' : 'secondary'

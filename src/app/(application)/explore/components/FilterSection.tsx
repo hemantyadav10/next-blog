@@ -2,20 +2,25 @@
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { FileTextIcon, LucideProps, TagIcon, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 type Path = '/explore' | '/explore/users' | '/explore/tags';
 
 type Filter = {
   path: Path;
   name: string;
+  Icon?: ForwardRefExoticComponent<
+    Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
+  >;
 };
 
 const filters: Filter[] = [
-  { path: '/explore', name: 'Posts' },
-  { path: '/explore/users', name: 'People' },
-  { path: '/explore/tags', name: 'Tags' },
+  { path: '/explore', name: 'Posts', Icon: FileTextIcon },
+  { path: '/explore/users', name: 'People', Icon: UserIcon },
+  { path: '/explore/tags', name: 'Tags', Icon: TagIcon },
 ] as const;
 
 function FilterSection() {
@@ -25,17 +30,20 @@ function FilterSection() {
 
   return (
     <>
-      {filters.map(({ name, path }, idx) => (
+      {filters.map(({ name, path, Icon }, idx) => (
         <Button
           key={`${path}-${idx}`}
-          variant={pathname === path ? 'default' : 'ghost'}
+          variant={pathname === path ? 'secondary' : 'ghost'}
           className={cn(
             'justify-start md:h-10',
             pathname === path ? 'font-medium' : 'font-normal',
           )}
           asChild
         >
-          <Link href={`${path}?${queryString}`}>{name}</Link>
+          <Link href={`${path}?${queryString}`}>
+            {Icon && <Icon />}
+            {name}
+          </Link>
         </Button>
       ))}
     </>
