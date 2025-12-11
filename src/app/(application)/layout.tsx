@@ -9,7 +9,7 @@ export default async function RootLayout({
   const authResult = await verifyAuth();
 
   return (
-    <div className="flex min-h-screen flex-col pt-16">
+    <div className="flex min-h-screen flex-col">
       <Header user={authResult} />
       {children}
     </div>

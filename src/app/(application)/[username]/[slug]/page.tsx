@@ -12,60 +12,73 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent } from '@/components/ui/tooltip';
-import connectDb from '@/lib/connectDb';
+import { getBlogPost } from '@/lib/blog';
+import { APP_NAME } from '@/lib/constants';
 import { getMyHtml } from '@/lib/generate-html';
-import { Blog } from '@/models';
-import { CategoryDocument } from '@/models/categoryModel';
-import { TagDocument } from '@/models/tagModel';
-import { UserType } from '@/models/userModel';
-import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { formatDate } from 'date-fns';
-import {
-  Bookmark,
-  Calendar,
-  Clock,
-  Ellipsis,
-  Folder,
-  Heart,
-  MessageCircleIcon,
-  Share2,
-  TagIcon,
-  UserPlus,
-} from 'lucide-react';
-import { Types } from 'mongoose';
+import { Calendar, Clock, Folder, TagIcon, UserPlus } from 'lucide-react';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import BlogCard from './components/BlogCard';
+import {
+  BlogActionsDesktop,
+  BlogActionsMobile,
+} from './components/blog-actions-nav';
 
-type PopulatedAuthor = Pick<
-  UserType,
-  'username' | 'firstName' | 'lastName' | 'profilePicture'
-> & { _id: Types.ObjectId };
-
-type PopulatedTag = Pick<TagDocument, 'name' | 'slug'> & {
-  _id: Types.ObjectId;
-};
-
-type PopulatedCategory = Pick<CategoryDocument, 'name' | 'slug'> & {
-  _id: Types.ObjectId;
-};
-
-async function page({
-  params,
-}: {
+type Props = {
   params: Promise<{ slug: string; username: string }>;
-}) {
-  const { slug, username } = await params;
-  await connectDb();
+};
 
-  const blog = await Blog.findOne({ slug, status: 'published' })
-    .populate<{
-      authorId: PopulatedAuthor;
-    }>('authorId', 'username firstName lastName profilePicture')
-    .populate<{ tags: PopulatedTag[] }>('tags', 'name slug')
-    .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug');
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug, username } = await params;
+  const blog = await getBlogPost(slug);
+  if (!blog || blog.authorId.username !== username) {
+    notFound();
+  }
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/${username}/${slug}`;
+  const ogImage =
+    blog.banner || `${process.env.NEXT_PUBLIC_BASE_URL}/default-og.jpg`;
+
+  return {
+    title: blog.title,
+    description: blog.metaDescription || blog.description,
+    authors: [{ name: blog.authorId.username }],
+
+    openGraph: {
+      title: blog.title,
+      description: blog.metaDescription || blog.description,
+      url: url,
+      siteName: APP_NAME,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: blog.title,
+        },
+      ],
+      locale: 'en_US',
+      type: 'article',
+      publishedTime: (blog.publishedAt || blog.createdAt).toISOString(),
+      modifiedTime: blog.updatedAt.toISOString(),
+      authors: [blog.authorId.username],
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title: blog.title,
+      description: blog.metaDescription || blog.description,
+      images: [ogImage],
+      creator: `@${blog.authorId.username}`,
+    },
+  };
+}
+
+async function page({ params }: Props) {
+  const { slug, username } = await params;
+  const blog = await getBlogPost(slug);
 
   if (!blog || blog.authorId.username !== username) {
     notFound();
@@ -74,61 +87,17 @@ async function page({
   const html = await getMyHtml({ value: blog.content });
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8 md:px-8 md:py-12">
+    <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
       {/* Blog Actions */}
+      <BlogActionsMobile
+        title={blog.title}
+        text={blog.metaDescription || blog.description}
+      />
       <div className="sticky top-28 hidden w-16 flex-col items-center space-y-6 self-start md:flex">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              aria-label="Like"
-              variant={'ghost'}
-              className="flex h-auto flex-col font-normal"
-            >
-              <Heart /> 32
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Like</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              aria-label="Comment"
-              variant={'ghost'}
-              className="flex h-auto flex-col font-normal"
-            >
-              <MessageCircleIcon /> 32
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Comment</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button aria-label="Save" variant={'ghost'} size={'icon'}>
-              <Bookmark />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Save</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button aria-label="Share" variant={'ghost'} size={'icon'}>
-              <Share2 />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Share</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button aria-label="Share" variant={'ghost'} size={'icon'}>
-              <Ellipsis />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">More</TooltipContent>
-        </Tooltip>
+        <BlogActionsDesktop
+          title={blog.title}
+          text={blog.metaDescription || blog.description}
+        />
       </div>
 
       <div className="flex flex-col gap-8 xl:flex-row">

@@ -1,6 +1,8 @@
 import { BlogDocument } from '@/models/blogModel';
 import { CategoryDocument } from '@/models/categoryModel';
+import { TagDocument } from '@/models/tagModel';
 import { UserType } from '@/models/userModel';
+import { Types } from 'mongoose';
 
 type BlogAuthor = Pick<
   UserType,
@@ -32,10 +34,15 @@ type PopulatedAuthor = Pick<
 
 type PopulatedCategory = Pick<CategoryDocument, 'name' | 'slug' | '_id'>;
 
+type PopulatedTag = Pick<TagDocument, 'name' | 'slug'> & {
+  _id: Types.ObjectId;
+};
+
 export type {
   BlogAuthor,
   BlogListItem,
   CategoryBlogsResponse,
   PopulatedAuthor,
   PopulatedCategory,
+  PopulatedTag,
 };

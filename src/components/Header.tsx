@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useScrollProgress } from '@/hooks/use-progressive-header';
 import { AuthResult } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import type { NavItems } from '@/types/navigation.types';
@@ -36,27 +37,28 @@ import { Kbd } from './ui/kbd';
 import { Spinner } from './ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
+const navItems: NavItems[] = [
+  {
+    name: 'Home',
+    href: '/',
+  },
+  {
+    name: 'Explore',
+    href: '/explore',
+  },
+  {
+    name: 'Write',
+    href: '/write',
+  },
+];
+
 function Header({ user }: { user: AuthResult }) {
   const { isAuthenticated, user: userDetails } = user;
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
   const router = useRouter();
   const [toggleMenu, setToggleMenu] = useState(false);
-
-  const navItems: NavItems[] = [
-    {
-      name: 'Home',
-      href: '/',
-    },
-    {
-      name: 'Explore',
-      href: '/explore',
-    },
-    {
-      name: 'Write',
-      href: '/write',
-    },
-  ];
+  const headerOffset = useScrollProgress(64);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -107,8 +109,12 @@ function Header({ user }: { user: AuthResult }) {
 
       <header
         className={cn(
-          'bg-background/90 fixed top-0 right-0 left-0 z-50 backdrop-blur-lg',
+          'bg-background/95 sticky top-0 z-50 backdrop-blur-sm md:transform-none',
+          'dark:bg-background/90 dark:backdrop-blur-lg',
         )}
+        style={{
+          transform: `translateY(-${headerOffset}px)`,
+        }}
       >
         {/* Left: App Name */}
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
@@ -141,7 +147,7 @@ function Header({ user }: { user: AuthResult }) {
               <Logo />
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               {/* Center: Navigation Links */}
               {navItems.map(({ name, href }) => {
                 const isActive =
@@ -153,9 +159,9 @@ function Header({ user }: { user: AuthResult }) {
                     href={href}
                     key={name}
                     className={cn(
-                      'relative hidden items-center px-4 py-3 font-medium sm:flex',
+                      'relative hidden items-center px-2 py-3 sm:flex',
                       isActive
-                        ? 'text-primary'
+                        ? 'text-primary font-medium'
                         : 'text-foreground hover:text-primary transition-colors',
                     )}
                   >
@@ -164,7 +170,7 @@ function Header({ user }: { user: AuthResult }) {
                       <motion.div
                         style={{ originY: '0px' }}
                         layoutId="underline"
-                        className="via-primary absolute inset-x-0 -bottom-1.5 h-0.5 bg-gradient-to-r from-transparent to-transparent blur-[0.5px]"
+                        className="bg-primary absolute inset-x-0 -bottom-1.5 h-0.5"
                         transition={{
                           type: 'spring',
                           stiffness: 400,

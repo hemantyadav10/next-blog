@@ -124,23 +124,23 @@
 
   --radius: 0.65rem;
   --background: oklch(1 0 0);
-  --foreground: #1f1f1f;
+  --foreground: oklch(23.929% 0.00003 271.152);
   --card: oklch(1 0 0);
-  --card-foreground: #1a1b1f;
+  --card-foreground: oklch(22.277% 0.00793 274.569);
   --popover: oklch(1 0 0);
-  --popover-foreground: #1a1b1f;
-  --primary: #005cbb;
+  --popover-foreground: oklch(22.277% 0.00793 274.569);
+  --primary: oklch(48.704% 0.16717 256.148);
   --primary-foreground: oklch(1 0 0);
-  --secondary: #f1f3f4;
-  --secondary-foreground: #1f1f1f;
-  --muted: #f1f3f4;
-  --muted-foreground: #5f6368;
+  --secondary: oklch(96.292% 0.00261 230.408);
+  --secondary-foreground: oklch(23.929% 0.00003 271.152);
+  --muted: oklch(96.292% 0.00261 230.408);
+  --muted-foreground: oklch(49.788% 0.00944 254.023);
   --accent: oklch(96.558% 0.01725 248.156);
-  --accent-foreground: #005cbb;
+  --accent-foreground: oklch(48.704% 0.16717 256.148);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: #005cbb;
+  --ring: oklch(48.704% 0.16717 256.148);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -148,38 +148,38 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: #1a1b1f;
-  --sidebar-primary: #1f1f1f;
+  --sidebar-foreground: oklch(22.277% 0.00793 274.569);
+  --sidebar-primary: oklch(23.929% 0.00003 271.152);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: #f1f3f4;
-  --sidebar-accent-foreground: #1f1f1f;
+  --sidebar-accent: oklch(96.292% 0.00261 230.408);
+  --sidebar-accent-foreground: oklch(23.929% 0.00003 271.152);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --highlight: oklch(0.852 0.199 91.936);
-  --link: #005cbb;
+  --link: oklch(48.704% 0.16717 256.148);
   --contrast: oklch(0.985 0 0);
-  --progress: #005cbb;
+  --progress: oklch(48.704% 0.16717 256.148);
 }
 
 .dark {
   --brand: oklch(0.707 0.165 254.624);
 
-  --background: #0f0f0f;
-  --foreground: #e8e8e8;
-  --card: #282828;
-  --card-foreground: #e8e8e8;
-  --popover: #282828;
-  --popover-foreground: #e8e8e8;
-  --primary: #99c3ff;
+  --background: oklch(16.842% 0.00002 271.152);
+  --foreground: oklch(93.1% 0.00011 271.152);
+  --card: oklch(24.776% 0.00003 271.152);
+  --card-foreground: oklch(93.1% 0.00011 271.152);
+  --popover: oklch(24.776% 0.00003 271.152);
+  --popover-foreground: oklch(93.1% 0.00011 271.152);
+  --primary: oklch(80.926% 0.09672 257.313);
   --primary-foreground: oklch(14.479% 0.00002 271.152);
-  --secondary: #ffffff1a;
-  --secondary-foreground: #e8e8e8;
-  --muted: #ffffff1a;
-  --muted-foreground: #aaaaaa;
-  --accent: #ffffff1a;
+  --secondary: oklch(100% 0.00011 271.152 / 0.102);
+  --secondary-foreground: oklch(93.1% 0.00011 271.152);
+  --muted: oklch(100% 0.00011 271.152 / 0.102);
+  --muted-foreground: oklch(73.802% 0.00008 271.152);
+  --accent: oklch(100% 0.00011 271.152 / 0.102);
   --accent-foreground: oklch(97.034% 0.01038 248.179);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #30363d;
+  --border: oklch(32.999% 0.01492 252.364);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(78.53% 0.10424 274.718);
   --chart-1: oklch(0.488 0.243 264.376);
@@ -193,12 +193,12 @@
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: #3c4043;
+  --sidebar-border: oklch(36.883% 0.00749 240.191);
   --sidebar-ring: oklch(0.556 0 0);
   --highlight: oklch(0.852 0.199 91.936);
-  --link: #99c3ff;
-  --contrast: #e8e8e8;
-  --progress: #99c3ff;
+  --link: oklch(80.926% 0.09672 257.313);
+  --contrast: oklch(93.1% 0.00011 271.152);
+  --progress: oklch(80.926% 0.09672 257.313);
 }
 
 @layer base {
@@ -220,4 +220,8 @@
   .custom_scrollbar {
     @apply scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent;
   }
+}
+
+@utility sticky-below-header {
+  top: calc(4rem - var(--header-offset, 0px));
 }

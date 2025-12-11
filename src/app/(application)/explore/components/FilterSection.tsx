@@ -2,19 +2,16 @@
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { FileTextIcon, LucideProps, TagIcon, UserIcon } from 'lucide-react';
+import { FileTextIcon, LucideIcon, TagIcon, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 type Path = '/explore' | '/explore/users' | '/explore/tags';
 
 type Filter = {
   path: Path;
   name: string;
-  Icon?: ForwardRefExoticComponent<
-    Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
-  >;
+  Icon?: LucideIcon;
 };
 
 const filters: Filter[] = [

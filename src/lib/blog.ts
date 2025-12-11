@@ -1,7 +1,12 @@
 import { Blog } from '@/models';
-import type { PopulatedAuthor, PopulatedCategory } from '@/types/blog.types';
+import type {
+  PopulatedAuthor,
+  PopulatedCategory,
+  PopulatedTag,
+} from '@/types/blog.types';
 import { nanoid } from 'nanoid';
 import { Value } from 'platejs';
+import { cache } from 'react';
 import { Node } from 'slate';
 import slugify from 'slugify';
 import connectDb from './connectDb';
@@ -76,3 +81,16 @@ export const getCategoryPopularBlogs = async ({
 
   return blogs;
 };
+
+export const getBlogPost = cache(async (slug: string) => {
+  await connectDb();
+
+  const blog = await Blog.findOne({ slug, status: 'published' })
+    .populate<{
+      authorId: PopulatedAuthor;
+    }>('authorId', 'username firstName lastName profilePicture')
+    .populate<{ tags: PopulatedTag[] }>('tags', 'name slug')
+    .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug');
+
+  return blog;
+});

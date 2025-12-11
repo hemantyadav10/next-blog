@@ -36,7 +36,7 @@ export default async function RootLayout({
       </Suspense>
 
       <section className="grid grid-cols-12 gap-4">
-        <section className="bg-background sticky top-16 z-40 col-span-full flex self-start overflow-x-auto md:col-span-3 md:flex-col">
+        <section className="bg-background sticky-below-header sticky z-40 col-span-full -my-2 flex self-start overflow-x-auto py-2 md:col-span-3 md:my-0 md:flex-col md:py-0">
           <Suspense>
             <FilterSection />
           </Suspense>

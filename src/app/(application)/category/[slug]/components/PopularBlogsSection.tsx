@@ -46,7 +46,7 @@ async function PopularBlogsSection({ categoryId }: { categoryId: string }) {
   }
 
   return (
-    <Carousel className="w-full">
+    <Carousel opts={{ dragFree: true }} className="w-full">
       <CarouselContent>
         {blogs.map((blog) => {
           const {

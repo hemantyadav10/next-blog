@@ -70,11 +70,11 @@ function Categories({ categories }: CategoriesProps) {
       <section
         ref={scrollRef}
         onScroll={checkScroll}
-        className="scrollbar-hide flex items-center gap-2 overflow-x-auto p-1"
+        className="scrollbar-hide flex items-center gap-2 overflow-x-auto p-1 px-4 md:px-1"
       >
         {categories.map((category) => (
           <Badge
-            className="h-9 px-4 font-medium whitespace-nowrap md:text-sm"
+            className="h-9 shrink-0 rounded-md px-4 md:text-sm"
             asChild
             variant={
               category.slug === selectedCategory ? 'default' : 'secondary'
