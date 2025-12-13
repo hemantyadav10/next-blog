@@ -54,12 +54,11 @@ interface ShareButtonProps {
 
 export function ShareButton({ text, title, url, onShare }: ShareButtonProps) {
   const [open, setOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   if (isDesktop) {
     return (
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={open} onOpenChange={setOpen}>
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
@@ -95,7 +94,7 @@ export function ShareButton({ text, title, url, onShare }: ShareButtonProps) {
         <DrawerHeader>
           <DrawerTitle className="text-left">Share</DrawerTitle>
         </DrawerHeader>
-        <div className="px-4 pb-4">
+        <div className="overflow-y-auto px-4 pb-4">
           <ShareContent title={title} text={text} url={url} onShare={onShare} />
         </div>
       </DrawerContent>

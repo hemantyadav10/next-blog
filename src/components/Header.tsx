@@ -58,8 +58,7 @@ function Header({ user }: { user: AuthResult }) {
   const pathname = usePathname();
   const router = useRouter();
   const [toggleMenu, setToggleMenu] = useState(false);
-  const headerOffset = useScrollProgress(64);
-
+  const { headerOffset, isSnapping } = useScrollProgress(64);
   // Prevent body scroll when menu is open
   useEffect(() => {
     if (toggleMenu) {
@@ -111,6 +110,7 @@ function Header({ user }: { user: AuthResult }) {
         className={cn(
           'bg-background/95 sticky top-0 z-50 backdrop-blur-sm md:transform-none',
           'dark:bg-background/90 dark:backdrop-blur-lg',
+          isSnapping ? 'transition-transform duration-200 ease-out' : '',
         )}
         style={{
           transform: `translateY(-${headerOffset}px)`,

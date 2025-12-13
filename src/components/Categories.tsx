@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { PopulatedCategory } from '@/types/category.types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
@@ -72,19 +73,24 @@ function Categories({ categories }: CategoriesProps) {
         onScroll={checkScroll}
         className="scrollbar-hide flex items-center gap-2 overflow-x-auto p-1 px-4 md:px-1"
       >
-        {categories.map((category) => (
-          <Badge
-            className="h-9 shrink-0 rounded-md px-4 md:text-sm"
-            asChild
-            variant={
-              category.slug === selectedCategory ? 'default' : 'secondary'
-            }
-            key={category._id}
-            data-active={category.slug === selectedCategory}
-          >
-            <Link href={`/category/${category.slug}`}>{category.name}</Link>
-          </Badge>
-        ))}
+        {categories.map((category) => {
+          const isActive = category.slug === selectedCategory;
+          return (
+            <Badge
+              className={cn(
+                'h-9 shrink-0 px-4 md:text-sm',
+                isActive &&
+                  'bg-primary/10 ring-primary dark:bg-primary/20 ring',
+              )}
+              asChild
+              variant="secondary"
+              key={category._id}
+              data-active={isActive}
+            >
+              <Link href={`/category/${category.slug}`}>{category.name}</Link>
+            </Badge>
+          );
+        })}
       </section>
 
       {showRight && (

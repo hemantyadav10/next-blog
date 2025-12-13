@@ -118,14 +118,16 @@ function BlogActionsDesktop({ text, title }: BlogActionProps) {
 function BlogActionsMobile({ text, title }: BlogActionProps) {
   const pathname = usePathname();
   const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
-  const offset = useScrollProgress(56);
+  const { headerOffset, isSnapping } = useScrollProgress(64);
   return (
     <div
       className={cn(
-        'bg-background border-border fixed right-0 bottom-0 left-0 z-40 flex h-14 items-center justify-between border-t px-4 md:hidden',
+        'bg-background border-border flex h-14 items-center justify-between border-t px-4 md:hidden',
+        'fixed right-0 bottom-0 left-0 z-40',
+        isSnapping ? 'transition-transform duration-200 ease-out' : '',
       )}
       style={{
-        transform: `translateY(${offset}px)`,
+        transform: `translateY(${headerOffset}px)`,
         boxShadow: '0 -1px 5px 0 rgba(0, 0, 0, 0.1)',
       }}
     >

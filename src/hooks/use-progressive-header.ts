@@ -4,19 +4,20 @@ import { useEffect, useRef, useState } from 'react';
 
 export function useScrollProgress(headerHeight = 64) {
   const [headerOffset, setHeaderOffset] = useState(0);
+  const [isSnapping, setIsSnapping] = useState(false);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
   const isMobile = useRef(false);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+  const snapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Initialize
     lastScrollY.current = window.scrollY;
     isMobile.current = window.innerWidth < 768;
 
     const updateOffset = () => {
       const currentScrollY = window.scrollY;
 
-      // Early return if at top of page
       if (currentScrollY <= 0) {
         setHeaderOffset(0);
         lastScrollY.current = 0;
@@ -26,8 +27,12 @@ export function useScrollProgress(headerHeight = 64) {
 
       const scrollDiff = currentScrollY - lastScrollY.current;
 
-      // Only update if there's actual movement
       if (scrollDiff !== 0) {
+        setIsSnapping(false);
+        if (snapTimeoutRef.current) {
+          clearTimeout(snapTimeoutRef.current);
+          snapTimeoutRef.current = null;
+        }
         setHeaderOffset((prev) => {
           const newOffset = prev + scrollDiff;
           return Math.max(0, Math.min(newOffset, headerHeight));
@@ -38,18 +43,34 @@ export function useScrollProgress(headerHeight = 64) {
       ticking.current = false;
     };
 
+    const snapHeader = () => {
+      setIsSnapping(true);
+      setHeaderOffset((prev) => {
+        return prev > headerHeight / 2 ? headerHeight : 0;
+      });
+      if (snapTimeoutRef.current) {
+        clearTimeout(snapTimeoutRef.current);
+      }
+      snapTimeoutRef.current = setTimeout(() => setIsSnapping(false), 200);
+    };
+
     const handleScroll = () => {
       if (!isMobile.current || ticking.current) return;
 
       ticking.current = true;
       requestAnimationFrame(updateOffset);
+
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+
+      scrollTimeout.current = setTimeout(snapHeader, 100);
     };
 
     const handleResize = () => {
       const wasMobile = isMobile.current;
       isMobile.current = window.innerWidth < 768;
 
-      // Reset offset when switching to desktop
       if (wasMobile && !isMobile.current) {
         setHeaderOffset(0);
         lastScrollY.current = window.scrollY;
@@ -62,10 +83,15 @@ export function useScrollProgress(headerHeight = 64) {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+      if (snapTimeoutRef.current) {
+        clearTimeout(snapTimeoutRef.current);
+      }
     };
   }, [headerHeight]);
 
-  // Set CSS variable
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--header-offset',
@@ -73,5 +99,5 @@ export function useScrollProgress(headerHeight = 64) {
     );
   }, [headerOffset]);
 
-  return headerOffset;
+  return { headerOffset, isSnapping };
 }
