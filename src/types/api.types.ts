@@ -28,3 +28,10 @@ export type ActionResponse<T, V extends string = string> =
       error: string;
       errors?: Partial<Record<V, string[]>>;
     };
+
+export type PaginatedResponse<T> = {
+  docs: T;
+  hasNextPage: boolean;
+  nextPage: number | null;
+  totalDocs?: number;
+};

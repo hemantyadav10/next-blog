@@ -3,6 +3,7 @@ import { CategoryDocument } from '@/models/categoryModel';
 import { TagDocument } from '@/models/tagModel';
 import { UserType } from '@/models/userModel';
 import { Types } from 'mongoose';
+import { PaginatedResponse } from './api.types';
 
 type BlogAuthor = Pick<
   UserType,
@@ -27,9 +28,18 @@ type CategoryBlogsResponse = {
   nextPage: number | null;
 };
 
+type AuthorBlogsResponse = PaginatedResponse<BlogListItem[]>;
+
 type PopulatedAuthor = Pick<
   UserType,
-  'username' | 'firstName' | 'lastName' | 'profilePicture' | '_id'
+  | 'username'
+  | 'firstName'
+  | 'lastName'
+  | 'profilePicture'
+  | '_id'
+  | 'bio'
+  | 'email'
+  | 'createdAt'
 >;
 
 type PopulatedCategory = Pick<CategoryDocument, 'name' | 'slug' | '_id'>;
@@ -39,6 +49,7 @@ type PopulatedTag = Pick<TagDocument, 'name' | 'slug'> & {
 };
 
 export type {
+  AuthorBlogsResponse,
   BlogAuthor,
   BlogListItem,
   CategoryBlogsResponse,

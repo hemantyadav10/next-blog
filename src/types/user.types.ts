@@ -1,3 +1,5 @@
+import { UserType } from '@/models/userModel';
+
 export type UserPreview = {
   _id: string;
   username: string;
@@ -12,3 +14,21 @@ export type UsersResponse = {
   hasNextPage: boolean;
   nextPage: number | null;
 };
+
+export type UserProfileData = Pick<
+  UserType,
+  | 'email'
+  | 'username'
+  | '_id'
+  | 'bio'
+  | 'createdAt'
+  | 'firstName'
+  | 'language'
+  | 'lastName'
+  | 'phoneNumber'
+  | 'updatedAt'
+  | 'role'
+  | 'timezone'
+  | 'socialLinks'
+  | 'profilePicture'
+>;

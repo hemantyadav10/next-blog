@@ -147,7 +147,7 @@ function Header({ user }: { user: AuthResult }) {
               <Logo />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="hidden items-center gap-2 sm:flex">
               {/* Center: Navigation Links */}
               {navItems.map(({ name, href }) => {
                 const isActive =
@@ -159,7 +159,7 @@ function Header({ user }: { user: AuthResult }) {
                     href={href}
                     key={name}
                     className={cn(
-                      'relative hidden items-center px-2 py-3 sm:flex',
+                      'relative items-center px-2 py-3',
                       isActive
                         ? 'text-primary font-medium'
                         : 'text-foreground hover:text-primary transition-colors',
@@ -253,7 +253,7 @@ function Header({ user }: { user: AuthResult }) {
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                      <Link href={'/profile'}>
+                      <Link href={`/author/${userDetails.username}`}>
                         <User />
                         Profile
                       </Link>

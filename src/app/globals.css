@@ -117,6 +117,36 @@
       transform: translateZ(0) rotate(360deg);
     }
   }
+
+  --animate-rotate: rotate var(--duration, 1.4s) linear infinite;
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  --animate-dash: dash var(--duration, 1.4s)
+    var(--easing, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
+  @keyframes dash {
+    0% {
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0;
+    }
+
+    50% {
+      stroke-dasharray: 89, 200;
+      stroke-dashoffset: -35px;
+    }
+
+    100% {
+      stroke-dasharray: 89, 200;
+      stroke-dashoffset: -124px;
+    }
+  }
 }
 
 :root {

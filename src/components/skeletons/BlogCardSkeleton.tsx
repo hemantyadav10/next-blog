@@ -28,7 +28,7 @@ function BlogCardSkeleton({
       >
         {/* Title - 2 lines */}
         <div className="space-y-2">
-          <Skeleton className="h-5 w-3/4 sm:h-6" />
+          <Skeleton className="h-5 w-3/4 md:h-6" />
         </div>
 
         {/* Description - 2 lines */}

@@ -2,22 +2,21 @@
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { FileTextIcon, LucideIcon, TagIcon, UserIcon } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-type Path = '/explore' | '/explore/users' | '/explore/tags';
-
 type Filter = {
-  path: Path;
+  path: string;
   name: string;
   Icon?: LucideIcon;
 };
 
 const filters: Filter[] = [
-  { path: '/explore', name: 'Posts', Icon: FileTextIcon },
-  { path: '/explore/users', name: 'People', Icon: UserIcon },
-  { path: '/explore/tags', name: 'Tags', Icon: TagIcon },
+  { path: '/explore', name: 'Posts' },
+  { path: '/explore/following', name: 'Following' },
+  { path: '/explore/users', name: 'People' },
+  { path: '/explore/tags', name: 'Tags' },
 ] as const;
 
 function FilterSection() {

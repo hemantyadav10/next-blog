@@ -15,6 +15,7 @@ export type AuthResult =
         role: string;
         fullName: string;
         profilePicture: string | null | undefined;
+        username: string;
       };
       error: null;
     }
@@ -110,7 +111,7 @@ export const verifyAuth = cache(async (): Promise<AuthResult> => {
     }
 
     const user = await User.findById(tokenResult.payload.userId)
-      .select('email firstName lastName role profilePicture')
+      .select('email firstName lastName role profilePicture username')
       .lean();
 
     if (!user) {
@@ -130,6 +131,7 @@ export const verifyAuth = cache(async (): Promise<AuthResult> => {
         role: user.role,
         fullName: `${user.firstName} ${user.lastName}`,
         profilePicture: user.profilePicture,
+        username: user.username,
       },
     };
   } catch (error) {

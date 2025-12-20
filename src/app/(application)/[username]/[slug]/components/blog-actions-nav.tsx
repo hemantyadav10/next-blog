@@ -118,7 +118,7 @@ function BlogActionsDesktop({ text, title }: BlogActionProps) {
 function BlogActionsMobile({ text, title }: BlogActionProps) {
   const pathname = usePathname();
   const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
-  const { headerOffset, isSnapping } = useScrollProgress(64);
+  const { headerOffset, isSnapping } = useScrollProgress(56);
   return (
     <div
       className={cn(

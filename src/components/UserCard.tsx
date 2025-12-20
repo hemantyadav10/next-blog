@@ -18,14 +18,14 @@ type UserProps = {
   profilePicture: string | null | undefined;
 };
 
-function UserCard({ profilePicture, name, username }: UserProps) {
+function UserCard({ profilePicture, name, username, bio }: UserProps) {
   return (
     <Item variant="outline" asChild>
-      <Link href={`/@${username}`}>
+      <Link href={`/author/${username}`}>
         <ItemMedia>
           <Avatar className="size-12">
-            <AvatarImage src={profilePicture || undefined} alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={profilePicture || undefined} alt={name} />
+            <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </ItemMedia>
         <ItemContent>
@@ -33,8 +33,10 @@ function UserCard({ profilePicture, name, username }: UserProps) {
           <ItemDescription className="flex items-center gap-0.5">
             <AtSign className="size-4" /> {username}
           </ItemDescription>
+          {bio && <p className="text-muted-foreground line-clamp-3">{bio}</p>}
         </ItemContent>
         <ItemActions>
+          {/* TODO: Implement follow/unfollow logic and button state */}
           <Button variant="outline">Follow</Button>
         </ItemActions>
       </Link>

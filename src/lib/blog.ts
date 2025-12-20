@@ -88,7 +88,10 @@ export const getBlogPost = cache(async (slug: string) => {
   const blog = await Blog.findOne({ slug, status: 'published' })
     .populate<{
       authorId: PopulatedAuthor;
-    }>('authorId', 'username firstName lastName profilePicture')
+    }>(
+      'authorId',
+      'username firstName lastName profilePicture bio email createdAt',
+    )
     .populate<{ tags: PopulatedTag[] }>('tags', 'name slug')
     .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug');
 

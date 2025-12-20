@@ -93,14 +93,14 @@ async function page({ params }: Props) {
         title={blog.title}
         text={blog.metaDescription || blog.description}
       />
-      <div className="sticky top-28 hidden w-16 flex-col items-center space-y-6 self-start md:flex">
+      <div className="sticky top-28 hidden w-16 shrink-0 flex-col items-center space-y-6 self-start md:flex">
         <BlogActionsDesktop
           title={blog.title}
           text={blog.metaDescription || blog.description}
         />
       </div>
 
-      <div className="flex flex-col gap-8 xl:flex-row">
+      <div className="flex w-full max-w-2xl flex-col gap-8 xl:max-w-full xl:flex-row">
         {/* Blog Content */}
         <div className="flex w-full max-w-2xl flex-col gap-8">
           <div className="space-y-6">
@@ -144,7 +144,7 @@ async function page({ params }: Props) {
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
               {/* author */}
               <Link
-                href={`/${blog.authorId.username}`}
+                href={`/author/${blog.authorId.username}`}
                 className="group text-foreground flex w-fit items-center gap-2 text-sm"
               >
                 <Avatar className="text-foreground size-8">
@@ -161,8 +161,7 @@ async function page({ params }: Props) {
                 </span>
               </Link>
 
-              {/* mete data */}
-
+              {/* meta data */}
               {/* Publishing date */}
               {blog?.publishedAt ? (
                 <span className="flex items-center gap-1">
@@ -262,24 +261,34 @@ async function page({ params }: Props) {
           {/* Author Info */}
           <div className="space-y-4 sm:flex xl:flex-col">
             <div className="flex items-start gap-4 sm:flex-1">
-              <Avatar className="size-14">
-                <AvatarImage
-                  src={blog.authorId.profilePicture ?? ''}
-                  alt={blog.authorId.firstName}
-                />
-                <AvatarFallback className="uppercase">
-                  {blog.authorId.firstName.charAt(0)}{' '}
-                  {blog.authorId.lastName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+              <Link
+                href={`/author/${blog.authorId.username}`}
+                className="rounded-full"
+              >
+                <Avatar className="size-14">
+                  <AvatarImage
+                    src={blog.authorId.profilePicture ?? ''}
+                    alt={blog.authorId.firstName}
+                  />
+                  <AvatarFallback className="uppercase">
+                    {blog.authorId.firstName.charAt(0)}{' '}
+                    {blog.authorId.lastName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
               <div className="space-y-2 text-sm">
-                <p className="text-lg font-medium">
-                  Written by {blog.authorId.firstName} {blog.authorId.lastName}
-                </p>
+                <Link
+                  href={`/author/${blog.authorId.username}`}
+                  className="hover:underline"
+                >
+                  <p className="text-lg font-medium">
+                    {blog.authorId.firstName} {blog.authorId.lastName}
+                  </p>
+                </Link>
                 <p className="text-muted-foreground">
                   3.4K followers and 2.1K following
                 </p>
-                <p>Freelancer IT specialist web developer</p>
+                {blog.authorId.bio && <p>{blog.authorId.bio}</p>}
               </div>
             </div>
             <Button className="w-full sm:w-auto" variant={'raised'}>

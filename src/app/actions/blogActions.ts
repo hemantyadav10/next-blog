@@ -14,7 +14,11 @@ import { isMongoError } from '@/lib/utils';
 import { Blog, Category, Tag } from '@/models';
 import { BlogDocument } from '@/models/blogModel';
 import { ActionResponse } from '@/types/api.types';
-import { BlogListItem, CategoryBlogsResponse } from '@/types/blog.types';
+import {
+  AuthorBlogsResponse,
+  BlogListItem,
+  CategoryBlogsResponse,
+} from '@/types/blog.types';
 import { v2 as cloudinary } from 'cloudinary';
 import {
   AggregatePaginateResult,
@@ -366,6 +370,63 @@ export const getCategoryLatestBlogs = async ({
         docs: JSON.parse(JSON.stringify(blogs)),
         hasNextPage: skip + limit < totalDocs,
         nextPage: skip + limit < totalDocs ? page + 1 : null,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+
+    return {
+      success: false,
+      error: 'Failed to load blogs. Please try again.',
+    };
+  }
+};
+
+export const getAuthorBlogs = async ({
+  limit = 12,
+  page = 1,
+  authorId,
+}: {
+  limit?: number;
+  page?: number;
+  authorId: string;
+}): Promise<ActionResponse<AuthorBlogsResponse>> => {
+  try {
+    await connectDb();
+
+    if (!isValidObjectId(authorId)) {
+      return {
+        success: false,
+        error: 'Invalid author Id',
+      };
+    }
+
+    const filter: FilterQuery<BlogDocument> = {
+      authorId: authorId,
+      status: 'published',
+    };
+
+    const skip = (page - 1) * limit;
+
+    const blogs = await Blog.find(filter)
+      .populate('authorId', 'username  firstName  lastName profilePicture')
+      .select(
+        'authorId banner blurDataUrl description publishedAt readTime slug title',
+      )
+      .sort({ publishedAt: -1 })
+      .skip(skip)
+      .limit(limit + 1)
+      .lean();
+
+    const hasNextPage = blogs.length > limit;
+    if (hasNextPage) blogs.pop();
+
+    return {
+      success: true,
+      data: {
+        docs: JSON.parse(JSON.stringify(blogs)),
+        hasNextPage,
+        nextPage: hasNextPage ? page + 1 : null,
       },
     };
   } catch (error) {

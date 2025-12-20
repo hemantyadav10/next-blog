@@ -1,14 +1,14 @@
-import { model, models, Schema, Types } from 'mongoose';
+import {
+  AggregatePaginateModel,
+  InferSchemaType,
+  model,
+  models,
+  Schema,
+  Types,
+} from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-export interface IFollow {
-  followerId: Types.ObjectId;
-  followingId: Types.ObjectId;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const followSchema = new Schema<IFollow>(
+const followSchema = new Schema(
   {
     followerId: {
       type: Schema.Types.ObjectId,
@@ -26,11 +26,22 @@ const followSchema = new Schema<IFollow>(
 
 // TODO: Add indexes, virtuals, hooks and methods
 
-// Prevent duplicate follows
-followSchema.index({ followerId: 1, followingId: 1 }, { unique: true });
+// INDEXES
+followSchema.index({ followerId: 1, followingId: 1 }, { unique: true }); // Prevent duplicate follows
+followSchema.index({ followingId: 1, createdAt: -1 });
+followSchema.index({ followerId: 1, createdAt: -1 });
 
+// PLUGINS
 followSchema.plugin(aggregatePaginate);
 
-const Follow = models.Follow || model<IFollow>('Follow', followSchema);
+export type FollowDocument = InferSchemaType<typeof followSchema> & {
+  _id: Types.ObjectId;
+};
+
+const Follow = (models.Follow ||
+  model<FollowDocument, AggregatePaginateModel<FollowDocument>>(
+    'Follow',
+    followSchema,
+  )) as AggregatePaginateModel<FollowDocument>;
 
 export default Follow;

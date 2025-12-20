@@ -38,7 +38,7 @@ export default function BlogCard({
       className={cn(
         'group grid grid-cols-12 gap-y-3',
         orientation === 'vertical'
-          ? 'grid-cols-1 gap-x-4 sm:gap-x-0'
+          ? 'grid-cols-1 gap-x-4 md:gap-x-0'
           : 'gap-x-4',
       )}
     >
@@ -50,17 +50,17 @@ export default function BlogCard({
       />
       <div
         className={cn(
-          'space-y-2 sm:space-y-3',
+          'space-y-2 md:space-y-3',
           orientation === 'vertical' ? 'col-span-full' : 'col-span-8',
         )}
       >
-        <div className="space-y-1 sm:space-y-2">
-          <h3 className="text-primary line-clamp-3 font-medium sm:line-clamp-2 sm:text-xl">
+        <div className="space-y-2">
+          <h3 className="text-primary line-clamp-3 font-medium md:line-clamp-2 md:text-xl">
             <span className="from-primary to-primary bg-gradient-to-r bg-[length:0px_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover:bg-[length:100%_2px]">
               {title}
             </span>
           </h3>
-          <p className="line-clamp-1 text-sm sm:line-clamp-2 sm:text-base">
+          <p className="line-clamp-1 text-sm md:line-clamp-2 md:text-base">
             {description}
           </p>
         </div>
