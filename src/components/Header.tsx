@@ -108,7 +108,7 @@ function Header({ user }: { user: AuthResult }) {
 
       <header
         className={cn(
-          'bg-background/95 sticky top-0 z-50 backdrop-blur-sm md:transform-none',
+          'bg-background/95 border-border sticky top-0 z-50 border-b backdrop-blur-sm md:transform-none',
           'dark:bg-background/90 dark:backdrop-blur-lg',
           isSnapping ? 'transition-transform duration-200 ease-out' : '',
         )}
@@ -117,7 +117,7 @@ function Header({ user }: { user: AuthResult }) {
         }}
       >
         {/* Left: App Name */}
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
+        <div className="mx-auto flex h-16 items-center justify-between px-4">
           <nav className="flex items-center gap-8">
             <div className="flex items-center gap-2">
               <Button
@@ -271,7 +271,7 @@ function Header({ user }: { user: AuthResult }) {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href={'/settings'}>
+                      <Link href={'/dashboard/settings'}>
                         <Settings />
                         Settings
                       </Link>

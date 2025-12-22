@@ -2,9 +2,13 @@
 import bcrypt from 'bcrypt';
 import * as z from 'zod';
 
-import { generateTokens } from '@/lib/auth';
+import { generateTokens, verifyAuth } from '@/lib/auth';
 import connectDb from '@/lib/connectDb';
 import { COOKIE_NAMES } from '@/lib/constants';
+import {
+  ChangePasswordInput,
+  changePasswordSchema,
+} from '@/lib/schema/authSchema';
 import {
   LoginInput,
   loginSchema,
@@ -45,6 +49,14 @@ export type ResponseState = {
 };
 
 export type InitialState = ResponseState | null;
+
+type Response<T = unknown> =
+  | { success: true; message: string; data?: T }
+  | {
+      success: false;
+      error: string;
+      errors?: Record<string, string[] | undefined>;
+    };
 
 // Registers a new user
 export async function registerUser(
@@ -290,3 +302,53 @@ export const getAllUsers = async ({
     };
   }
 };
+
+export async function changePassword(
+  formData: ChangePasswordInput,
+): Promise<Response<{ updated: true }>> {
+  try {
+    // Connect to databasse
+    await connectDb();
+
+    // Verify user is authenticated and get user ID
+    const {
+      error: authenticationError,
+      isAuthenticated,
+      user: currentUser,
+    } = await verifyAuth();
+    if (!isAuthenticated)
+      return { success: false, error: authenticationError || 'Unauthorized' };
+
+    // Validate input with Zod schema
+    const { success, data, error } = changePasswordSchema.safeParse(formData);
+    if (!success) {
+      return {
+        success: false,
+        error: 'Validation failed',
+        errors: z.flattenError(error).fieldErrors,
+      };
+    }
+
+    // Fetch user with password field (excluded by default)
+    const user = await User.findById(currentUser.userId).select('+password');
+    if (!user) return { success: false, error: 'User not found' };
+
+    // Verify current password matches
+    const isMatch = await bcrypt.compare(data.currentPassword, user.password);
+    if (!isMatch)
+      return { success: false, error: 'Current password is incorrect' };
+
+    // Update password (pre-save hook handles bcrypt automatically)
+    user.password = data.newPassword;
+    await user.save();
+
+    return {
+      success: true,
+      message: 'Password changed successfully',
+      data: { updated: true },
+    };
+  } catch (error) {
+    console.error('Change password failed:', error);
+    return { success: false, error: 'Server error. Please try again later.' };
+  }
+}

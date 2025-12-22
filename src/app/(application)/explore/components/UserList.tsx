@@ -57,11 +57,12 @@ function UserList({ initialData, query, sortBy, sortOrder }: UserListProps) {
   return (
     <section className="space-y-4">
       {allUsers.map(
-        ({ _id, firstName, lastName, profilePicture, username }) => (
+        ({ _id, firstName, lastName, profilePicture, username, bio }) => (
           <UserCard
             name={`${firstName} ${lastName}`}
             profilePicture={profilePicture}
             username={username}
+            bio={bio}
             key={_id.toString()}
           />
         ),
