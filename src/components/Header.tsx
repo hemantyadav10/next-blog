@@ -170,7 +170,7 @@ function Header({ user }: { user: AuthResult }) {
                       <motion.div
                         style={{ originY: '0px' }}
                         layoutId="underline"
-                        className="bg-primary absolute inset-x-0 -bottom-1.5 h-0.5"
+                        className="bg-primary absolute inset-x-0 -bottom-2 h-0.5"
                         transition={{
                           type: 'spring',
                           stiffness: 400,

@@ -48,11 +48,25 @@ type PopulatedTag = Pick<TagDocument, 'name' | 'slug'> & {
   _id: Types.ObjectId;
 };
 
+type MyBlogs = Pick<
+  BlogDocument,
+  | '_id'
+  | 'status'
+  | 'slug'
+  | 'title'
+  | 'description'
+  | 'createdAt'
+  | 'publishedAt'
+  | 'isEdited'
+  | 'updatedAt'
+>;
+
 export type {
   AuthorBlogsResponse,
   BlogAuthor,
   BlogListItem,
   CategoryBlogsResponse,
+  MyBlogs,
   PopulatedAuthor,
   PopulatedCategory,
   PopulatedTag,

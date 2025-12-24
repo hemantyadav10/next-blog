@@ -12,15 +12,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { Sort } from '@/types/shared.types';
 import { ArrowUpDown } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
-type Sort = {
-  value: string;
-  label: string;
-  sortBy: string;
-  sortOrder: string;
-};
 
 const sortItems: Sort[] = [
   {

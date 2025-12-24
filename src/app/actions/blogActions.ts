@@ -222,7 +222,7 @@ export async function deleteBlog(blogId: string): Promise<ResponseState> {
   }
 }
 
-// Fetches all blogs wiith searching, filtering and sorting functionality
+// Fetches all blogs with searching, filtering and sorting functionality
 export const getAllBlogs = async ({
   query,
   sortBy,

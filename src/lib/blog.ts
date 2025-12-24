@@ -1,9 +1,12 @@
+import { verifyAuth } from '@/lib/auth';
 import { Blog } from '@/models';
 import type {
+  MyBlogs,
   PopulatedAuthor,
   PopulatedCategory,
   PopulatedTag,
 } from '@/types/blog.types';
+import { PipelineStage, SortValues, Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { Value } from 'platejs';
 import { cache } from 'react';
@@ -97,3 +100,58 @@ export const getBlogPost = cache(async (slug: string) => {
 
   return blog;
 });
+
+export const getMyPosts = async ({
+  page = 1,
+  limit = 20,
+  sortBy,
+  sortOrder,
+}: Partial<{
+  page: number;
+  limit: number;
+  sortBy: string;
+  sortOrder: string;
+}> = {}) => {
+  await connectDb();
+
+  const { error, isAuthenticated, user } = await verifyAuth();
+  if (!isAuthenticated) {
+    throw new Error(error || 'User is not authenticated');
+  }
+
+  // TODO: Implement aggregation logic to sort posts by views, likes, and comments count
+  let sortOption: Record<string, SortValues> = {};
+  if (sortOrder && sortBy) {
+    const order = sortOrder === 'asc' ? 1 : -1;
+    sortOption = { [sortBy]: order };
+  } else {
+    sortOption = { createdAt: -1 };
+  }
+
+  const pipeline: PipelineStage[] = [];
+
+  pipeline.push(
+    { $match: { authorId: new Types.ObjectId(user.userId) } },
+    {
+      $project: {
+        status: 1,
+        slug: 1,
+        title: 1,
+        description: 1,
+        createdAt: 1,
+        publishedAt: 1,
+        isEdited: 1,
+        updatedAt: 1,
+      },
+    },
+  );
+
+  const aggregate = Blog.aggregate<MyBlogs>(pipeline);
+
+  const result = await Blog.aggregatePaginate(aggregate, {
+    page,
+    limit,
+    sort: sortOption,
+  });
+  return { user, data: result };
+};

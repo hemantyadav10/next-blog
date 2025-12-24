@@ -36,7 +36,9 @@ export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
   const errorMessage =
     IS_DEV && error instanceof Error
       ? error.message
-      : 'An unexpected error occurred. Please try again.';
+      : typeof error === 'string'
+        ? error
+        : 'An unexpected error occurred. Please try again.';
 
   return errorResponse(500, errorMessage);
 }
