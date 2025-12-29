@@ -1,5 +1,4 @@
-import { verifyAuth } from '@/lib/auth';
-import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
 import TabNav from './components/TabNav';
 
 export default async function SettingsLayout({
@@ -7,24 +6,15 @@ export default async function SettingsLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const authResult = await verifyAuth();
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-2xl font-semibold md:text-3xl">Settings</h1>
-        <Link
-          href={`/author/${authResult.user?.username}`}
-          className="text-lg hover:underline"
-        >
-          {authResult.user?.fullName}{' '}
-          <span className="text-muted-foreground">
-            (@{authResult.user?.username})
-          </span>
-        </Link>
-      </div>
-      <section className="space-y-8">
-        <TabNav />
-        {children}
+    <div className="space-y-8">
+      <h1 className="text-2xl font-semibold md:text-3xl">Settings</h1>
+      <Separator />
+      <section className="flex flex-col gap-8 lg:flex-row">
+        <aside className="bg-background lg:sticky lg:top-20 lg:z-40 lg:min-w-60 lg:self-start">
+          <TabNav />
+        </aside>
+        <section className="flex-1">{children}</section>
       </section>
     </div>
   );

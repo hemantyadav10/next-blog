@@ -4,19 +4,14 @@ import { changePassword } from '@/app/actions/userActions';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
   Field,
   FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from '@/components/ui/field';
 import {
   InputGroup,
@@ -85,162 +80,159 @@ function ChangePasswordForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">Change Password</CardTitle>
-        <CardDescription>
+    <form onSubmit={handleSubmit(handleChangePassword)} className="space-y-6">
+      <FieldSet>
+        <FieldLegend className="data-[variant=legend]:text-2xl">
+          Change Password
+        </FieldLegend>
+        <FieldDescription>
           Update your password to keep your account secure.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={handleSubmit(handleChangePassword)}
-          className="space-y-6"
+        </FieldDescription>
+        {/* Error callout */}
+        {error && (
+          <Alert variant={'destructive'}>
+            <AlertCircleIcon />
+            <AlertTitle>{error}</AlertTitle>
+          </Alert>
+        )}
+        <FieldGroup>
+          {/* Current Password */}
+          <Controller
+            control={control}
+            name="currentPassword"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Current Password</FieldLabel>
+                <FieldContent>
+                  <InputGroup className="max-w-md">
+                    <InputGroupInput
+                      id={field.name}
+                      type={showCurrent ? 'text' : 'password'}
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Enter your current password"
+                    />
+                    <InputGroupAddon align={'inline-end'}>
+                      <InputGroupButton
+                        type="button"
+                        aria-label="Toggle password visibility"
+                        title="Toggle password"
+                        size="icon-sm"
+                        onClick={() => {
+                          setShowCurrent(!showCurrent);
+                        }}
+                      >
+                        {showCurrent ? <EyeOff /> : <Eye />}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                  <FieldDescription>
+                    Enter your current password for verification.
+                  </FieldDescription>
+                </FieldContent>
+              </Field>
+            )}
+          />
+
+          {/* New Password */}
+          <Controller
+            control={control}
+            name="newPassword"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
+                <FieldContent>
+                  <InputGroup className="max-w-md">
+                    <InputGroupInput
+                      id={field.name}
+                      type={showNew ? 'text' : 'password'}
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Create a new password"
+                    />
+                    <InputGroupAddon align={'inline-end'}>
+                      <InputGroupButton
+                        type="button"
+                        aria-label="Toggle password visibility"
+                        title="Toggle password"
+                        size="icon-sm"
+                        onClick={() => {
+                          setShowNew(!showNew);
+                        }}
+                      >
+                        {showNew ? <EyeOff /> : <Eye />}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                  <FieldDescription>
+                    Password must be at least 8 characters.
+                  </FieldDescription>
+                </FieldContent>
+              </Field>
+            )}
+          />
+
+          {/* Confirm New Password */}
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Confirm New Password
+                </FieldLabel>
+                <FieldContent>
+                  <InputGroup className="max-w-md">
+                    <InputGroupInput
+                      id={field.name}
+                      type={showConfirm ? 'text' : 'password'}
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Confirm your new password"
+                    />
+                    <InputGroupAddon align={'inline-end'}>
+                      <InputGroupButton
+                        type="button"
+                        aria-label="Toggle password visibility"
+                        title="Toggle password"
+                        size="icon-sm"
+                        onClick={() => {
+                          setShowConfirm(!showConfirm);
+                        }}
+                      >
+                        {showConfirm ? <EyeOff /> : <Eye />}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                  <FieldDescription>
+                    Re-enter your new password to confirm.
+                  </FieldDescription>
+                </FieldContent>
+              </Field>
+            )}
+          />
+        </FieldGroup>
+
+        {/* Submit button */}
+        <Button
+          type="submit"
+          disabled={isPending}
+          size={'lg'}
+          className="max-w-fit disabled:cursor-not-allowed"
         >
-          {/* Error callout */}
-          {error && (
-            <Alert variant={'destructive'}>
-              <AlertCircleIcon />
-              <AlertTitle>{error}</AlertTitle>
-            </Alert>
-          )}
-
-          <FieldGroup>
-            {/* Current Password */}
-            <Controller
-              control={control}
-              name="currentPassword"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Current Password</FieldLabel>
-                  <FieldContent>
-                    <InputGroup>
-                      <InputGroupInput
-                        id={field.name}
-                        type={showCurrent ? 'text' : 'password'}
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Enter your current password"
-                      />
-                      <InputGroupAddon align={'inline-end'}>
-                        <InputGroupButton
-                          aria-label="Toggle password"
-                          title="Toggle password"
-                          size="icon-sm"
-                          onClick={() => {
-                            setShowCurrent(!showCurrent);
-                          }}
-                        >
-                          {showCurrent ? <EyeOff /> : <Eye />}
-                        </InputGroupButton>
-                      </InputGroupAddon>
-                    </InputGroup>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                    <FieldDescription>
-                      Enter your current password for verification.
-                    </FieldDescription>
-                  </FieldContent>
-                </Field>
-              )}
-            />
-
-            {/* New Password */}
-            <Controller
-              control={control}
-              name="newPassword"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
-                  <FieldContent>
-                    <InputGroup>
-                      <InputGroupInput
-                        id={field.name}
-                        type={showNew ? 'text' : 'password'}
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Create a new password"
-                      />
-                      <InputGroupAddon align={'inline-end'}>
-                        <InputGroupButton
-                          aria-label="Toggle password"
-                          title="Toggle password"
-                          size="icon-xs"
-                          onClick={() => {
-                            setShowNew(!showNew);
-                          }}
-                        >
-                          {showNew ? <EyeOff /> : <Eye />}
-                        </InputGroupButton>
-                      </InputGroupAddon>
-                    </InputGroup>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                    <FieldDescription>
-                      Password must be at least 8 characters.
-                    </FieldDescription>
-                  </FieldContent>
-                </Field>
-              )}
-            />
-
-            {/* Confirm New Password */}
-            <Controller
-              control={control}
-              name="confirmPassword"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Confirm New Password
-                  </FieldLabel>
-                  <FieldContent>
-                    <InputGroup>
-                      <InputGroupInput
-                        id={field.name}
-                        type={showConfirm ? 'text' : 'password'}
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Confirm your new password"
-                      />
-                      <InputGroupAddon align={'inline-end'}>
-                        <InputGroupButton
-                          aria-label="Toggle password"
-                          title="Toggle password"
-                          size="icon-xs"
-                          onClick={() => {
-                            setShowConfirm(!showConfirm);
-                          }}
-                        >
-                          {showConfirm ? <EyeOff /> : <Eye />}
-                        </InputGroupButton>
-                      </InputGroupAddon>
-                    </InputGroup>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                    <FieldDescription>
-                      Re-enter your new password to confirm.
-                    </FieldDescription>
-                  </FieldContent>
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          {/* Submit button */}
-          <Button
-            type="submit"
-            disabled={isPending}
-            size={'lg'}
-            className="disabled:cursor-not-allowed"
-          >
-            {isPending && <Spinner />} Change Password
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+          {isPending && <Spinner />} Change Password
+        </Button>
+      </FieldSet>
+    </form>
   );
 }
 

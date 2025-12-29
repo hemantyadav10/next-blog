@@ -66,7 +66,7 @@ async function MyPosts({
         </Empty>
       ) : (
         <>
-          <section className="divide-border bg-card divide-y rounded-xl border shadow-md">
+          <section className="divide-border bg-card divide-y rounded-xl border">
             {posts.map((post) => (
               <div key={post._id.toString()}>
                 <PostCard post={post} user={user} />

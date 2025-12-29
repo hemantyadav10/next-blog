@@ -5,7 +5,8 @@ import {
   NativeSelectOption,
 } from '@/components/ui/native-select';
 import { Sort } from '@/types/shared.types';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 
 export const sortItems: Sort[] = [
   {

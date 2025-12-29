@@ -17,7 +17,7 @@ export default loading;
 // Full section skeleton
 export function PostsListSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <section className="divide-border bg-card divide-y rounded-xl border shadow-md">
+    <section className="divide-border bg-card divide-y rounded-xl border">
       {[...Array(count)].map((_, i) => (
         <div key={i} className="space-y-4 p-4">
           {/* Title and Description */}

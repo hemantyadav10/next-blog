@@ -109,7 +109,7 @@ function Header({ user }: { user: AuthResult }) {
       <header
         className={cn(
           'bg-background/95 border-border sticky top-0 z-50 border-b backdrop-blur-sm md:transform-none',
-          'dark:bg-background/90 dark:backdrop-blur-lg',
+          'dark:bg-card/90 dark:backdrop-blur-lg',
           isSnapping ? 'transition-transform duration-200 ease-out' : '',
         )}
         style={{
@@ -187,7 +187,7 @@ function Header({ user }: { user: AuthResult }) {
           {/* Right: Theme Toggle + Auth */}
           <div className="flex items-center gap-4">
             {/* Search */}
-            <InputGroup className="hidden h-9 rounded-full lg:flex lg:min-w-sm">
+            <InputGroup className="hidden h-9 rounded-full inset-shadow-sm lg:flex lg:min-w-sm">
               <InputGroupInput placeholder="Search..." />
               <InputGroupAddon>
                 <SearchIcon />

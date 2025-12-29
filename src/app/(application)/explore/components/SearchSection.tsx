@@ -8,7 +8,8 @@ import {
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { SearchIcon, X } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import { useEffect, useState, useTransition } from 'react';
 
 function SearchSection() {
@@ -63,7 +64,7 @@ function SearchSection() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <InputGroup className="mx-auto h-12 max-w-lg rounded-full shadow-sm">
+      <InputGroup className="mx-auto h-12 max-w-lg rounded-full inset-shadow-sm">
         <InputGroupInput
           value={searchValue}
           onChange={handleChange}

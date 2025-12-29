@@ -14,7 +14,8 @@ import {
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { Sort } from '@/types/shared.types';
 import { ArrowUpDown } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 
 const sortItems: Sort[] = [
   {

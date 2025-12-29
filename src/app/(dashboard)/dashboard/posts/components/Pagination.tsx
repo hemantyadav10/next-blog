@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import { FormEvent } from 'react';
 import NavigationButton from './NavigationButton';
 
