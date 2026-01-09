@@ -30,6 +30,8 @@ type CategoryBlogsResponse = {
 
 type AuthorBlogsResponse = PaginatedResponse<BlogListItem[]>;
 
+type BlogsResponse = PaginatedResponse<BlogListItem[]>;
+
 type PopulatedAuthor = Pick<
   UserType,
   | 'username'
@@ -65,6 +67,7 @@ export type {
   AuthorBlogsResponse,
   BlogAuthor,
   BlogListItem,
+  BlogsResponse,
   CategoryBlogsResponse,
   MyBlogs,
   PopulatedAuthor,

@@ -1,25 +1,38 @@
 'use client';
 
-import { getAllBlogs } from '@/app/actions/blogActions';
 import BlogCard from '@/components/BlogCard';
 import { ClientErrorState } from '@/components/ClientErrorState';
 import AllBlogsSkeleton from '@/components/skeletons/AllBlogsSkeleton';
 import { Separator } from '@/components/ui/separator';
 import { ActionResponse } from '@/types/api.types';
-import { BlogListItem } from '@/types/blog.types';
+import { BlogsResponse } from '@/types/blog.types';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { AggregatePaginateResult } from 'mongoose';
 import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 type BlogListProps = {
-  initialData: ActionResponse<AggregatePaginateResult<BlogListItem>>;
+  initialData: ActionResponse<BlogsResponse>;
   query?: string;
   sortBy?: string;
   sortOrder?: string;
+  queryKey: string[];
+  fetchFn: (params: {
+    query?: string | undefined;
+    sortBy?: string | undefined;
+    sortOrder?: string | undefined;
+    limit?: number | undefined;
+    page?: number | undefined;
+  }) => Promise<ActionResponse<BlogsResponse>>;
 };
 
-function BlogsList({ initialData, query, sortBy, sortOrder }: BlogListProps) {
+function BlogsList({
+  initialData,
+  query,
+  sortBy,
+  sortOrder,
+  queryKey,
+  fetchFn,
+}: BlogListProps) {
   const { ref, inView } = useInView({
     threshold: 0,
     rootMargin: '100px',
@@ -32,9 +45,9 @@ function BlogsList({ initialData, query, sortBy, sortOrder }: BlogListProps) {
     isError,
     error,
   } = useInfiniteQuery({
-    queryKey: ['blogs', query, sortBy, sortOrder],
+    queryKey: queryKey,
     queryFn: async ({ pageParam }) => {
-      const result = await getAllBlogs({
+      const result = await fetchFn({
         query,
         sortBy,
         sortOrder,

@@ -17,15 +17,16 @@ import { ActionResponse } from '@/types/api.types';
 import {
   AuthorBlogsResponse,
   BlogListItem,
+  BlogsResponse,
   CategoryBlogsResponse,
 } from '@/types/blog.types';
 import { v2 as cloudinary } from 'cloudinary';
 import {
-  AggregatePaginateResult,
   FilterQuery,
   isValidObjectId,
   PipelineStage,
   SortValues,
+  Types,
 } from 'mongoose';
 import * as z from 'zod';
 
@@ -235,7 +236,7 @@ export const getAllBlogs = async ({
   sortOrder?: string;
   limit?: number;
   page?: number;
-}): Promise<ActionResponse<AggregatePaginateResult<BlogListItem>>> => {
+}): Promise<ActionResponse<BlogsResponse>> => {
   try {
     await connectDb();
     let sortOption: Record<string, SortValues | { $meta: string }> = {};
@@ -435,6 +436,151 @@ export const getAuthorBlogs = async ({
     return {
       success: false,
       error: 'Failed to load blogs. Please try again.',
+    };
+  }
+};
+
+export const getFollowingPosts = async ({
+  query,
+  sortBy,
+  sortOrder,
+  limit = 12,
+  page = 1,
+}: {
+  query?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  limit?: number;
+  page?: number;
+}): Promise<ActionResponse<BlogsResponse>> => {
+  try {
+    await connectDb();
+
+    const { error: authError, isAuthenticated, user } = await verifyAuth();
+
+    if (!isAuthenticated) {
+      return {
+        success: false,
+        error: authError,
+      };
+    }
+
+    const { userId } = user;
+
+    let sortOption: Record<string, SortValues | { $meta: string }> = {};
+
+    if (sortBy && sortOrder) {
+      const order = sortOrder === 'asc' ? 1 : -1;
+
+      if (sortBy === 'popularity') {
+        // TODO: Implement popularity sorting based on engagement metrics (views/likes/comments)
+        sortOption = { title: 1 };
+      } else if (sortBy === 'publishedAt') {
+        sortOption = { publishedAt: order };
+      } else {
+        sortOption = { publishedAt: -1 };
+      }
+    } else if (query) {
+      sortOption = { score: { $meta: 'textScore' } };
+    } else {
+      sortOption = { publishedAt: -1 };
+    }
+
+    const pipeline: PipelineStage[] = [];
+
+    if (query && typeof query === 'string') {
+      pipeline.push(
+        {
+          $match: {
+            $text: { $search: query },
+          },
+        },
+        {
+          $addFields: {
+            score: { $meta: 'textScore' },
+          },
+        },
+      );
+    }
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'follows',
+          let: { authorId: '$authorId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$followerId', new Types.ObjectId(userId)] },
+                    { $eq: ['$followingId', '$$authorId'] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'followCheck',
+        },
+      },
+      // Only include blogs where the author is followed
+      {
+        $match: {
+          followCheck: { $ne: [] },
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          foreignField: '_id',
+          localField: 'authorId',
+          as: 'authorId',
+          pipeline: [
+            {
+              $project: {
+                username: 1,
+                firstName: 1,
+                lastName: 1,
+                profilePicture: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          authorId: { $first: '$authorId' },
+          banner: 1,
+          blurDataUrl: 1,
+          description: 1,
+          publishedAt: 1,
+          readTime: 1,
+          slug: 1,
+          title: 1,
+          ...(query ? { score: 1 } : {}),
+        },
+      },
+    );
+
+    const aggregate = Blog.aggregate<BlogListItem>(pipeline);
+
+    const result = await Blog.aggregatePaginate(aggregate, {
+      sort: sortOption,
+      limit,
+      page,
+    });
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(result)),
+    };
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+
+    return {
+      success: false,
+      error: 'Failed to fetch blogs. Please try again.',
     };
   }
 };

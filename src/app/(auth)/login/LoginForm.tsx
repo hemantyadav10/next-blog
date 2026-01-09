@@ -25,7 +25,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircleIcon, Eye, EyeOff, LockIcon, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -50,6 +50,8 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get('redirect') || '/';
 
   async function handleFormAction(data: LoginInput) {
     setError('');
@@ -59,7 +61,7 @@ function LoginForm() {
       if (success) {
         toast.success('Signed in successfully');
         reset();
-        router.push('/');
+        router.push(redirectPath);
         router.refresh();
       } else if (error) {
         // Set error message

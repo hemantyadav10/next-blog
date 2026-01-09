@@ -27,7 +27,7 @@ async function UsersSection({
 
   if (users.length === 0) {
     return (
-      <Empty>
+      <Empty className="border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <SearchIcon />

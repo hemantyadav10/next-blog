@@ -82,7 +82,7 @@ function Pagination({
       <div>
         Showing {start}-{end} of {totalPosts} posts
       </div>
-      <div className="gap-y flex h-9 flex-wrap items-center gap-x-4">
+      <div className="flex h-9 flex-wrap items-center gap-x-4 gap-y-2">
         <div>
           <NavigationButton
             onClick={() => handleClick(1)}

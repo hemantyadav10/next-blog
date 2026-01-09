@@ -28,7 +28,7 @@ async function BlogsSection({
 
   if (totalBlogs === 0) {
     return (
-      <Empty>
+      <Empty className="border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <SearchIcon />
@@ -50,6 +50,8 @@ async function BlogsSection({
       query={query}
       sortBy={sortBy}
       sortOrder={sortOrder}
+      queryKey={['blogs', query, sortBy, sortOrder]}
+      fetchFn={getAllBlogs}
     />
   );
 }

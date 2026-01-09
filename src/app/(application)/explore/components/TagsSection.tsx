@@ -28,7 +28,7 @@ async function TagsSection({
 
   if (tags.length === 0) {
     return (
-      <Empty>
+      <Empty className="border">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <SearchIcon />
