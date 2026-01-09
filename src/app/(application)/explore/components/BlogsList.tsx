@@ -2,7 +2,7 @@
 
 import BlogCard from '@/components/BlogCard';
 import { ClientErrorState } from '@/components/ClientErrorState';
-import AllBlogsSkeleton from '@/components/skeletons/AllBlogsSkeleton';
+import Loader from '@/components/ui/Loader';
 import { Separator } from '@/components/ui/separator';
 import { ActionResponse } from '@/types/api.types';
 import { BlogsResponse } from '@/types/blog.types';
@@ -120,7 +120,7 @@ function BlogsList({
       )}
 
       {hasNextPage && !isError && <div ref={ref} />}
-      {isFetchingNextPage && <AllBlogsSkeleton count={2} />}
+      {isFetchingNextPage && <Loader center />}
       {!hasNextPage && !isError && allBlogs.length > 0 && (
         <p className="text-muted-foreground py-4 text-center text-xs">
           You&apos;ve reached the end

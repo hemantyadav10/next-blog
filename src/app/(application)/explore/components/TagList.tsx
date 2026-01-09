@@ -4,7 +4,7 @@ import { getAllTags } from '@/app/actions/tagActions';
 import { ClientErrorState } from '@/components/ClientErrorState';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import Loader from '@/components/ui/Loader';
 import { ActionResponse } from '@/types/api.types';
 import { TagsListResponse } from '@/types/tags.type';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -95,11 +95,7 @@ function TagList({
         </div>
       )}
 
-      {isFetchingNextPage && (
-        <div className="flex h-8 items-center justify-center">
-          <Spinner className="size-6" />
-        </div>
-      )}
+      {isFetchingNextPage && <Loader center />}
 
       {!hasNextPage && !isError && allTags.length > 0 && (
         <p className="text-muted-foreground py-4 text-center text-xs">

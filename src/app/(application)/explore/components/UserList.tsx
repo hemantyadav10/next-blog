@@ -2,8 +2,8 @@
 
 import { getAllUsers } from '@/app/actions/userActions';
 import { ClientErrorState } from '@/components/ClientErrorState';
-import UserCardListSkeleton from '@/components/skeletons/UserListSkeleton';
 import { Button } from '@/components/ui/button';
+import Loader from '@/components/ui/Loader';
 import UserCard from '@/components/UserCard';
 import { ActionResponse } from '@/types/api.types';
 import { UsersResponse } from '@/types/user.types';
@@ -87,7 +87,7 @@ function UserList({ initialData, query, sortBy, sortOrder }: UserListProps) {
         </div>
       )}
 
-      {isFetchingNextPage && <UserCardListSkeleton count={2} />}
+      {isFetchingNextPage && <Loader center />}
 
       {!hasNextPage && !isError && allUsers.length > 0 && (
         <p className="text-muted-foreground py-4 text-center text-xs">
