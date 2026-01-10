@@ -61,6 +61,7 @@ type MyBlogs = Pick<
   | 'publishedAt'
   | 'isEdited'
   | 'updatedAt'
+  | 'editedAt'
 >;
 
 export type {

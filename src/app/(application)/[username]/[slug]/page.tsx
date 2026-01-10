@@ -12,20 +12,29 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { verifyAuth } from '@/lib/auth';
 import { getBlogPost } from '@/lib/blog';
 import { APP_NAME } from '@/lib/constants';
 import { getMyHtml } from '@/lib/generate-html';
 import { formatDate } from 'date-fns';
-import { Calendar, Clock, Folder, TagIcon, UserPlus } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Edit3Icon,
+  Folder,
+  TagIcon,
+  UserPlus,
+} from 'lucide-react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import BlogCard from './components/BlogCard';
 import {
   BlogActionsDesktop,
   BlogActionsMobile,
 } from './components/blog-actions-nav';
+import BlogCard from './components/BlogCard';
+import PostActions from './components/PostActions';
 
 type Props = {
   params: Promise<{ slug: string; username: string }>;
@@ -78,13 +87,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 async function page({ params }: Props) {
   const { slug, username } = await params;
-  const blog = await getBlogPost(slug);
+  const [blog, { isAuthenticated, user }] = await Promise.all([
+    getBlogPost(slug),
+    verifyAuth(),
+  ]);
 
-  if (!blog || blog.authorId.username !== username) {
-    notFound();
-  }
+  if (!blog || blog.authorId.username !== username) return notFound();
 
   const html = await getMyHtml({ value: blog.content });
+
+  const isOwner =
+    isAuthenticated && user.userId === blog.authorId._id.toString();
 
   return (
     <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
@@ -133,6 +146,7 @@ async function page({ params }: Props) {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+
             {/* title */}
             <h1 className="text-3xl leading-tight font-semibold md:text-5xl">
               {blog.title}
@@ -141,49 +155,71 @@ async function page({ params }: Props) {
             <div className="text-lg">
               <p>{blog.description}</p>
             </div>
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-              {/* author */}
-              <Link
-                href={`/author/${blog.authorId.username}`}
-                className="group text-foreground flex w-fit items-center gap-2 text-sm"
-              >
-                <Avatar className="text-foreground size-8">
-                  <AvatarImage
-                    src={blog.authorId.profilePicture ?? ''}
-                    alt={blog.authorId.firstName}
-                  />
-                  <AvatarFallback className="uppercase">
-                    {blog.authorId.firstName.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="group-hover:underline">
-                  {blog.authorId.firstName} {blog.authorId.lastName}
-                </span>
-              </Link>
 
-              {/* meta data */}
-              {/* Publishing date */}
-              {blog?.publishedAt ? (
+            <div className="flex items-start justify-between gap-4">
+              <div className="text-muted-foreground flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                {/* author */}
+                <Link
+                  href={`/author/${blog.authorId.username}`}
+                  className="group text-foreground flex w-fit items-center gap-2 text-sm"
+                >
+                  <Avatar className="text-foreground size-8">
+                    <AvatarImage
+                      src={blog.authorId.profilePicture ?? ''}
+                      alt={blog.authorId.firstName}
+                    />
+                    <AvatarFallback className="uppercase">
+                      {blog.authorId.firstName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="group-hover:underline">
+                    {blog.authorId.firstName} {blog.authorId.lastName}
+                  </span>
+                </Link>
+
+                {/* meta data */}
+
+                {/* Published date */}
+                {blog.publishedAt && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="size-3.5" />
+                    {formatDate(new Date(blog.publishedAt), 'MMM d, yyyy')}
+                  </span>
+                )}
+
+                {/* Edited date (only if edited) */}
+                {blog.isEdited && blog.editedAt && (
+                  <span className="flex items-center gap-1 italic">
+                    <Edit3Icon className="size-3.5" />
+                    Edited {formatDate(new Date(blog.editedAt), 'MMM d, yyyy')}
+                  </span>
+                )}
+
+                {/* read time */}
                 <span className="flex items-center gap-1">
-                  <Calendar className="size-3.5" />{' '}
-                  {formatDate(new Date(blog.publishedAt), 'MMM d, yyyy')}{' '}
+                  <Clock className="size-3.5" />
+                  {blog.readTime} min read
                 </span>
-              ) : null}
-              {/* read time */}
-              <span className="flex items-center gap-1">
-                <Clock className="size-3.5" />
-                {blog.readTime} min read
-              </span>
-              {/* category */}
-              <Link
-                href={`/category/${blog.categoryId.slug}`}
-                className="hover:text-foreground flex items-center gap-1 underline-offset-2 hover:underline"
-              >
-                <Folder className="size-3.5" />
-                {blog.categoryId.name}
-              </Link>
-            </div>
 
+                {/* category */}
+                <Link
+                  href={`/category/${blog.categoryId.slug}`}
+                  className="hover:text-foreground flex items-center gap-1 underline-offset-2 hover:underline"
+                >
+                  <Folder className="size-3.5" />
+                  {blog.categoryId.name}
+                </Link>
+              </div>
+
+              {/* Post Actions */}
+              {isOwner && (
+                <PostActions
+                  title={blog.title}
+                  authorUsername={blog.authorId.username}
+                  slug={blog.slug}
+                />
+              )}
+            </div>
             {/* banner */}
             {blog.banner && (
               <Image
@@ -202,7 +238,7 @@ async function page({ params }: Props) {
             <div dangerouslySetInnerHTML={{ __html: html }} />
 
             {/* tags */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <TagIcon className="size-4" />
               {blog.tags.map((tag) => (
                 <Badge

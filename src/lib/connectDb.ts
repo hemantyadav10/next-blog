@@ -1,4 +1,5 @@
 import mongoose, { Mongoose } from 'mongoose';
+import { IS_DEV } from './constants';
 
 declare global {
   var mongoose: {
@@ -11,7 +12,9 @@ let cached = global.mongoose;
 
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
-  console.log('🔧 Initializing MongoDB cache');
+  if (IS_DEV) {
+    console.log('🔧 Initializing MongoDB cache');
+  }
 }
 
 async function connectDb() {
@@ -24,13 +27,16 @@ async function connectDb() {
   }
 
   if (cached.conn) {
-    console.log('✅ Using cached MongoDB connection');
+    if (IS_DEV) {
+      console.log('✅ Using cached MongoDB connection');
+    }
     return cached.conn;
   }
 
   if (!cached.promise) {
-    console.log('🔄 Initiating new MongoDB connection...');
-
+    if (IS_DEV) {
+      console.log('🔄 Initiating new MongoDB connection...');
+    }
     const opts = {
       bufferCommands: false,
     };
@@ -40,7 +46,9 @@ async function connectDb() {
   }
   try {
     cached.conn = await cached.promise;
-    console.log('🍃 MongoDB connection cached and ready');
+    if (IS_DEV) {
+      console.log('🍃 MongoDB connection cached and ready');
+    }
   } catch (e) {
     console.error('❌ MongoDB connection failed:', e);
     cached.promise = null;

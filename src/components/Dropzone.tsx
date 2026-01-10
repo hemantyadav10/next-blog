@@ -29,7 +29,6 @@ function Dropzone() {
   const [zoom, setZoom] = useState(1);
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
   const [image, setImage] = useState('');
-  const [croppedImage, setCroppedImage] = useState('');
   const [croppedBlob, setCroppedBlob] = useState<Blob | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCropping, setIsCropping] = useState(false);
@@ -37,9 +36,14 @@ function Dropzone() {
     setValue,
     formState: { errors },
     resetField,
+    getValues,
   } = useFormContext<CreateBlogInput>();
 
+  const bannerValue = getValues('banner');
   const hasError = errors.banner?.message;
+  const [croppedImage, setCroppedImage] = useState(() => {
+    return typeof bannerValue === 'string' && bannerValue ? bannerValue : '';
+  });
 
   const handleDropRejected = (fileRejection: FileRejection[]) => {
     if (fileRejection.length) {

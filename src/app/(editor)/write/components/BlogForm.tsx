@@ -3,7 +3,7 @@
 import Dropzone from '@/components/Dropzone';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { createBlogSchema } from '@/lib/schema/blogSchema';
+import { CreateBlogInput, createBlogSchema } from '@/lib/schema/blogSchema';
 import { cn } from '@/lib/utils';
 import { CategoryListItem } from '@/types/category.types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,26 +12,38 @@ import EditorComponent from './Editor';
 import BlogEditorHeader from './EditorHeader';
 import EditorSidebar from './EditorSidebar';
 
-function BlogForm({ categories }: { categories: CategoryListItem[] }) {
+function BlogForm({
+  categories,
+  blogData,
+  slug,
+}: {
+  categories: CategoryListItem[];
+  blogData?: CreateBlogInput & { _id: string };
+  slug?: string;
+}) {
   const methods = useForm({
     resolver: zodResolver(createBlogSchema),
     defaultValues: {
-      description: '',
-      metaDescription: '',
-      categoryId: '',
-      tags: [],
-      status: 'draft',
-      isCommentsEnabled: false,
-      content: [],
-      title: '',
-      banner: undefined,
+      description: blogData?.description ?? '',
+      metaDescription: blogData?.metaDescription ?? '',
+      categoryId: blogData?.categoryId ?? '',
+      tags: blogData?.tags ?? [],
+      status: blogData?.status ?? 'draft',
+      isCommentsEnabled: blogData?.isCommentsEnabled ?? false,
+      content: blogData?.content ?? [],
+      title: blogData?.title ?? '',
+      banner: blogData?.banner ?? undefined,
     },
   });
 
   return (
     <FormProvider {...methods}>
       <div>
-        <BlogEditorHeader categories={categories} />
+        <BlogEditorHeader
+          categories={categories}
+          blogId={blogData?._id}
+          slug={slug}
+        />
         <div className="border-x-border mx-auto grid h-[calc(100vh-64px)] max-w-[80rem] grid-cols-12 xl:border-x">
           <div className="custom_scrollbar col-span-12 h-full min-h-0 overflow-y-auto lg:col-span-8">
             {/* Title Input */}

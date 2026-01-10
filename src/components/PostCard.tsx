@@ -65,8 +65,9 @@ function PostCard({ post, user }: PostCardProps) {
           size={'sm'}
           variant={'ghost'}
           className="font-normal"
+          asChild
         >
-          Edit
+          <Link href={`/${user.username}/${post.slug}/edit`}>Edit</Link>
         </Button>
         <Button
           title="More options"
@@ -111,13 +112,13 @@ function PostCard({ post, user }: PostCardProps) {
               })}
             </div>
           )}
-          {post.isEdited && (
+          {post.isEdited && post.editedAt && (
             <div
               className="after:bg-muted-foreground/60 flex items-center gap-1 after:mx-2 after:inline-block after:h-1 after:w-1 after:rounded-full last:after:hidden"
-              title={`Last updated at ${formatDate(post.updatedAt, 'PPpp')}`}
+              title={`Last updated at ${formatDate(post.editedAt, 'PPpp')}`}
             >
               <span className="text-muted-foreground">Updated </span>{' '}
-              {formatDistanceToNow(post.updatedAt, { addSuffix: true })}
+              {formatDistanceToNow(post.editedAt, { addSuffix: true })}
             </div>
           )}
         </div>

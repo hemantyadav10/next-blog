@@ -5,6 +5,7 @@ export interface CategoryListItem {
   name: string;
   description: string;
   blogsCount: number;
+  slug: string;
 }
 
 export type PopulatedCategory = Pick<CategoryDocument, 'name' | 'slug'> & {

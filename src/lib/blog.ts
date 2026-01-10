@@ -96,10 +96,28 @@ export const getBlogPost = cache(async (slug: string) => {
       'username firstName lastName profilePicture bio email createdAt',
     )
     .populate<{ tags: PopulatedTag[] }>('tags', 'name slug')
-    .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug');
+    .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug')
+    .lean();
 
   return blog;
 });
+
+export const getBlogPostForEdit = async (slug: string, authorId: string) => {
+  await connectDb();
+
+  const blog = await Blog.findOne({ slug, authorId })
+    .populate<{
+      authorId: PopulatedAuthor;
+    }>(
+      'authorId',
+      'username firstName lastName profilePicture bio email createdAt',
+    )
+    .populate<{ tags: PopulatedTag[] }>('tags', 'name slug')
+    .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug')
+    .lean();
+
+  return blog;
+};
 
 export const getMyPosts = async ({
   page = 1,
@@ -142,6 +160,7 @@ export const getMyPosts = async ({
         publishedAt: 1,
         isEdited: 1,
         updatedAt: 1,
+        editedAt: 1,
       },
     },
   );

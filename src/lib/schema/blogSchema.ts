@@ -11,18 +11,24 @@ const ALLOWED_IMAGE_TYPES = [
 ];
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
+const fileSchema = z
+  .instanceof(File, { message: 'Banner image is required' })
+  .refine((file) => file.size > 0, 'Banner image is required')
+  .refine(
+    (file) => file.size <= MAX_FILE_SIZE,
+    `File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB`,
+  )
+  .refine(
+    (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
+    'Only JPEG, PNG, and WebP images are allowed',
+  );
+
+const urlSchema = z.url('Invalid image URL');
+
 export const createBlogSchema = z.object({
-  banner: z
-    .instanceof(File, { message: 'Banner image is required' })
-    .refine((file) => file.size > 0, 'Banner image is required')
-    .refine(
-      (file) => file.size <= MAX_FILE_SIZE,
-      `File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB`,
-    )
-    .refine(
-      (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
-      'Only JPEG, PNG, and WebP images are allowed',
-    ),
+  banner: z.union([fileSchema, urlSchema], {
+    error: 'Banner image is required',
+  }),
 
   status: z.enum(['published', 'draft']),
 
