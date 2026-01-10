@@ -19,7 +19,8 @@ import { CreateBlogInput } from '@/lib/schema/blogSchema';
 import { cn } from '@/lib/utils';
 import { CategoryListItem } from '@/types/category.types';
 import { PanelRight, Save, Send } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import { useTransition } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -178,7 +179,9 @@ function BlogActionButton({
             router.push('/dashboard/posts');
           }
         }
-        reset();
+        if (!isEditing) {
+          reset();
+        }
       }
     });
   }

@@ -290,7 +290,9 @@ export async function updateBlog(
         banner: coverImageUrl,
         bannerPublicId: coverImagePublicId,
         blurDataUrl: blurDataUrl,
-        metaDescription: generateMetaDescription(blogData.description),
+        metaDescription:
+          blogData.metaDescription ||
+          generateMetaDescription(blogData.description),
         readTime: calculateReadTime(blogData.content),
         publishedAt:
           blogData.status === 'published' && existingBlog.status === 'draft'
