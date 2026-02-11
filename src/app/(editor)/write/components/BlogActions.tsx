@@ -105,13 +105,8 @@ function BlogActionButton({
 }) {
   const path = usePathname();
   const username = path.split('/')[1];
-  const {
-    handleSubmit,
-    watch,
-    setError,
-    reset,
-    formState: { isDirty },
-  } = useFormContext<CreateBlogInput>();
+  const { handleSubmit, watch, setError, reset } =
+    useFormContext<CreateBlogInput>();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const isEditing = Boolean(blogId);
@@ -168,9 +163,9 @@ function BlogActionButton({
         // Redirect logic
         if (isEditing) {
           if (isPublishing && username && slug) {
-            router.push(`/${username}/${slug}`);
+            router.replace(`/${username}/${slug}`);
           } else {
-            router.push('/dashboard/posts');
+            router.replace('/dashboard/posts');
           }
         } else {
           if (isPublishing && result.data.slug && username) {
@@ -193,7 +188,7 @@ function BlogActionButton({
       size="sm"
       onClick={handleSubmit(handleSubmitAction)}
       className={cn(className)}
-      disabled={isPending || !isDirty}
+      disabled={isPending}
     >
       {isPending ? (
         <>
