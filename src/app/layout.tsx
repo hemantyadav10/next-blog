@@ -46,8 +46,8 @@ export default function RootLayout({
           >
             <NextTopLoader
               showSpinner={false}
-              shadow={false}
               color="var(--progress)"
+              height={2.5}
             />
             <Toaster />
             <main>{children}</main>

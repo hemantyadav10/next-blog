@@ -28,7 +28,7 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
   const { control } = useFormContext();
 
   return (
-    <div className="px-4 py-8 lg:px-8">
+    <div className="px-4 py-4 lg:py-0">
       <FieldSet>
         <FieldLegend className="hidden text-2xl lg:block">
           Post Settings

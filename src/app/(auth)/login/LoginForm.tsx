@@ -52,7 +52,8 @@ function LoginForm() {
   const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || '/';
+  const rawRedirect = searchParams.get('redirect');
+  const redirectPath = rawRedirect ? decodeURIComponent(rawRedirect) : '/';
 
   async function handleFormAction(data: LoginInput) {
     setError('');

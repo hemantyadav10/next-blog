@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from './ui/dialog';
 import { Field, FieldContent, FieldError } from './ui/field';
+import { Skeleton } from './ui/skeleton';
 import { Slider } from './ui/slider';
 import { Spinner } from './ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
@@ -30,8 +31,9 @@ function Dropzone() {
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
   const [image, setImage] = useState('');
   const [croppedBlob, setCroppedBlob] = useState<Blob | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isCropping, setIsCropping] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [isCropping, setIsCropping] = useState<boolean>(false);
   const {
     setValue,
     formState: { errors },
@@ -41,7 +43,7 @@ function Dropzone() {
 
   const bannerValue = getValues('banner');
   const hasError = errors.banner?.message;
-  const [croppedImage, setCroppedImage] = useState(() => {
+  const [croppedImage, setCroppedImage] = useState<string>(() => {
     return typeof bannerValue === 'string' && bannerValue ? bannerValue : '';
   });
 
@@ -79,7 +81,7 @@ function Dropzone() {
     }
   };
 
-  const onCropComplete = (_croppedArea: Area, croppedArea: Area) => {
+  const onCropComplete = (_: Area, croppedArea: Area) => {
     setCroppedArea(croppedArea);
   };
 
@@ -97,18 +99,19 @@ function Dropzone() {
       imageElement.src = image;
 
       await new Promise((resolve, reject) => {
-        imageElement.onload = resolve;
-        imageElement.onerror = reject;
+        imageElement.onload = () => resolve(true);
+        imageElement.onerror = () => reject(new Error('Failed to load image'));
       });
 
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
-      if (!ctx) return;
+      if (!ctx) throw new Error('Failed to get canvas context');
 
       canvas.width = croppedArea.width;
       canvas.height = croppedArea.height;
 
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(
         imageElement,
         croppedArea.x,
@@ -163,6 +166,7 @@ function Dropzone() {
     const imageUrl = URL.createObjectURL(files[0]);
     setImage(imageUrl);
     setIsDialogOpen(true);
+    setIsMounted(false);
     setCrop({ x: 0, y: 0 });
     setZoom(1);
 
@@ -187,6 +191,7 @@ function Dropzone() {
       const imageUrl = URL.createObjectURL(croppedBlob);
       setImage(imageUrl);
       setIsDialogOpen(true);
+      setIsMounted(false);
       setCrop({ x: 0, y: 0 });
       setZoom(1);
     }
@@ -214,8 +219,20 @@ function Dropzone() {
       setCrop({ x: 0, y: 0 });
       setZoom(1);
       setCroppedArea(null);
+      setIsMounted(false);
     }, 200);
   };
+
+  // Dialog mount effect
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isDialogOpen && !isMounted) {
+      timeout = setTimeout(() => setIsMounted(true), 200); // Matches shadcn dialog animation
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [isDialogOpen, isMounted]);
 
   useEffect(() => {
     return () => {
@@ -231,9 +248,9 @@ function Dropzone() {
     isFileDialogActive,
     isDragReject,
   } = useDropzone({
-    accept: { 'image/*': [] },
+    accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.gif'] },
     maxFiles: 1,
-    maxSize: 3 * 1024 * 1024,
+    maxSize: 3 * 1024 * 1024, // 3MB
     onDropRejected: handleDropRejected,
     onDropAccepted: handleDropAccepted,
   });
@@ -242,7 +259,7 @@ function Dropzone() {
     <Field>
       <div
         className={cn(
-          'relative z-10 flex aspect-3/2 cursor-pointer flex-col items-center justify-center gap-1 border-2 p-8 transition-colors',
+          'relative z-10 flex aspect-3/2 cursor-pointer flex-col items-center justify-center gap-1 border-2 border-dashed p-8 transition-colors',
           isDragActive
             ? isDragReject
               ? 'border-destructive/50 bg-destructive/15'
@@ -252,7 +269,7 @@ function Dropzone() {
               : 'border-input',
           isFileDialogActive && 'border-brand/50 bg-brand/15',
           !(isDragActive || isDragReject || isFileDialogActive || hasError) &&
-            'hover:bg-input/20',
+            'hover:bg-input/20 dark:hover:bg-input/40 dark:bg-input/30',
           croppedImage && 'p-0',
         )}
         {...getRootProps()}
@@ -282,7 +299,7 @@ function Dropzone() {
               className="h-full w-full object-cover"
             />
             <div className="absolute top-2 right-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-              Tap or drag a new image to replace
+              Tap or drag to replace
             </div>
           </div>
         ) : (
@@ -304,10 +321,10 @@ function Dropzone() {
                   Drag & drop your cover image here
                 </p>
                 <p className="text-muted-foreground text-center text-xs">
-                  Or click to browse (max 3MB, 3:2 recommended)
+                  Or click to browse (max 3MB, 3:2 aspect recommended)
                 </p>
 
-                <Button size="sm" className="mt-2 w-fit">
+                <Button size="sm" className="mt-2 w-fit" variant={'secondary'}>
                   Browse files
                 </Button>
               </>
@@ -325,7 +342,7 @@ function Dropzone() {
         {croppedImage && (
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground text-xs">
-              Tap or drag a new image to replace
+              Ready for upload • WebP optimized
             </p>
 
             <div className="flex gap-2">
@@ -382,25 +399,33 @@ function Dropzone() {
           <DialogHeader>
             <DialogTitle>Crop Cover Image</DialogTitle>
             <DialogDescription>
-              Adjust the crop area and zoom to fit your image
+              Adjust crop area and zoom. Recommended 3:2 aspect ratio.
             </DialogDescription>
           </DialogHeader>
 
           <div className="bg-background relative aspect-3/2">
-            <Cropper
-              image={image}
-              aspect={3 / 2}
-              crop={crop}
-              zoom={zoom}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-            />
+            {isMounted && image ? (
+              <Cropper
+                image={image}
+                crop={crop}
+                zoom={zoom}
+                aspect={3 / 2}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+                restrictPosition={false}
+                cropShape="rect"
+                showGrid={true}
+                zoomWithScroll={true}
+              />
+            ) : (
+              <Skeleton className="h-full rounded-none" />
+            )}
           </div>
           <div className="space-y-3">
             <div>
-              <span className="w-10 text-right text-xs">
-                {Math.round((zoom - 1) * 100)}%
+              <span className="text-muted-foreground w-10 text-right font-mono text-xs">
+                {Math.round(zoom * 100)}%
               </span>
             </div>
             <Slider
@@ -417,7 +442,7 @@ function Dropzone() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button onClick={handleCrop} disabled={isCropping}>
+            <Button onClick={handleCrop} disabled={!isMounted || isCropping}>
               {isCropping ? <Spinner /> : <CropIcon />} Crop
             </Button>
           </DialogFooter>

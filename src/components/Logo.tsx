@@ -9,6 +9,7 @@ interface LogoProps {
   imageClassName?: string;
   textClassName?: string;
   href?: string;
+  size?: number;
 }
 
 export function Logo({
@@ -17,6 +18,7 @@ export function Logo({
   imageClassName,
   textClassName,
   href = '/',
+  size = 40,
 }: LogoProps) {
   return (
     <Link
@@ -26,8 +28,8 @@ export function Logo({
       <Image
         src={logo.src}
         alt="Logo"
-        width={40}
-        height={40}
+        width={size}
+        height={size}
         className={cn('dark:invert', imageClassName)}
       />
       {showText && (

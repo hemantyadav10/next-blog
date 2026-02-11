@@ -1,5 +1,11 @@
+'use client';
+
 import { Logo } from '@/components/Logo';
+import { FixedToolbar } from '@/components/ui/fixed-toolbar';
+import { FixedToolbarButtons } from '@/components/ui/fixed-toolbar-buttons';
+import { CreateBlogInput } from '@/lib/schema/blogSchema';
 import { CategoryListItem } from '@/types/category.types';
+import { useFormContext } from 'react-hook-form';
 import BlogActions from './BlogActions';
 
 interface BlogEditorHeaderProps {
@@ -13,14 +19,30 @@ export default function BlogEditorHeader({
   blogId,
   slug,
 }: BlogEditorHeaderProps) {
+  const { watch } = useFormContext<CreateBlogInput>();
+  const title = watch('title') || (!blogId && 'New Blog');
+
   return (
-    <header className="bg-background border-border sticky top-0 z-50 flex w-full items-center backdrop-blur-sm">
-      <div className="border-border mx-auto flex h-16 w-full max-w-[80rem] items-center justify-between border-b px-4 md:px-8 xl:border-x">
+    <header className="bg-card sticky top-0 z-50 flex w-full flex-col items-center border-b pb-4 shadow-md">
+      <div className="mx-auto flex h-16 w-full items-center justify-between gap-3 px-4">
         {/* Logo and Title */}
-        <Logo textClassName="block" />
+        <div className="flex items-center gap-6">
+          <Logo textClassName="block" showText={false} className="shrink-0" />
+          <p
+            className="line-clamp-1 max-w-md text-sm"
+            title={title || undefined}
+          >
+            {title}
+          </p>
+        </div>
 
         {/* Actions */}
         <BlogActions categories={categories} blogId={blogId} slug={slug} />
+      </div>
+      <div className="w-full px-4">
+        <FixedToolbar>
+          <FixedToolbarButtons />
+        </FixedToolbar>
       </div>
     </header>
   );

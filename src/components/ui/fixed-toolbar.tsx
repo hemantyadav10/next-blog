@@ -9,7 +9,7 @@ export function FixedToolbar(props: React.ComponentProps<typeof Toolbar>) {
     <Toolbar
       {...props}
       className={cn(
-        'custom_scrollbar border-y-border bg-background/80 supports-backdrop-blur:bg-background/80 sticky top-0 left-0 z-50 w-full justify-between overflow-x-auto border-y p-1 backdrop-blur-sm',
+        'custom_scrollbar bg-accent/50 w-full justify-between overflow-x-auto rounded-md p-1',
         props.className,
       )}
     />
