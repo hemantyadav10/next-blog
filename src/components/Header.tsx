@@ -73,14 +73,14 @@ function Header({ user }: { user: AuthResult }) {
     };
   }, [toggleMenu]);
 
-  const getUserInitials = () => {
-    if (!userDetails) return 'U';
-    const names = userDetails.fullName.split(' ');
-    if (names.length >= 2) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return userDetails.fullName.substring(0, 2).toUpperCase();
-  };
+  // const getUserInitials = () => {
+  //   if (!userDetails) return 'U';
+  //   const names = userDetails.fullName.split(' ');
+  //   if (names.length >= 2) {
+  //     return `${names[0][0]}${names[1][0]}`.toUpperCase();
+  //   }
+  //   return userDetails.fullName.substring(0, 2).toUpperCase();
+  // };
 
   // Logs out user
   function handleLogout() {
@@ -218,16 +218,18 @@ function Header({ user }: { user: AuthResult }) {
                           <Avatar className="size-9">
                             <AvatarImage
                               src={userDetails.profilePicture || undefined}
-                              alt={userDetails.fullName}
+                              alt={userDetails.firstName}
                             />
-                            <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                            <AvatarFallback>
+                              {userDetails.firstName.charAt(0)}
+                            </AvatarFallback>
                           </Avatar>
                         )}
                       </Button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{userDetails.fullName}</p>
+                    <p>{`${userDetails.firstName} ${userDetails.lastName}`}</p>
                   </TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent align="end" className="min-w-56">
@@ -236,14 +238,14 @@ function Header({ user }: { user: AuthResult }) {
                       <Avatar className="size-9 rounded-full">
                         <AvatarImage
                           src={userDetails.profilePicture ?? undefined}
-                          alt={userDetails.fullName}
+                          alt={userDetails.firstName}
                         />
                         <AvatarFallback className="rounded-lg">
-                          {getUserInitials()}
+                          {userDetails.firstName.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm">
-                        <span className="truncate">{userDetails.fullName}</span>
+                        <span className="truncate">{`${userDetails.firstName} ${userDetails.lastName}`}</span>
                         <span className="truncate text-xs font-normal">
                           {userDetails.email}
                         </span>

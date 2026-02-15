@@ -1,5 +1,5 @@
 import User from '@/models/userModel';
-import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import 'server-only';
@@ -13,7 +13,8 @@ export type AuthResult =
         userId: string;
         email: string;
         role: string;
-        fullName: string;
+        firstName: string;
+        lastName: string;
         profilePicture: string | null | undefined;
         username: string;
       };
@@ -68,14 +69,14 @@ export async function verifyToken(
   { success: true; payload: TokenPayload } | { success: false; error: string }
 > {
   if (!token) {
-    return { success: false, error: 'No token provided' };
+    return { success: false, error: 'Invalid token' };
   }
 
   try {
     const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string);
 
     if (typeof payload === 'string' || !payload?.userId) {
-      return { success: false, error: 'Invalid token payload' };
+      return { success: false, error: 'Invalid token' };
     }
 
     return {
@@ -83,13 +84,11 @@ export async function verifyToken(
       payload: payload as TokenPayload,
     };
   } catch (error) {
+    console.error('Token verification error:', error);
     if (error instanceof TokenExpiredError) {
       return { success: false, error: 'Token expired' };
     }
-    if (error instanceof JsonWebTokenError) {
-      return { success: false, error: 'Invalid token' };
-    }
-    return { success: false, error: 'Token verification failed' };
+    return { success: false, error: 'Invalid token' };
   }
 }
 
@@ -105,7 +104,7 @@ export const verifyAuth = cache(async (): Promise<AuthResult> => {
     if (!tokenResult.success) {
       return {
         isAuthenticated: false,
-        error: tokenResult.error,
+        error: 'Authentication required',
         user: null,
       };
     }
@@ -117,7 +116,7 @@ export const verifyAuth = cache(async (): Promise<AuthResult> => {
     if (!user) {
       return {
         isAuthenticated: false,
-        error: 'User not found',
+        error: 'Authentication required',
         user: null,
       };
     }
@@ -129,19 +128,18 @@ export const verifyAuth = cache(async (): Promise<AuthResult> => {
         userId: user._id.toString(),
         email: user.email,
         role: user.role,
-        fullName: `${user.firstName} ${user.lastName}`,
+        firstName: user.firstName,
+        lastName: user.lastName,
         profilePicture: user.profilePicture,
         username: user.username,
       },
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Authentication failed';
-    if (IS_DEV) console.error(error);
+    if (IS_DEV) console.error('Auth error:', error);
 
     return {
       isAuthenticated: false,
-      error: errorMessage,
+      error: 'Authentication required',
       user: null,
     };
   }

@@ -32,7 +32,10 @@ export function errorResponse(
   );
 }
 
-export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
+export function handleApiError(
+  error: unknown,
+  errors?: Record<string, string[] | undefined> | undefined,
+): NextResponse<ApiErrorResponse> {
   const errorMessage =
     IS_DEV && error instanceof Error
       ? error.message
@@ -40,5 +43,5 @@ export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
         ? error
         : 'An unexpected error occurred. Please try again.';
 
-  return errorResponse(500, errorMessage);
+  return errorResponse(500, errorMessage, errors);
 }

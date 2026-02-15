@@ -246,6 +246,51 @@
   :host {
     -webkit-tap-highlight-color: revert;
   }
+  strong {
+    @apply font-semibold;
+  }
+
+  .tiptap,
+  .tiptap-preview {
+    @apply w-full outline-none;
+
+    & p {
+      @apply my-2 leading-relaxed whitespace-pre-line;
+    }
+
+    & h1 {
+      @apply mt-4 mb-2 text-xl font-bold;
+    }
+
+    & ul {
+      @apply my-2 list-disc pl-5;
+    }
+
+    & blockquote {
+      @apply my-4 border-l-4 pl-4 italic;
+    }
+
+    & pre {
+      @apply bg-muted/50 text-foreground scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent my-4 max-w-full min-w-0 overflow-x-auto rounded-md p-4 select-all;
+
+      & code {
+        @apply bg-transparent p-0 leading-6 whitespace-pre;
+        display: inline-block;
+        min-width: 100%;
+        padding-right: 1rem;
+        font-family: 'JetBrains Mono', monospace;
+      }
+    }
+
+    & :not(pre) > code {
+      @apply bg-muted rounded px-1.5 py-1 text-[13px] font-medium;
+    }
+
+    & p.is-editor-empty:first-child::before {
+      @apply text-muted-foreground pointer-events-none float-left h-0;
+      content: attr(data-placeholder);
+    }
+  }
 
   .custom_scrollbar {
     @apply scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent;

@@ -1,4 +1,4 @@
-import { Alert, AlertTitle } from '@/components/ui/alert';
+import CommentSectionSkeleton from '@/components/skeletons/CommentSectionSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import { verifyAuth } from '@/lib/auth';
 import { getBlogPost } from '@/lib/blog';
 import { APP_NAME } from '@/lib/constants';
@@ -29,11 +28,13 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import {
   BlogActionsDesktop,
   BlogActionsMobile,
 } from './components/blog-actions-nav';
 import BlogCard from './components/BlogCard';
+import CommentSection from './components/comments/CommentSection';
 import PostActions from './components/PostActions';
 
 type Props = {
@@ -100,22 +101,24 @@ async function page({ params }: Props) {
     isAuthenticated && user.userId === blog.authorId._id.toString();
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
+    <div className="mx-auto flex w-full max-w-7xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
       {/* Blog Actions */}
       <BlogActionsMobile
         title={blog.title}
         text={blog.metaDescription || blog.description}
+        commentsCount={blog.commentsCount}
       />
       <div className="sticky top-28 hidden w-16 shrink-0 flex-col items-center space-y-6 self-start md:flex">
         <BlogActionsDesktop
           title={blog.title}
           text={blog.metaDescription || blog.description}
+          commentsCount={blog.commentsCount}
         />
       </div>
 
-      <div className="flex w-full max-w-2xl flex-col gap-8 xl:max-w-full xl:flex-row">
+      <div className="flex w-full max-w-3xl flex-col gap-8 xl:max-w-full xl:flex-row">
         {/* Blog Content */}
-        <div className="flex w-full max-w-2xl flex-col gap-8">
+        <div className="flex w-full max-w-3xl flex-col gap-8">
           <div className="space-y-6">
             <Breadcrumb>
               <BreadcrumbList>
@@ -253,41 +256,16 @@ async function page({ params }: Props) {
             </div>
           </div>
           <Separator />
-          <section className="space-y-8">
-            <p className="text-xl font-medium">Comments (12)</p>
 
-            {blog.isCommentsEnabled ? (
-              // Show comment form
-              <>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-2">
-                    <Avatar className="size-10">
-                      <AvatarImage src={blog.authorId.profilePicture ?? ''} />
-                      <AvatarFallback className="uppercase">
-                        {blog.authorId.firstName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <Textarea
-                      placeholder="Leave a comment..."
-                      className="flex-1"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <Button>Add Comment</Button>
-                  </div>
-                </div>
-
-                {/* Display existing comments */}
-              </>
-            ) : (
-              // Show disabled state with explanation
-              <Alert>
-                <AlertTitle className="text-center">
-                  Comments are disabled for this post.
-                </AlertTitle>
-              </Alert>
-            )}
-          </section>
+          {/* Comment Section */}
+          <Suspense fallback={<CommentSectionSkeleton />}>
+            <CommentSection
+              isCommentsEnabled={blog.isCommentsEnabled}
+              blogId={blog._id.toString()}
+              slug={blog.slug}
+              authorUsername={blog.authorId.username}
+            />
+          </Suspense>
         </div>
 
         <Separator className="block xl:hidden" />
@@ -324,7 +302,9 @@ async function page({ params }: Props) {
                 <p className="text-muted-foreground">
                   3.4K followers and 2.1K following
                 </p>
-                {blog.authorId.bio && <p>{blog.authorId.bio}</p>}
+                {blog.authorId.bio && (
+                  <p className="line-clamp-3">{blog.authorId.bio}</p>
+                )}
               </div>
             </div>
             <Button className="w-full sm:w-auto" variant={'raised'}>

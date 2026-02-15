@@ -28,8 +28,9 @@ type User = {
   userId: string;
   email: string;
   role: string;
-  fullName: string;
-  profilePicture: string | null | undefined;
+  firstName: string;
+  lastName: string;
+  profilePicture?: string | null | undefined;
   username: string;
 };
 

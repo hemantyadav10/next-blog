@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function BlogPageSkeleton() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
+    <div className="mx-auto flex w-full max-w-7xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
       {/* Blog Actions Desktop - Sticky Sidebar */}
       <div className="sticky top-28 hidden w-16 shrink-0 flex-col items-center space-y-6 self-start md:flex">
         <Skeleton className="size-10" />
@@ -11,9 +11,9 @@ export default function BlogPageSkeleton() {
         <Skeleton className="size-10" />
       </div>
 
-      <div className="flex w-full max-w-2xl flex-col gap-8 xl:max-w-full xl:flex-row">
+      <div className="flex w-full max-w-3xl flex-col gap-8 xl:max-w-full xl:flex-row">
         {/* Blog Content */}
-        <div className="w-full flex-col gap-8 xl:max-w-2xl">
+        <div className="w-full flex-col gap-8 xl:max-w-3xl">
           <div className="space-y-6">
             {/* Breadcrumb */}
             <div className="flex items-center gap-6 py-1">

@@ -16,7 +16,7 @@ import {
   MessageCircleIcon,
   Share2,
 } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ShareButton } from './ShareButton';
 
 type BlogActionItem = {
@@ -30,57 +30,64 @@ type BlogActionItem = {
   onClick?: () => void;
 };
 
-const blogActions: BlogActionItem[] = [
-  {
-    id: 'like',
-    icon: Heart,
-    label: 'Like',
-    ariaLabel: 'Like',
-    count: 32,
-    variant: 'ghost',
-  },
-  {
-    id: 'comment',
-    icon: MessageCircleIcon,
-    label: 'Comment',
-    ariaLabel: 'Comment',
-    count: 32,
-    variant: 'ghost',
-  },
-  {
-    id: 'save',
-    icon: Bookmark,
-    label: 'Save',
-    ariaLabel: 'Save',
-    variant: 'ghost',
-    size: 'icon',
-  },
-  {
-    id: 'share',
-    icon: Share2,
-    label: 'Share',
-    ariaLabel: 'Share',
-    variant: 'ghost',
-    size: 'icon',
-  },
-  {
-    id: 'more',
-    icon: Ellipsis,
-    label: 'More',
-    ariaLabel: 'More options',
-    variant: 'ghost',
-    size: 'icon',
-  },
-];
-
 type BlogActionProps = {
   title: string;
   text: string;
+  commentsCount: number;
 };
 
-function BlogActionsDesktop({ text, title }: BlogActionProps) {
+function BlogActionsDesktop({ text, title, commentsCount }: BlogActionProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
+
+  // TODO: refractor to follow DRY principle
+
+  const blogActions: BlogActionItem[] = [
+    {
+      id: 'like',
+      icon: Heart,
+      label: 'Like',
+      ariaLabel: 'Like',
+      count: 32,
+      variant: 'ghost',
+    },
+    {
+      id: 'comment',
+      icon: MessageCircleIcon,
+      label: 'Comment',
+      ariaLabel: 'Comment',
+      count: commentsCount,
+      variant: 'ghost',
+      onClick: () => {
+        router.push('#comments');
+      },
+    },
+    {
+      id: 'save',
+      icon: Bookmark,
+      label: 'Save',
+      ariaLabel: 'Save',
+      variant: 'ghost',
+      size: 'icon',
+    },
+    {
+      id: 'share',
+      icon: Share2,
+      label: 'Share',
+      ariaLabel: 'Share',
+      variant: 'ghost',
+      size: 'icon',
+    },
+    {
+      id: 'more',
+      icon: Ellipsis,
+      label: 'More',
+      ariaLabel: 'More options',
+      variant: 'ghost',
+      size: 'icon',
+    },
+  ];
 
   return (
     <>
@@ -115,14 +122,60 @@ function BlogActionsDesktop({ text, title }: BlogActionProps) {
   );
 }
 
-function BlogActionsMobile({ text, title }: BlogActionProps) {
+function BlogActionsMobile({ text, title, commentsCount }: BlogActionProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const blogActions: BlogActionItem[] = [
+    {
+      id: 'like',
+      icon: Heart,
+      label: 'Like',
+      ariaLabel: 'Like',
+      count: 32,
+      variant: 'ghost',
+    },
+    {
+      id: 'comment',
+      icon: MessageCircleIcon,
+      label: 'Comment',
+      ariaLabel: 'Comment',
+      count: commentsCount,
+      variant: 'ghost',
+      onClick: () => {
+        router.push('#comments');
+      },
+    },
+    {
+      id: 'save',
+      icon: Bookmark,
+      label: 'Save',
+      ariaLabel: 'Save',
+      variant: 'ghost',
+      size: 'icon',
+    },
+    {
+      id: 'share',
+      icon: Share2,
+      label: 'Share',
+      ariaLabel: 'Share',
+      variant: 'ghost',
+      size: 'icon',
+    },
+    {
+      id: 'more',
+      icon: Ellipsis,
+      label: 'More',
+      ariaLabel: 'More options',
+      variant: 'ghost',
+      size: 'icon',
+    },
+  ];
   const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
   const { headerOffset, isSnapping } = useScrollProgress(56);
   return (
     <div
       className={cn(
-        'bg-background border-border flex h-14 items-center justify-between border-t px-4 md:hidden',
+        'bg-card border-border flex h-14 items-center justify-between border-t px-4 md:hidden',
         'fixed right-0 bottom-0 left-0 z-40',
         isSnapping ? 'transition-transform duration-200 ease-out' : '',
       )}
