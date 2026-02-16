@@ -13,6 +13,7 @@ interface CommentSectionProps {
   blogId: string;
   slug: string;
   authorUsername: string;
+  totalComments: number;
 }
 
 async function CommentSection({
@@ -20,6 +21,7 @@ async function CommentSection({
   blogId,
   slug,
   authorUsername,
+  totalComments = 0,
 }: CommentSectionProps) {
   const { isAuthenticated, user } = await verifyAuth();
 
@@ -35,9 +37,7 @@ async function CommentSection({
 
   return (
     <div className="scroll-mt-20 space-y-8" id="comments">
-      <p className="text-xl font-semibold">
-        Comments {data && `(${data.pageInfo.totalCount})`}
-      </p>
+      <p className="text-xl font-semibold">Comments {`(${totalComments})`}</p>
 
       {/* Show editor only if authenticated AND comments enabled */}
       {isAuthenticated && isCommentsEnabled && (

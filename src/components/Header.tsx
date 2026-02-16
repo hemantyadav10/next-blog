@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useScrollProgress } from '@/hooks/use-progressive-header';
 import { AuthResult } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import type { NavItems } from '@/types/navigation.types';
@@ -58,7 +57,7 @@ function Header({ user }: { user: AuthResult }) {
   const pathname = usePathname();
   const router = useRouter();
   const [toggleMenu, setToggleMenu] = useState(false);
-  const { headerOffset, isSnapping } = useScrollProgress(64);
+
   // Prevent body scroll when menu is open
   useEffect(() => {
     if (toggleMenu) {
@@ -72,15 +71,6 @@ function Header({ user }: { user: AuthResult }) {
       document.body.style.overflow = 'unset';
     };
   }, [toggleMenu]);
-
-  // const getUserInitials = () => {
-  //   if (!userDetails) return 'U';
-  //   const names = userDetails.fullName.split(' ');
-  //   if (names.length >= 2) {
-  //     return `${names[0][0]}${names[1][0]}`.toUpperCase();
-  //   }
-  //   return userDetails.fullName.substring(0, 2).toUpperCase();
-  // };
 
   // Logs out user
   function handleLogout() {
@@ -110,11 +100,7 @@ function Header({ user }: { user: AuthResult }) {
         className={cn(
           'bg-background/95 border-border sticky top-0 z-50 border-b backdrop-blur-sm md:transform-none',
           'dark:bg-card/90 dark:backdrop-blur-lg',
-          isSnapping ? 'transition-transform duration-200 ease-out' : '',
         )}
-        style={{
-          transform: `translateY(-${headerOffset}px)`,
-        }}
       >
         {/* Left: App Name */}
         <div className="mx-auto flex h-16 items-center justify-between px-4">

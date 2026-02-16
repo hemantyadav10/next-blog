@@ -264,6 +264,7 @@ async function page({ params }: Props) {
               blogId={blog._id.toString()}
               slug={blog.slug}
               authorUsername={blog.authorId.username}
+              totalComments={blog.commentsCount}
             />
           </Suspense>
         </div>

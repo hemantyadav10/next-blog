@@ -6,7 +6,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useScrollProgress } from '@/hooks/use-progressive-header';
 import { cn } from '@/lib/utils';
 import {
   Bookmark,
@@ -171,18 +170,13 @@ function BlogActionsMobile({ text, title, commentsCount }: BlogActionProps) {
     },
   ];
   const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
-  const { headerOffset, isSnapping } = useScrollProgress(56);
+
   return (
     <div
       className={cn(
         'bg-card border-border flex h-14 items-center justify-between border-t px-4 md:hidden',
         'fixed right-0 bottom-0 left-0 z-40',
-        isSnapping ? 'transition-transform duration-200 ease-out' : '',
       )}
-      style={{
-        transform: `translateY(${headerOffset}px)`,
-        boxShadow: '0 -1px 5px 0 rgba(0, 0, 0, 0.1)',
-      }}
     >
       {blogActions.map((action) => {
         const Icon = action.icon;

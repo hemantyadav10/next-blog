@@ -141,9 +141,7 @@ const CommentItem = ({
 
   const directReplyCount = comment.replyCount || 0;
   const descendantCount = comment.visibleDescendantCount || 0;
-
   const hasReplies = descendantCount > 0;
-  const showViewRepliesInstead = directReplyCount === 0 && descendantCount > 0;
 
   const cleanCommentContent = sanitizeHtml(
     comment.content,
@@ -710,8 +708,6 @@ const CommentItem = ({
                 )}
               </Button>
             )}
-
-            {/* {isLoading && <Loader center />} */}
           </div>
         </div>
       </Activity>
