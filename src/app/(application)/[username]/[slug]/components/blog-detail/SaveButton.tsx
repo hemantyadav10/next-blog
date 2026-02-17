@@ -13,13 +13,16 @@ import { Bookmark } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useOptimistic, useTransition } from 'react';
 import { toast } from 'sonner';
+import LoginPromptDialog from '../LoginPromptDialog';
 
 function SaveButton({
   isBookmarked = false,
   blogId,
+  isAuthenticated = false,
 }: {
   isBookmarked: boolean;
   blogId: string;
+  isAuthenticated: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [optimisticSave, setOptimisticSave] = useOptimistic(isBookmarked);
@@ -36,6 +39,22 @@ function SaveButton({
       }
     });
   };
+
+  if (!isAuthenticated)
+    return (
+      <LoginPromptDialog
+        trigger={
+          <Button
+            aria-label="Login to save"
+            variant="ghost"
+            size="icon"
+            title="Login to save"
+          >
+            <Bookmark />
+          </Button>
+        }
+      />
+    );
 
   return (
     <Tooltip>

@@ -2,10 +2,10 @@
 
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
-import CommentButton from './blog-detail/CommentButton';
-import LikeButton from './blog-detail/LikeButton';
-import SaveButton from './blog-detail/SaveButton';
-import { ShareButton } from './ShareButton';
+import { ShareButton } from '../ShareButton';
+import CommentButton from './CommentButton';
+import LikeButton from './LikeButton';
+import SaveButton from './SaveButton';
 
 type BlogActionProps = {
   isBookmarked: boolean;
@@ -15,6 +15,7 @@ type BlogActionProps = {
   isLiked: boolean;
   likesCount: number;
   blogId: string;
+  isAuthenticated: boolean;
 };
 
 function BlogActionsDesktop({
@@ -25,6 +26,7 @@ function BlogActionsDesktop({
   isLiked,
   likesCount,
   blogId,
+  isAuthenticated,
 }: BlogActionProps) {
   const pathname = usePathname();
   const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
@@ -33,7 +35,11 @@ function BlogActionsDesktop({
     <>
       <LikeButton isLiked={isLiked} likesCount={likesCount} />
       <CommentButton commentCount={commentCount} />
-      <SaveButton isBookmarked={isBookmarked} blogId={blogId} />
+      <SaveButton
+        isBookmarked={isBookmarked}
+        blogId={blogId}
+        isAuthenticated={isAuthenticated}
+      />
       <ShareButton url={url} text={text} title={title} />
     </>
   );
@@ -47,6 +53,7 @@ function BlogActionsMobile({
   isLiked,
   likesCount,
   blogId,
+  isAuthenticated,
 }: BlogActionProps) {
   const pathname = usePathname();
   const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
@@ -60,7 +67,11 @@ function BlogActionsMobile({
     >
       <LikeButton isLiked={isLiked} likesCount={likesCount} />
       <CommentButton commentCount={commentCount} />
-      <SaveButton isBookmarked={isBookmarked} blogId={blogId} />
+      <SaveButton
+        isBookmarked={isBookmarked}
+        blogId={blogId}
+        isAuthenticated={isAuthenticated}
+      />
       <ShareButton url={url} text={text} title={title} />
     </div>
   );

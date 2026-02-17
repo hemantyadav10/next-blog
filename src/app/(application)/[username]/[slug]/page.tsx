@@ -30,10 +30,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+
 import {
   BlogActionsDesktop,
   BlogActionsMobile,
-} from './components/blog-actions-nav';
+} from './components/blog-detail/blog-actions-nav';
 import BlogCard from './components/BlogCard';
 import CommentSection from './components/comments/CommentSection';
 import PostActions from './components/PostActions';
@@ -114,6 +115,7 @@ async function page({ params }: Props) {
         isLiked={false}
         likesCount={blog.likesCount}
         blogId={blog._id.toString()}
+        isAuthenticated={isAuthenticated}
       />
       <div className="sticky top-28 hidden w-16 shrink-0 flex-col items-center space-y-6 self-start md:flex">
         <BlogActionsDesktop
@@ -124,6 +126,7 @@ async function page({ params }: Props) {
           isLiked={false}
           likesCount={blog.likesCount}
           blogId={blog._id.toString()}
+          isAuthenticated={isAuthenticated}
         />
       </div>
 

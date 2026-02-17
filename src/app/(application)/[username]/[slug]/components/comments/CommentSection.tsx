@@ -59,7 +59,7 @@ async function CommentSection({
           trigger={
             <Button
               variant={'outline'}
-              className="text-muted-foreground dark:hover:border-ring hover:text-muted-foreground hover:border-ring min-h-16 items-start justify-start px-3 py-4 text-sm font-normal hover:bg-transparent active:bg-transparent"
+              className="text-muted-foreground dark:hover:border-ring hover:text-muted-foreground hover:border-ring min-h-16 w-full items-start justify-start px-3 py-4 text-sm font-normal hover:bg-transparent active:bg-transparent"
             >
               Leave a comment...
             </Button>

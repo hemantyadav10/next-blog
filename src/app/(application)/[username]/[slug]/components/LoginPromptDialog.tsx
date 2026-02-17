@@ -48,9 +48,7 @@ export default function LoginPromptDialog({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild className="w-full">
-          {trigger}
-        </DialogTrigger>
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
         <DialogContent className="text-center sm:max-w-md">
           <ContentBody redirectUrl={redirectUrl} isDesktop={true} />
         </DialogContent>
