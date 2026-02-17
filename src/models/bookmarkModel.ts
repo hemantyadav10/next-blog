@@ -1,14 +1,14 @@
-import { model, models, Schema, Types } from 'mongoose';
+import {
+  AggregatePaginateModel,
+  InferSchemaType,
+  model,
+  models,
+  Schema,
+  Types,
+} from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-interface IBookMark {
-  userId: Types.ObjectId;
-  blogId: Types.ObjectId;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const bookmarkSchema = new Schema<IBookMark>(
+const bookmarkSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -25,9 +25,17 @@ const bookmarkSchema = new Schema<IBookMark>(
 );
 
 // TODO: Add indexes, virtuals, hooks and methods
-
+bookmarkSchema.index({ userId: 1, blogId: 1 }, { unique: true });
 bookmarkSchema.plugin(aggregatePaginate);
 
-const Bookmark =
-  models.Bookmark || model<IBookMark>('Bookmark', bookmarkSchema);
+export type BookMarkDocument = InferSchemaType<typeof bookmarkSchema> & {
+  _id: Types.ObjectId;
+};
+
+const Bookmark = (models.Bookmark ||
+  model<BookMarkDocument, AggregatePaginateModel<BookMarkDocument>>(
+    'Bookmark',
+    bookmarkSchema,
+  )) as AggregatePaginateModel<BookMarkDocument>;
+
 export default Bookmark;

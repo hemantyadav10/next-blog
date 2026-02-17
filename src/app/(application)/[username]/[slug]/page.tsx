@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { verifyAuth } from '@/lib/auth';
 import { getBlogPost } from '@/lib/blog';
+import { isBlogBookmarked } from '@/lib/bookmark';
 import { APP_NAME } from '@/lib/constants';
 import { getMyHtml } from '@/lib/generate-html';
 import { formatDate } from 'date-fns';
@@ -95,6 +96,8 @@ async function page({ params }: Props) {
 
   if (!blog || blog.authorId.username !== username) return notFound();
 
+  const isBookmarked = await isBlogBookmarked(blog._id.toString());
+
   const html = await getMyHtml({ value: blog.content });
 
   const isOwner =
@@ -104,15 +107,23 @@ async function page({ params }: Props) {
     <div className="mx-auto flex w-full max-w-7xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
       {/* Blog Actions */}
       <BlogActionsMobile
+        isBookmarked={isBookmarked}
+        commentCount={blog.commentsCount}
         title={blog.title}
         text={blog.metaDescription || blog.description}
-        commentsCount={blog.commentsCount}
+        isLiked={false}
+        likesCount={blog.likesCount}
+        blogId={blog._id.toString()}
       />
       <div className="sticky top-28 hidden w-16 shrink-0 flex-col items-center space-y-6 self-start md:flex">
         <BlogActionsDesktop
+          isBookmarked={isBookmarked}
+          commentCount={blog.commentsCount}
           title={blog.title}
           text={blog.metaDescription || blog.description}
-          commentsCount={blog.commentsCount}
+          isLiked={false}
+          likesCount={blog.likesCount}
+          blogId={blog._id.toString()}
         />
       </div>
 
