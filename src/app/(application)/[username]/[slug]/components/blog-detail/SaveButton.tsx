@@ -49,6 +49,7 @@ function SaveButton({
             variant="ghost"
             size="icon"
             title="Login to save"
+            className="size-9"
           >
             <Bookmark />
           </Button>
