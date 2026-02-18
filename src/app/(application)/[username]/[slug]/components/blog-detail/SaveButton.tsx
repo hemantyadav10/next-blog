@@ -9,8 +9,10 @@ import {
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Bookmark } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useRouter } from 'nextjs-toploader/app';
 import { useOptimistic, useTransition } from 'react';
 import { toast } from 'sonner';
 import LoginPromptDialog from '../LoginPromptDialog';
@@ -27,13 +29,30 @@ function SaveButton({
   const [isPending, startTransition] = useTransition();
   const [optimisticSave, setOptimisticSave] = useOptimistic(isBookmarked);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleSave = () => {
     startTransition(async () => {
       setOptimisticSave((current) => !current);
       const response = await toggleBookmark({ blogId });
       if (response.success) {
+        if (response.data.saved) {
+          toast.success('Saved to Reading List', {
+            action: (
+              <Button
+                asChild
+                variant={'outline'}
+                className="ml-auto h-6 w-max rounded px-2 text-xs"
+              >
+                <Link href={'/reading-list'}>View List</Link>
+              </Button>
+            ),
+          });
+        } else {
+          toast.success('Removed from Reading List');
+        }
         router.refresh();
+        queryClient.invalidateQueries({ queryKey: ['reading-list'] });
       } else {
         toast.error(response.error);
       }

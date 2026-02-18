@@ -4,7 +4,13 @@ import { COOKIE_NAMES } from './lib/constants';
 
 // 1. Specify protected and public routes
 const authRoutes = ['/login', '/register'];
-const protectedRoutes = ['/dashboard', '/write', '/settings', '/profile'];
+const protectedRoutes = [
+  '/dashboard',
+  '/write',
+  '/settings',
+  '/profile',
+  '/reading-list',
+];
 
 export async function proxy(request: NextRequest) {
   // 2. Check if the current route is protected or public

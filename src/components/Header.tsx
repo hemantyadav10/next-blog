@@ -15,6 +15,7 @@ import { AuthResult } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import type { NavItems } from '@/types/navigation.types';
 import {
+  Bookmark,
   LayoutDashboard,
   LogOut,
   SearchIcon,
@@ -256,6 +257,12 @@ function Header({ user }: { user: AuthResult }) {
                       <Link href={'/dashboard'}>
                         <LayoutDashboard />
                         Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={'/reading-list'}>
+                        <Bookmark />
+                        Reading List
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
