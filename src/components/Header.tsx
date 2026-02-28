@@ -99,12 +99,12 @@ function Header({ user }: { user: AuthResult }) {
 
       <header
         className={cn(
-          'bg-background/95 border-border sticky top-0 z-50 border-b backdrop-blur-sm md:transform-none',
+          'bg-background/95 border-border sticky top-0 z-50 h-16 border-b backdrop-blur-sm md:transform-none',
           'dark:bg-card/90 dark:backdrop-blur-lg',
         )}
       >
         {/* Left: App Name */}
-        <div className="mx-auto flex h-16 items-center justify-between px-4">
+        <div className="mx-auto flex h-full items-center justify-between px-4">
           <nav className="flex items-center gap-8">
             <div className="flex items-center gap-2">
               <Button
