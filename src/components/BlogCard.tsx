@@ -55,12 +55,12 @@ export default function BlogCard({
         )}
       >
         <div className="space-y-2">
-          <h3 className="text-primary line-clamp-3 font-medium md:line-clamp-2 md:text-xl">
+          <h3 className="group-hover:text-primary line-clamp-3 font-medium transition-colors duration-300 md:line-clamp-2 md:text-xl">
             <span className="from-primary to-primary bg-gradient-to-r bg-[length:0px_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover:bg-[length:100%_2px]">
               {title}
             </span>
           </h3>
-          <p className="line-clamp-1 text-sm md:line-clamp-2 md:text-base">
+          <p className="text-muted-foreground line-clamp-1 text-sm md:line-clamp-2 md:text-base">
             {description}
           </p>
         </div>

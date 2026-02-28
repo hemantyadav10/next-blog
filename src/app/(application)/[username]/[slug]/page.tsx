@@ -35,8 +35,9 @@ import {
   BlogActionsDesktop,
   BlogActionsMobile,
 } from './components/blog-detail/blog-actions-nav';
-import BlogCard from './components/BlogCard';
 import CommentSection from './components/comments/CommentSection';
+import MoreFromAuthor from './components/MoreFromAuthor';
+import MoreFromAuthorSkeleton from './components/MoreFromAuthorSkeleton';
 import PostActions from './components/PostActions';
 
 type Props = {
@@ -169,7 +170,7 @@ async function page({ params }: Props) {
               {blog.title}
             </h1>
             {/* description */}
-            <div className="text-lg">
+            <div className="text-muted-foreground text-lg">
               <p>{blog.description}</p>
             </div>
 
@@ -330,19 +331,14 @@ async function page({ params }: Props) {
           <Separator />
 
           {/* More from this author */}
-          <div className="space-y-6">
-            <h2 className="text-lg font-medium">
-              More from {blog.authorId.firstName} {blog.authorId.lastName}
-            </h2>
-            <div className="space-y-4">
-              <BlogCard />
-              <BlogCard />
-              <BlogCard />
-            </div>
-            <Button className="w-full sm:w-auto xl:w-full" variant="outline">
-              View All
-            </Button>
-          </div>
+          <Suspense fallback={<MoreFromAuthorSkeleton />}>
+            <MoreFromAuthor
+              authorName={`${blog.authorId.firstName} ${blog.authorId.lastName}`}
+              authorId={blog.authorId._id.toString()}
+              blogId={blog._id.toString()}
+              authorUsername={blog.authorId.username}
+            />
+          </Suspense>
         </div>
       </div>
     </div>

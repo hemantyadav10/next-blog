@@ -6,7 +6,7 @@ import type {
   PopulatedCategory,
   PopulatedTag,
 } from '@/types/blog.types';
-import { PipelineStage, SortValues, Types } from 'mongoose';
+import { isValidObjectId, PipelineStage, SortValues, Types } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { Value } from 'platejs';
 import { cache } from 'react';
@@ -173,4 +173,26 @@ export const getMyPosts = async ({
     sort: sortOption,
   });
   return { user, data: result };
+};
+
+export const getMoreBlogsFromAuthor = async ({
+  authorId,
+  excludePostId,
+}: {
+  authorId: string;
+  excludePostId: string;
+}) => {
+  if (!isValidObjectId(excludePostId)) throw new Error('Invalide blog id');
+
+  await connectDb();
+  const blogs = await Blog.find({
+    authorId,
+    status: 'published',
+    _id: { $ne: excludePostId },
+  })
+    .limit(3)
+    .sort({ publishedAt: -1 })
+    .lean();
+
+  return blogs;
 };
