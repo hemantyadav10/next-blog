@@ -26,7 +26,6 @@ function LikeButton({
         <Button
           aria-label="Like"
           variant="ghost"
-          size="icon"
           onClick={handleLike}
           className={cn(
             'text-xs font-normal md:flex md:h-auto md:flex-col',

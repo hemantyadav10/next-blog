@@ -1,15 +1,6 @@
 import CommentSectionSkeleton from '@/components/skeletons/CommentSectionSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { verifyAuth } from '@/lib/auth';
 import { getBlogPost } from '@/lib/blog';
@@ -17,28 +8,25 @@ import { isBlogBookmarked } from '@/lib/bookmark';
 import { APP_NAME } from '@/lib/constants';
 import { getMyHtml } from '@/lib/generate-html';
 import { formatDate } from 'date-fns';
-import {
-  Calendar,
-  Clock,
-  Edit3Icon,
-  Folder,
-  TagIcon,
-  UserPlus,
-} from 'lucide-react';
+import { Calendar, Clock, Edit3Icon, Folder, TagIcon } from 'lucide-react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import RelatedBlogsSkeleton from '@/components/skeletons/RelatedBlogsSkeleton';
+import AuthorInfo from './components/AuthorInfo';
 import {
   BlogActionsDesktop,
   BlogActionsMobile,
 } from './components/blog-detail/blog-actions-nav';
+import BlogBreadcrumbs from './components/BlogBreadcrumbs';
 import CommentSection from './components/comments/CommentSection';
 import MoreFromAuthor from './components/MoreFromAuthor';
 import MoreFromAuthorSkeleton from './components/MoreFromAuthorSkeleton';
 import PostActions from './components/PostActions';
+import RelatedBlogs from './components/RelatedBlogs';
 
 type Props = {
   params: Promise<{ slug: string; username: string }>;
@@ -106,7 +94,7 @@ async function page({ params }: Props) {
     isAuthenticated && user.userId === blog.authorId._id.toString();
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl justify-center gap-8 px-4 py-8 pb-22 md:px-8 md:py-12">
+    <div className="mx-auto flex w-full max-w-7xl justify-center gap-8 px-4 py-8 pb-26 md:px-8 md:py-12">
       {/* Blog Actions */}
       <BlogActionsMobile
         isBookmarked={isBookmarked}
@@ -135,35 +123,14 @@ async function page({ params }: Props) {
         {/* Blog Content */}
         <div className="flex w-full max-w-3xl flex-col gap-8">
           <div className="space-y-6">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="/">Home</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="/explore">Explore</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href={`/category/${blog.categoryId.slug}`}>
-                      {blog.categoryId.name}
-                    </Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1 max-w-40">
-                    {blog.title}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            {/* Blog Breadcrums */}
+            <BlogBreadcrumbs
+              title={blog.title}
+              category={{
+                name: blog.categoryId.name,
+                slug: blog.categoryId.slug,
+              }}
+            />
 
             {/* title */}
             <h1 className="text-3xl leading-tight font-semibold md:text-5xl">
@@ -270,6 +237,7 @@ async function page({ params }: Props) {
               ))}
             </div>
           </div>
+
           <Separator />
 
           {/* Comment Section */}
@@ -282,6 +250,13 @@ async function page({ params }: Props) {
               totalComments={blog.commentsCount}
             />
           </Suspense>
+
+          <Separator />
+
+          {/* Related blogs section */}
+          <Suspense fallback={<RelatedBlogsSkeleton />}>
+            <RelatedBlogs blogId={blog._id.toString()} />
+          </Suspense>
         </div>
 
         <Separator className="block xl:hidden" />
@@ -289,44 +264,13 @@ async function page({ params }: Props) {
         {/* Author Sidebar */}
         <div className="flex-1 space-y-8">
           {/* Author Info */}
-          <div className="space-y-4 sm:flex xl:flex-col">
-            <div className="flex items-start gap-4 sm:flex-1">
-              <Link
-                href={`/author/${blog.authorId.username}`}
-                className="rounded-full"
-              >
-                <Avatar className="size-14">
-                  <AvatarImage
-                    src={blog.authorId.profilePicture ?? ''}
-                    alt={blog.authorId.firstName}
-                  />
-                  <AvatarFallback className="uppercase">
-                    {blog.authorId.firstName.charAt(0)}{' '}
-                    {blog.authorId.lastName.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
-              <div className="space-y-2 text-sm">
-                <Link
-                  href={`/author/${blog.authorId.username}`}
-                  className="hover:underline"
-                >
-                  <p className="text-lg font-medium">
-                    {blog.authorId.firstName} {blog.authorId.lastName}
-                  </p>
-                </Link>
-                <p className="text-muted-foreground">
-                  3.4K followers and 2.1K following
-                </p>
-                {blog.authorId.bio && (
-                  <p className="line-clamp-3">{blog.authorId.bio}</p>
-                )}
-              </div>
-            </div>
-            <Button className="w-full sm:w-auto" variant={'raised'}>
-              <UserPlus /> Follow
-            </Button>
-          </div>
+          <AuthorInfo
+            username={blog.authorId.username}
+            firstName={blog.authorId.firstName}
+            lastName={blog.authorId.lastName}
+            profilePicture={blog.authorId.profilePicture ?? ''}
+            bio={blog.authorId.bio ?? undefined}
+          />
 
           <Separator />
 

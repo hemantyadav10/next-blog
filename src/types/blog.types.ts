@@ -64,6 +64,18 @@ type MyBlogs = Pick<
   | 'editedAt'
 >;
 
+type RelatedBlogs = Pick<
+  BlogDocument,
+  | '_id'
+  | 'title'
+  | 'description'
+  | 'readTime'
+  | 'slug'
+  | 'publishedAt'
+  | 'blurDataUrl'
+  | 'banner'
+> & { authorId: BlogAuthor };
+
 export type {
   AuthorBlogsResponse,
   BlogAuthor,
@@ -74,4 +86,5 @@ export type {
   PopulatedAuthor,
   PopulatedCategory,
   PopulatedTag,
+  RelatedBlogs,
 };

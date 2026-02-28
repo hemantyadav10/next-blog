@@ -5,6 +5,7 @@ import type {
   PopulatedAuthor,
   PopulatedCategory,
   PopulatedTag,
+  RelatedBlogs,
 } from '@/types/blog.types';
 import { isValidObjectId, PipelineStage, SortValues, Types } from 'mongoose';
 import { nanoid } from 'nanoid';
@@ -182,7 +183,7 @@ export const getMoreBlogsFromAuthor = async ({
   authorId: string;
   excludePostId: string;
 }) => {
-  if (!isValidObjectId(excludePostId)) throw new Error('Invalide blog id');
+  if (!isValidObjectId(excludePostId)) throw new Error('Invalid blog id');
 
   await connectDb();
   const blogs = await Blog.find({
@@ -195,4 +196,82 @@ export const getMoreBlogsFromAuthor = async ({
     .lean();
 
   return blogs;
+};
+
+export const getRelatedBlogs = async (blogId: string, limit = 6) => {
+  if (!isValidObjectId(blogId)) throw new Error('Invalid blog id');
+
+  await connectDb();
+
+  const blog = await Blog.findById(blogId).select('categoryId tags');
+  if (!blog) return [];
+
+  // fetch up to `limit` published blogs that share category or tags with the current blog
+  // scored by relevance (category match = 2pts, each shared tag = 1pt), then sorted by score + publishedAt
+  const relatedBlogs = await Blog.aggregate<RelatedBlogs>([
+    {
+      $match: {
+        _id: { $ne: blog._id },
+        status: 'published',
+        $or: [{ categoryId: blog.categoryId }, { tags: { $in: blog.tags } }],
+      },
+    },
+    {
+      $addFields: {
+        relevanceScore: {
+          $add: [
+            {
+              $cond: {
+                if: { $eq: ['$categoryId', blog.categoryId] },
+                then: 2,
+                else: 0,
+              },
+            },
+            {
+              $size: {
+                $ifNull: [{ $setIntersection: ['$tags', blog.tags] }, []],
+              },
+            },
+          ],
+        },
+      },
+    },
+    { $sort: { relevanceScore: -1, publishedAt: -1 } },
+    { $limit: limit },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'authorId',
+        foreignField: '_id',
+        as: 'authorId',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              firstName: 1,
+              lastName: 1,
+              username: 1,
+              profilePicture: 1,
+            },
+          },
+        ],
+      },
+    },
+    { $unwind: '$authorId' },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        description: 1,
+        readTime: 1,
+        authorId: 1,
+        slug: 1,
+        publishedAt: 1,
+        blurDataUrl: 1,
+        banner: 1,
+      },
+    },
+  ]);
+
+  return relatedBlogs;
 };
