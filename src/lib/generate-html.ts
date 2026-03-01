@@ -1,8 +1,8 @@
 import { BaseEditorKit } from '@/components/editor-base-kit';
 import { EditorStatic } from '@/components/ui/editor-static';
-import sanitizeHtml from 'sanitize-html';
 import { createSlateEditor, Value } from 'platejs';
 import { serializeHtml } from 'platejs/static';
+import sanitizeHtml from 'sanitize-html';
 
 export async function getMyHtml({ value }: { value: Value }) {
   // Create a server-side editor instance with components
@@ -51,7 +51,6 @@ export async function getMyHtml({ value }: { value: Value }) {
         // Allow common CSS properties
         color: [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/],
         'text-align': [/^left$/, /^right$/, /^center$/],
-        'font-size': [/^\d+(?:px|em|%)$/],
         'background-color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/],
         'font-weight': [/^\d+$/, /^bold$/, /^normal$/],
         'font-style': [/^italic$/, /^normal$/],

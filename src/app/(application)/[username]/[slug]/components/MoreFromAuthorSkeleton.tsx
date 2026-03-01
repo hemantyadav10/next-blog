@@ -1,15 +1,19 @@
+import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function MoreFromAuthorSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-6 w-full max-w-52" />
-      <div className="space-y-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <BlogCardSkeleton key={i} />
-        ))}
+    <>
+      <Separator />
+      <div className="space-y-6">
+        <Skeleton className="h-6 w-full max-w-52" />
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <BlogCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

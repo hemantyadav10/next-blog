@@ -16,6 +16,7 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import RelatedBlogsSkeleton from '@/components/skeletons/RelatedBlogsSkeleton';
+import { extractToc } from '@/lib/toc';
 import AuthorInfo from './components/AuthorInfo';
 import {
   BlogActionsDesktop,
@@ -27,6 +28,8 @@ import MoreFromAuthor from './components/MoreFromAuthor';
 import MoreFromAuthorSkeleton from './components/MoreFromAuthorSkeleton';
 import PostActions from './components/PostActions';
 import RelatedBlogs from './components/RelatedBlogs';
+import ScrollToTopButton from './components/ScrollToTopButton';
+import TOC from './components/TOC';
 
 type Props = {
   params: Promise<{ slug: string; username: string }>;
@@ -89,6 +92,8 @@ async function page({ params }: Props) {
   const isBookmarked = await isBlogBookmarked(blog._id.toString());
 
   const html = await getMyHtml({ value: blog.content });
+
+  const toc = extractToc(blog.content);
 
   const isOwner =
     isAuthenticated && user.userId === blog.authorId._id.toString();
@@ -219,6 +224,13 @@ async function page({ params }: Props) {
               />
             )}
 
+            {/* Table of Contents - Mobile inline (collapsible) */}
+            {toc.length >= 2 && (
+              <aside className="block space-y-8 xl:hidden">
+                <TOC toc={toc} collapsible />
+              </aside>
+            )}
+
             {/* main content */}
             <div dangerouslySetInnerHTML={{ __html: html }} />
 
@@ -251,15 +263,11 @@ async function page({ params }: Props) {
             />
           </Suspense>
 
-          <Separator />
-
           {/* Related blogs section */}
           <Suspense fallback={<RelatedBlogsSkeleton />}>
             <RelatedBlogs blogId={blog._id.toString()} />
           </Suspense>
         </div>
-
-        <Separator className="block xl:hidden" />
 
         {/* Author Sidebar */}
         <div className="flex-1 space-y-8">
@@ -272,7 +280,12 @@ async function page({ params }: Props) {
             bio={blog.authorId.bio ?? undefined}
           />
 
-          <Separator />
+          {/* Table of Contents */}
+          {toc.length >= 2 && (
+            <aside className="bg-background sticky top-[63px] z-10 hidden space-y-8 xl:block">
+              <TOC toc={toc} />
+            </aside>
+          )}
 
           {/* More from this author */}
           <Suspense fallback={<MoreFromAuthorSkeleton />}>
@@ -285,6 +298,7 @@ async function page({ params }: Props) {
           </Suspense>
         </div>
       </div>
+      <ScrollToTopButton />
     </div>
   );
 }

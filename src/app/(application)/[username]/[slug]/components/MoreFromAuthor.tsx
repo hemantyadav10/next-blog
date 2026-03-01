@@ -1,5 +1,6 @@
 import { ErrorState } from '@/components/error-state';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { getMoreBlogsFromAuthor } from '@/lib/blog';
 import Link from 'next/link';
 import BlogCard from './BlogCard';
@@ -39,28 +40,31 @@ async function MoreFromAuthor({
   if (blogs.length === 0) return null;
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-semibold">More from {authorName}</h2>
-      <div className="space-y-4">
-        {blogs.map((blog) => (
-          <BlogCard
-            key={blog._id.toString()}
-            title={blog.title}
-            viewCount={blog.views}
-            date={
-              blog.publishedAt?.toISOString() || blog.createdAt.toISOString()
-            }
-            banner={blog.banner}
-            blurDataUrl={blog.blurDataUrl}
-            slug={blog.slug}
-            username={authorUsername}
-          />
-        ))}
+    <>
+      <Separator />
+      <div className="space-y-6">
+        <h2 className="text-lg font-semibold">More from {authorName}</h2>
+        <div className="space-y-4">
+          {blogs.map((blog) => (
+            <BlogCard
+              key={blog._id.toString()}
+              title={blog.title}
+              viewCount={blog.views}
+              date={
+                blog.publishedAt?.toISOString() || blog.createdAt.toISOString()
+              }
+              banner={blog.banner}
+              blurDataUrl={blog.blurDataUrl}
+              slug={blog.slug}
+              username={authorUsername}
+            />
+          ))}
+        </div>
+        <Button asChild className="w-full" variant="outline">
+          <Link href={`/author/${authorUsername}`}>View All</Link>
+        </Button>
       </div>
-      <Button asChild className="w-full" variant="outline">
-        <Link href={`/author/${authorUsername}`}>View All</Link>
-      </Button>
-    </div>
+    </>
   );
 }
 

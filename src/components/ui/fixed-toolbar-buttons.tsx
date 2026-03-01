@@ -13,7 +13,6 @@ import { useEditorReadOnly } from 'platejs/react';
 
 import { AlignToolbarButton } from './align-toolbar-button';
 import { FontColorToolbarButton } from './font-color-toolbar-button';
-import { FontSizeToolbarButton } from './font-size-toolbar-button';
 import { RedoToolbarButton, UndoToolbarButton } from './history-toolbar-button';
 import {
   IndentToolbarButton,
@@ -63,7 +62,7 @@ export function FixedToolbarButtons() {
           <ToolbarGroup>
             <InsertToolbarButton />
             <TurnIntoToolbarButton />
-            <FontSizeToolbarButton />
+            {/* <FontSizeToolbarButton /> */}
           </ToolbarGroup>
 
           <ToolbarGroup>

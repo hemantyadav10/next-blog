@@ -48,6 +48,7 @@ export default function RootLayout({
               showSpinner={false}
               color="var(--progress)"
               height={2.5}
+              showForHashAnchor={false}
             />
             <Toaster />
             <main>{children}</main>
