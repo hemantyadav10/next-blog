@@ -62,7 +62,7 @@ function LikeButton({
             aria-label="Login to like"
             variant="ghost"
             title="Login to like"
-            className="text-xs font-normal md:flex md:h-auto md:flex-col"
+            className="w-auto text-xs font-normal md:flex md:h-auto md:flex-col"
           >
             <HeartIcon /> {likesCount}
           </Button>
