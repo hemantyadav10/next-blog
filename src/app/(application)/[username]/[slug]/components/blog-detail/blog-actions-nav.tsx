@@ -33,7 +33,12 @@ function BlogActionsDesktop({
 
   return (
     <>
-      <LikeButton isLiked={isLiked} likesCount={likesCount} />
+      <LikeButton
+        blogId={blogId}
+        isLiked={isLiked}
+        likesCount={likesCount}
+        isAuthenticated={isAuthenticated}
+      />
       <CommentButton commentCount={commentCount} />
       <SaveButton
         isBookmarked={isBookmarked}
@@ -65,7 +70,12 @@ function BlogActionsMobile({
         'fixed right-0 bottom-0 left-0 z-40',
       )}
     >
-      <LikeButton isLiked={isLiked} likesCount={likesCount} />
+      <LikeButton
+        blogId={blogId}
+        isLiked={isLiked}
+        likesCount={likesCount}
+        isAuthenticated={isAuthenticated}
+      />
       <CommentButton commentCount={commentCount} />
       <SaveButton
         isBookmarked={isBookmarked}

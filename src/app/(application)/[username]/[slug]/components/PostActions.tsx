@@ -91,9 +91,9 @@ function DeleteDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Post?</AlertDialogTitle>
-          <Alert>
+          <Alert variant={'warning'}>
             <AlertTitle>Recommendation:</AlertTitle>
-            <AlertDescription>
+            <AlertDescription className="text-foreground">
               Instead of deleting, consider unpublishing your post. This keeps
               your content and its history while removing it from public view.
               You can always republish it later.

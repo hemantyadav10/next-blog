@@ -1,15 +1,6 @@
-import { Schema, Types, model, models } from 'mongoose';
+import { InferSchemaType, Model, Schema, Types, model, models } from 'mongoose';
 
-export interface ILike {
-  userId: Types.ObjectId;
-  blogId?: Types.ObjectId;
-  commentId?: Types.ObjectId;
-  likeType: 'blog' | 'comment';
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const likeSchema = new Schema<ILike>(
+const likeSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -19,39 +10,46 @@ const likeSchema = new Schema<ILike>(
     blogId: {
       type: Schema.Types.ObjectId,
       ref: 'Blog',
-      required: function (this: ILike) {
-        if (this.likeType === 'blog') {
-          return true;
-        }
-        return false;
-      },
     },
     commentId: {
       type: Schema.Types.ObjectId,
       ref: 'Comment',
-      required: function (this: ILike) {
-        if (this.likeType === 'comment') {
-          return true;
-        }
-        return false;
-      },
-    },
-    likeType: {
-      type: String,
-      enum: ['blog', 'comment'],
-      required: true,
     },
   },
   { timestamps: true },
 );
 
 // TODO: Add indexes, virtuals, hooks and methods
+likeSchema.pre('validate', function (next) {
+  if (!this.blogId && !this.commentId) {
+    next(new Error('Either blogId or commentId must be provided'));
+  } else if (this.blogId && this.commentId) {
+    next(new Error('Only one of blogId or commentId can be provided'));
+  } else {
+    next();
+  }
+});
 
-// Prevent duplicate blog likes
-likeSchema.index({ blogId: 1, userId: 1 }, { unique: true, sparse: true });
+// Unique blog likes
+likeSchema.index(
+  { blogId: 1, userId: 1 },
+  { unique: true, partialFilterExpression: { blogId: { $exists: true } } },
+);
 
-// Prevent duplicate comment likes
-likeSchema.index({ userId: 1, commentId: 1 }, { unique: true, sparse: true });
+// Unique comment likes
+likeSchema.index(
+  { commentId: 1, userId: 1 },
+  { unique: true, partialFilterExpression: { commentId: { $exists: true } } },
+);
 
-const Like = models.Like || model<ILike>('Like', likeSchema);
+export type LikeDocument = InferSchemaType<typeof likeSchema> & {
+  _id: Types.ObjectId;
+};
+
+const Like = (models.Like ||
+  model<LikeDocument, Model<LikeDocument>>(
+    'Like',
+    likeSchema,
+  )) as Model<LikeDocument>;
+
 export default Like;

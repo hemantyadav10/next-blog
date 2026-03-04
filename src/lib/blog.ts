@@ -1,5 +1,5 @@
 import { verifyAuth } from '@/lib/auth';
-import { Blog } from '@/models';
+import { Blog, Bookmark, Like } from '@/models';
 import type {
   MyBlogs,
   PopulatedAuthor,
@@ -89,6 +89,8 @@ export const getCategoryPopularBlogs = async ({
 export const getBlogPost = cache(async (slug: string) => {
   await connectDb();
 
+  const { isAuthenticated, user } = await verifyAuth();
+
   const blog = await Blog.findOne({ slug, status: 'published' })
     .populate<{
       authorId: PopulatedAuthor;
@@ -100,7 +102,22 @@ export const getBlogPost = cache(async (slug: string) => {
     .populate<{ categoryId: PopulatedCategory }>('categoryId', 'name slug')
     .lean();
 
-  return blog;
+  if (!blog) return null;
+
+  if (isAuthenticated) {
+    const [bookmarkExists, likeExists] = await Promise.all([
+      Bookmark.exists({ blogId: blog._id, userId: user.userId }),
+      Like.exists({ blogId: blog._id, userId: user.userId }),
+    ]);
+
+    return {
+      ...blog,
+      isBookmarked: Boolean(bookmarkExists),
+      isLiked: Boolean(likeExists),
+    };
+  }
+
+  return { ...blog, isBookmarked: false, isLiked: false };
 });
 
 export const getBlogPostForEdit = async (slug: string, authorId: string) => {

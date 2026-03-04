@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { verifyAuth } from '@/lib/auth';
 import { getBlogPost } from '@/lib/blog';
-import { isBlogBookmarked } from '@/lib/bookmark';
 import { APP_NAME } from '@/lib/constants';
 import { getMyHtml } from '@/lib/generate-html';
 import { formatDate } from 'date-fns';
@@ -89,7 +88,8 @@ async function page({ params }: Props) {
 
   if (!blog || blog.authorId.username !== username) return notFound();
 
-  const isBookmarked = await isBlogBookmarked(blog._id.toString());
+  const isBookmarked = blog.isBookmarked;
+  const isLiked = blog.isLiked;
 
   const html = await getMyHtml({ value: blog.content });
 
@@ -106,7 +106,7 @@ async function page({ params }: Props) {
         commentCount={blog.commentsCount}
         title={blog.title}
         text={blog.metaDescription || blog.description}
-        isLiked={false}
+        isLiked={isLiked}
         likesCount={blog.likesCount}
         blogId={blog._id.toString()}
         isAuthenticated={isAuthenticated}
@@ -117,7 +117,7 @@ async function page({ params }: Props) {
           commentCount={blog.commentsCount}
           title={blog.title}
           text={blog.metaDescription || blog.description}
-          isLiked={false}
+          isLiked={isLiked}
           likesCount={blog.likesCount}
           blogId={blog._id.toString()}
           isAuthenticated={isAuthenticated}
