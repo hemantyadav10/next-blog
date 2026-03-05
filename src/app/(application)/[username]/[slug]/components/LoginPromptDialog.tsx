@@ -33,11 +33,15 @@ interface AuthPromptDialogProps {
   trigger: ReactNode;
   /** Optional: specific hash like "#comments" */
   hash?: string;
+  title?: string;
+  description?: string;
 }
 
 export default function LoginPromptDialog({
   trigger,
   hash = '',
+  title = 'Log in to continue',
+  description = 'Please sign in to your account or create a new one to continue with this action.',
 }: AuthPromptDialogProps) {
   const pathname = usePathname();
   const redirectUrl = encodeURIComponent(`${pathname}${hash}`);
@@ -50,7 +54,12 @@ export default function LoginPromptDialog({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{trigger}</DialogTrigger>
         <DialogContent className="text-center sm:max-w-md">
-          <ContentBody redirectUrl={redirectUrl} isDesktop={true} />
+          <ContentBody
+            redirectUrl={redirectUrl}
+            isDesktop={true}
+            title={title}
+            description={description}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -63,7 +72,12 @@ export default function LoginPromptDialog({
       </DrawerTrigger>
       <DrawerContent>
         <div className="px-4">
-          <ContentBody redirectUrl={redirectUrl} isDesktop={false} />
+          <ContentBody
+            redirectUrl={redirectUrl}
+            isDesktop={false}
+            title={title}
+            description={description}
+          />
         </div>
       </DrawerContent>
     </Drawer>
@@ -73,9 +87,13 @@ export default function LoginPromptDialog({
 function ContentBody({
   redirectUrl,
   isDesktop,
+  title,
+  description,
 }: {
   redirectUrl: string;
   isDesktop: boolean;
+  title: string;
+  description: string;
 }) {
   // Use the appropriate component tags based on the device
   const Header = isDesktop ? DialogHeader : DrawerHeader;
@@ -93,12 +111,9 @@ function ContentBody({
             : 'flex flex-col items-center space-y-1.5 pt-6 text-center'
         }
       >
-        <Logo size={60} showText={false} /> {/* Slightly larger */}
-        <Title className="text-xl">Log in to continue</Title>
-        <Description className="text-center">
-          Please sign in to your account or create a new one to continue with
-          this action.
-        </Description>
+        <Logo size={60} showText={false} />
+        <Title className="text-xl">{title}</Title>
+        <Description className="text-center">{description}</Description>
       </Header>
 
       <div className={cn('flex flex-col gap-3 px-4 py-4')}>

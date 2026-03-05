@@ -65,6 +65,8 @@ async function CommentSection({
             </Button>
           }
           hash="#comments"
+          title="Add your thoughts"
+          description="Sign in to comment and share your perspective."
         />
       )}
 

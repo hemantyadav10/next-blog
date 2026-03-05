@@ -270,7 +270,7 @@ async function page({ params }: Props) {
         </div>
 
         {/* Author Sidebar */}
-        <div className="flex-1 space-y-8">
+        <div className="scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent flex-1 space-y-8 overflow-y-auto pb-4 xl:sticky xl:top-28 xl:h-[calc(100vh-136px)]">
           {/* Author Info */}
           <AuthorInfo
             username={blog.authorId.username}
@@ -282,7 +282,7 @@ async function page({ params }: Props) {
 
           {/* Table of Contents */}
           {toc.length >= 2 && (
-            <aside className="bg-background sticky top-[63px] z-10 hidden space-y-8 xl:block">
+            <aside className="bg-background hidden space-y-8 xl:block">
               <TOC toc={toc} />
             </aside>
           )}

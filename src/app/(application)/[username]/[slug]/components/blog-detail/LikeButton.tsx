@@ -67,6 +67,8 @@ function LikeButton({
             <HeartIcon /> {likesCount}
           </Button>
         }
+        title="Show your support"
+        description="Sign in to like posts and support the creator."
       />
     );
 

@@ -579,6 +579,8 @@ const CommentItem = ({
                           <ReplyButton isCommentDeleted={isCommentDeleted} />
                         }
                         hash="#comments"
+                        title="Join the discussion"
+                        description="Sign in to reply and keep the conversation going."
                       />
                     ))}
 

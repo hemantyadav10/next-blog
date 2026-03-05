@@ -69,16 +69,17 @@ function TOC({ toc, collapsible = false }: TOCProps) {
         return (
           <li
             key={item.id}
-            className={cn('relative', item.level === 3 && 'ml-4')}
+            className={cn(
+              'relative border-l transition-colors',
+              item.level === 3 && 'pl-4',
+              isActive
+                ? 'border-primary text-primary bg-primary/5 font-medium'
+                : 'hover:border-muted-foreground text-muted-foreground hover:text-foreground',
+            )}
           >
             <a
               href={`#${item.id}`}
-              className={cn(
-                'block rounded-r-sm px-2 py-1 transition-colors',
-                isActive
-                  ? 'text-foreground border-primary bg-primary/10 border-l-2 font-medium'
-                  : 'text-muted-foreground hover:text-foreground',
-              )}
+              className={cn('block rounded-r-sm px-3 py-1')}
               onClick={() => collapsible && setAccordionValue('')}
             >
               {item.text}

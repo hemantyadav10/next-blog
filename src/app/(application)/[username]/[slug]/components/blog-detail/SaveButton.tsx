@@ -73,6 +73,8 @@ function SaveButton({
             <Bookmark />
           </Button>
         }
+        title="Save for later"
+        description="Sign in to bookmark posts and build your reading list."
       />
     );
 
