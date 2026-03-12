@@ -1,3 +1,4 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import { InferSchemaType, Model, Schema, Types, model, models } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
@@ -22,7 +23,7 @@ const categorySchema = new Schema(
     },
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
       required: true,
     },
     blogsCount: {
@@ -46,10 +47,8 @@ categorySchema.index(
 
 categorySchema.plugin(aggregatePaginate);
 
-const Category = (models.Category ||
-  model<CategoryDocument>(
-    'Category',
-    categorySchema,
-  )) as Model<CategoryDocument>;
+const Category =
+  (models.Category as Model<CategoryDocument>) ||
+  model<CategoryDocument>(MODEL_NAMES.CATEGORY, categorySchema);
 
 export default Category;

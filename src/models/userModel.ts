@@ -1,3 +1,4 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import bcrypt from 'bcrypt';
 import { InferSchemaType, Model, model, models, Schema, Types } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
@@ -124,7 +125,8 @@ userSchema.virtual('fullName').get(function () {
 
 userSchema.plugin(aggregatePaginate);
 
-const User = (models.User ||
-  model<UserType>('User', userSchema)) as Model<UserType>;
+const User =
+  (models.User as Model<UserType>) ||
+  model<UserType, Model<UserType>>(MODEL_NAMES.USER, userSchema);
 
 export default User;

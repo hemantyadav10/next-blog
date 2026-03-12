@@ -1,19 +1,20 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import { InferSchemaType, Model, Schema, Types, model, models } from 'mongoose';
 
 const likeSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
       required: true,
     },
     blogId: {
       type: Schema.Types.ObjectId,
-      ref: 'Blog',
+      ref: MODEL_NAMES.BLOG,
     },
     commentId: {
       type: Schema.Types.ObjectId,
-      ref: 'Comment',
+      ref: MODEL_NAMES.COMMENT,
     },
   },
   { timestamps: true },
@@ -46,10 +47,8 @@ export type LikeDocument = InferSchemaType<typeof likeSchema> & {
   _id: Types.ObjectId;
 };
 
-const Like = (models.Like ||
-  model<LikeDocument, Model<LikeDocument>>(
-    'Like',
-    likeSchema,
-  )) as Model<LikeDocument>;
+const Like =
+  (models.Like as Model<LikeDocument>) ||
+  model<LikeDocument, Model<LikeDocument>>(MODEL_NAMES.LIKE, likeSchema);
 
 export default Like;

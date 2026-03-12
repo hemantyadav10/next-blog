@@ -1,3 +1,4 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import { model, models, Schema, Types } from 'mongoose';
 
 export interface IBlogView {
@@ -12,12 +13,12 @@ export interface IBlogView {
 const blogViewSchema = new Schema<IBlogView>({
   blogId: {
     type: Schema.Types.ObjectId,
-    ref: 'Blog',
+    ref: MODEL_NAMES.BLOG,
     required: true,
   },
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: MODEL_NAMES.USER,
     required: true,
   },
   ipAddress: {
@@ -33,5 +34,5 @@ const blogViewSchema = new Schema<IBlogView>({
 // TODO: Add indexes, virtuals, hooks and methods
 
 const BlogView =
-  models.BlogView || model<IBlogView>('BlogView', blogViewSchema);
+  models.BlogView || model<IBlogView>(MODEL_NAMES.BLOG_VIEW, blogViewSchema);
 export default BlogView;

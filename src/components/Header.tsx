@@ -18,7 +18,6 @@ import {
   Bookmark,
   LayoutDashboard,
   LogOut,
-  SearchIcon,
   Settings,
   SquarePen,
   User,
@@ -31,9 +30,8 @@ import { toast } from 'sonner';
 import { Logo } from './Logo';
 import MobileMenu from './MobileMenu';
 import { ModeToggle } from './ModeToggle';
+import Search from './Search';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
-import { Kbd } from './ui/kbd';
 import { Spinner } from './ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
@@ -174,15 +172,7 @@ function Header({ user }: { user: AuthResult }) {
           {/* Right: Theme Toggle + Auth */}
           <div className="flex items-center gap-4">
             {/* Search */}
-            <InputGroup className="hidden h-9 rounded-full inset-shadow-sm lg:flex lg:min-w-sm">
-              <InputGroupInput placeholder="Search..." />
-              <InputGroupAddon>
-                <SearchIcon />
-              </InputGroupAddon>
-              <InputGroupAddon align={'inline-end'}>
-                <Kbd>/</Kbd>
-              </InputGroupAddon>
-            </InputGroup>
+            <Search userId={userDetails?.userId} />
 
             {/* Theme toggle */}
             <ModeToggle allOptions={false} />

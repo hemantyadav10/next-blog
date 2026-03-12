@@ -1,3 +1,4 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import {
   AggregatePaginateModel,
   InferSchemaType,
@@ -12,12 +13,12 @@ const bookmarkSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
       required: true,
     },
     blogId: {
       type: Schema.Types.ObjectId,
-      ref: 'Blog',
+      ref: MODEL_NAMES.BLOG,
       required: true,
     },
   },
@@ -32,10 +33,11 @@ export type BookMarkDocument = InferSchemaType<typeof bookmarkSchema> & {
   _id: Types.ObjectId;
 };
 
-const Bookmark = (models.Bookmark ||
+const Bookmark =
+  (models.Bookmark as AggregatePaginateModel<BookMarkDocument>) ||
   model<BookMarkDocument, AggregatePaginateModel<BookMarkDocument>>(
-    'Bookmark',
+    MODEL_NAMES.BOOKMARK,
     bookmarkSchema,
-  )) as AggregatePaginateModel<BookMarkDocument>;
+  );
 
 export default Bookmark;

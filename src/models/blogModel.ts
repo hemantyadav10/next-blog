@@ -1,3 +1,4 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import {
   AggregatePaginateModel,
   InferSchemaType,
@@ -12,7 +13,7 @@ const blogSchema = new Schema(
   {
     authorId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
       required: true,
       index: true,
     },
@@ -54,7 +55,7 @@ const blogSchema = new Schema(
     ],
     tags: {
       type: [Schema.Types.ObjectId],
-      ref: 'Tag',
+      ref: MODEL_NAMES.TAG,
       default: [],
       validate: [
         (val: Types.ObjectId[]) => val.length > 0,
@@ -69,7 +70,7 @@ const blogSchema = new Schema(
     },
     categoryId: {
       type: Schema.Types.ObjectId,
-      ref: 'Category',
+      ref: MODEL_NAMES.CATEGORY,
       required: true,
       index: true,
     },
@@ -133,13 +134,15 @@ export type BlogDocument = InferSchemaType<typeof blogSchema> & {
 };
 
 // TODO: Add indexes, virtuals, hooks and methods
+blogSchema.index({ title: 'text', description: 'text' });
 
 blogSchema.plugin(aggregatePaginate);
 
-const Blog = (models.Blog ||
+const Blog =
+  (models.Blog as AggregatePaginateModel<BlogDocument>) ||
   model<BlogDocument, AggregatePaginateModel<BlogDocument>>(
-    'Blog',
+    MODEL_NAMES.BLOG,
     blogSchema,
-  )) as AggregatePaginateModel<BlogDocument>;
+  );
 
 export default Blog;

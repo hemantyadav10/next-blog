@@ -1,3 +1,4 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import {
   AggregatePaginateModel,
   InferSchemaType,
@@ -12,12 +13,12 @@ const followSchema = new Schema(
   {
     followerId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
       required: true,
     },
     followingId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
       required: true,
     },
   },
@@ -38,10 +39,11 @@ export type FollowDocument = InferSchemaType<typeof followSchema> & {
   _id: Types.ObjectId;
 };
 
-const Follow = (models.Follow ||
+const Follow =
+  (models.Follow as AggregatePaginateModel<FollowDocument>) ||
   model<FollowDocument, AggregatePaginateModel<FollowDocument>>(
-    'Follow',
+    MODEL_NAMES.FOLLOW,
     followSchema,
-  )) as AggregatePaginateModel<FollowDocument>;
+  );
 
 export default Follow;

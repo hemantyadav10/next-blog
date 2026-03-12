@@ -9,3 +9,16 @@ export const IS_PROD = ENV === 'production';
 export const IS_TEST = ENV === 'test';
 
 export const APP_NAME = 'InfiniteInk' as const;
+
+export const MODEL_NAMES = {
+  BLOG: 'Blog',
+  BLOG_VIEW: 'BlogView',
+  BOOKMARK: 'Bookmark',
+  CATEGORY: 'Category',
+  COMMENT: 'Comment',
+  FOLLOW: 'Follow',
+  LIKE: 'Like',
+  SEARCH_HISTORY: 'SearchHistory',
+  TAG: 'Tag',
+  USER: 'User',
+} as const;

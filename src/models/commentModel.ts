@@ -1,3 +1,4 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import { Blog } from '@/models';
 import {
   AggregatePaginateModel,
@@ -17,7 +18,7 @@ const commentSchema = new Schema(
     },
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
       required: true,
     },
     isPinned: {
@@ -32,18 +33,18 @@ const commentSchema = new Schema(
     editedAt: Date,
     parentId: {
       type: Schema.Types.ObjectId,
-      ref: 'Comment',
+      ref: MODEL_NAMES.COMMENT,
       default: null,
     },
     blogId: {
       type: Schema.Types.ObjectId,
-      ref: 'Blog',
+      ref: MODEL_NAMES.BLOG,
       required: true,
     },
     mentions: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: MODEL_NAMES.USER,
       },
     ],
     likesCount: {
@@ -62,7 +63,7 @@ const commentSchema = new Schema(
     },
     rootCommentId: {
       type: Schema.Types.ObjectId,
-      ref: 'Comment',
+      ref: MODEL_NAMES.COMMENT,
       required: true,
     },
     replyCount: {
@@ -158,10 +159,11 @@ export type CommentDocument = Omit<
   parentId: Types.ObjectId | null;
 };
 
-const Comment = (models.Comment ||
+const Comment =
+  (models.Comment as AggregatePaginateModel<CommentDocument>) ||
   model<CommentDocument, AggregatePaginateModel<CommentDocument>>(
-    'Comment',
+    MODEL_NAMES.COMMENT,
     commentSchema,
-  )) as AggregatePaginateModel<CommentDocument>;
+  );
 
 export default Comment;

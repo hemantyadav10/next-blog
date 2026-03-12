@@ -1,10 +1,9 @@
 'use client';
 
-import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
-import { SearchIcon } from 'lucide-react';
+import { SearchIcon, XIcon } from 'lucide-react';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Spinner } from './spinner';
+import { cn } from '@/lib/utils';
+import { Button } from './button';
+import Loader from './Loader';
 
 function Command({
   className,
@@ -66,11 +67,13 @@ function CommandInput({
   wrapperClassName,
   showIcon = true,
   loading = false,
+  showClearButton = false,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input> & {
   showIcon?: boolean;
   loading?: boolean;
   wrapperClassName?: string;
+  showClearButton?: boolean;
 }) {
   return (
     <div
@@ -89,7 +92,19 @@ function CommandInput({
         )}
         {...props}
       />
-      {loading && <Spinner />}
+      {loading && <Loader size="sm" color="var(--foreground)" />}
+      {showClearButton && (
+        <Button
+          aria-label="Clear search"
+          title="Clear search"
+          variant="ghost"
+          size="icon-sm"
+          className="-mr-2 size-7"
+          onClick={() => props.onValueChange?.('')}
+        >
+          <XIcon />
+        </Button>
+      )}
     </div>
   );
 }
@@ -186,11 +201,11 @@ function CommandShortcut({
 export {
   Command,
   CommandDialog,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
-  CommandShortcut,
+  CommandList,
   CommandSeparator,
+  CommandShortcut,
 };

@@ -1,6 +1,8 @@
+import { MODEL_NAMES } from '@/lib/constants';
 import {
   InferSchemaType,
   Schema,
+  Types,
   model,
   models,
   type AggregatePaginateModel,
@@ -33,22 +35,25 @@ const tagSchema = new Schema(
     createdBy: {
       required: true,
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: MODEL_NAMES.USER,
     },
   },
   { timestamps: true },
 );
 
-export type TagDocument = InferSchemaType<typeof tagSchema>;
+export type TagDocument = InferSchemaType<typeof tagSchema> & {
+  _id: Types.ObjectId;
+};
 
 // TODO: Add indexes, virtuals, hooks and methods
 
 tagSchema.plugin(aggregatePaginate);
 
-const Tag = (models.Tag ||
+const Tag =
+  (models.Tag as AggregatePaginateModel<TagDocument>) ||
   model<TagDocument, AggregatePaginateModel<TagDocument>>(
-    'Tag',
+    MODEL_NAMES.TAG,
     tagSchema,
-  )) as AggregatePaginateModel<TagDocument>;
+  );
 
 export default Tag;
