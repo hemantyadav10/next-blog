@@ -23,7 +23,6 @@ import { Spinner } from '@/components/ui/spinner';
 import { LoginInput, loginSchema } from '@/lib/schema/userSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircleIcon, Eye, EyeOff, LockIcon, Mail } from 'lucide-react';
-import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
@@ -83,12 +82,7 @@ function LoginForm() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="w-full max-w-sm"
-    >
+    <div className="w-full max-w-sm">
       <FieldSet>
         <FieldContent className="gap-2 text-center">
           <FieldLabel className="mx-auto text-2xl font-semibold">
@@ -210,16 +204,16 @@ function LoginForm() {
             </Field>
 
             {/* Sign up link */}
-            <FieldDescription className="text-center">
+            <FieldDescription className="text-center [&>a]:no-underline">
               Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-link">
+              <Link href="/register" className="text-link hover:underline">
                 Sign up
               </Link>
             </FieldDescription>
           </FieldGroup>
         </form>
       </FieldSet>
-    </motion.div>
+    </div>
   );
 }
 

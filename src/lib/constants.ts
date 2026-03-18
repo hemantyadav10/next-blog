@@ -21,4 +21,7 @@ export const MODEL_NAMES = {
   SEARCH_HISTORY: 'SearchHistory',
   TAG: 'Tag',
   USER: 'User',
+  PASSWORD_RESET_TOKEN: 'PasswordResetToken',
 } as const;
+
+export const EMAIL_FROM = `${APP_NAME} <onboarding@resend.dev>` as const;

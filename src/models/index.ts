@@ -5,6 +5,7 @@ import Category from './categoryModel';
 import Comment from './commentModel';
 import Follow from './followModel';
 import Like from './likeModel';
+import PasswordResetToken from './passwordResetTokenModel';
 import SearchHistory from './searchHistoryModel';
 import Tag from './tagModel';
 import User from './userModel';
@@ -17,6 +18,7 @@ export {
   Comment,
   Follow,
   Like,
+  PasswordResetToken,
   SearchHistory,
   Tag,
   User,

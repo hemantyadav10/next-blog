@@ -3,7 +3,13 @@ import { verifyToken } from './lib/auth';
 import { COOKIE_NAMES } from './lib/constants';
 
 // 1. Specify protected and public routes
-const authRoutes = ['/login', '/register'];
+const authRoutes = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+];
+
 const protectedRoutes = [
   '/dashboard',
   '/write',

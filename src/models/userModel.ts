@@ -74,15 +74,6 @@ const userSchema = new Schema(
       select: false,
     },
 
-    passwordResetToken: {
-      type: String,
-      select: false,
-    },
-    passwordResetExpires: {
-      type: Date,
-      select: false,
-    },
-
     loginAttempts: {
       type: Number,
       default: 0,

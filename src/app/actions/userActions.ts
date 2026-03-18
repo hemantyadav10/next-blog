@@ -4,24 +4,32 @@ import * as z from 'zod';
 
 import { generateTokens, verifyAuth } from '@/lib/auth';
 import connectDb from '@/lib/connectDb';
-import { COOKIE_NAMES } from '@/lib/constants';
+import { COOKIE_NAMES, IS_DEV, IS_PROD } from '@/lib/constants';
+import { sendPasswordResetEmail } from '@/lib/email/templates';
+import { emailLimiter, getIP } from '@/lib/rateLimit';
 import {
   ChangePasswordInput,
   changePasswordSchema,
 } from '@/lib/schema/authSchema';
 import {
+  Email,
+  emailSchema,
   LoginInput,
   loginSchema,
   RegisterInput,
   registerSchema,
+  ResetPasswordInput,
+  resetPasswordSchema,
 } from '@/lib/schema/userSchema';
-import { isMongoError } from '@/lib/utils';
+import { generateRawToken, hashToken, isMongoError, sleep } from '@/lib/utils';
+import { PasswordResetToken } from '@/models';
 import User, { UserType } from '@/models/userModel';
 import type { ActionResponse } from '@/types/api.types';
 import { UsersResponse } from '@/types/user.types';
 import jwt from 'jsonwebtoken';
-import { FilterQuery, SortValues } from 'mongoose';
+import mongoose, { FilterQuery, SortValues } from 'mongoose';
 import { cookies } from 'next/headers';
+import { after } from 'next/server';
 
 const cookieOptions = {
   httpOnly: true,
@@ -350,5 +358,174 @@ export async function changePassword(
   } catch (error) {
     console.error('Change password failed:', error);
     return { success: false, error: 'Server error. Please try again later.' };
+  }
+}
+
+export async function forgotPassword(formData: Email): Promise<Response> {
+  try {
+    // Validate request payload using Zod
+    const { success, data, error } = emailSchema.safeParse(formData);
+    if (!success) {
+      return {
+        success: false,
+        error: 'Invalid input.',
+        errors: z.flattenError(error).fieldErrors,
+      };
+    }
+
+    // Rate limiter
+    const ip = await getIP();
+    const res = await emailLimiter.limit(`forgot-password:${ip}:${data.email}`);
+
+    if (!res.success) {
+      return {
+        success: false,
+        error: 'Too many attempts. Please try again later.',
+      };
+    }
+
+    // Connect to databasse
+    await connectDb();
+
+    // Check if a user with this email exists
+    // do not reveal this information to the client (to prevent user enumeration attacks)
+    const user = await User.findOne({ email: data.email }).select(
+      'username email',
+    );
+    if (!user)
+      return {
+        success: true,
+        message:
+          'If an account with this email exists, you will receive a password reset link shortly.',
+      };
+
+    const { _id: userId, email: userEmail, username } = user;
+
+    // Generate a secure random token (raw version sent via email)
+    const rawToken: string = generateRawToken();
+
+    // Hash the token before storing in DB
+    const hashedToken: string = hashToken(rawToken);
+
+    // Clean up old tokens for this user before creating a new one
+    await PasswordResetToken.deleteMany({ userId });
+
+    // Store hashed token with expiration (15 minutes)
+    await PasswordResetToken.create({
+      userId,
+      token: hashedToken,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 mins
+    });
+
+    const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${rawToken}`;
+
+    // TODO: replace after() with queue
+    after(async function () {
+      try {
+        if (IS_DEV) {
+          await sleep();
+          console.log('Background task running...', { resetLink });
+        } else if (IS_PROD) {
+          await sendPasswordResetEmail({ resetLink, userEmail, username });
+        }
+      } catch (mailError) {
+        console.error('Background Email Task Failed:', mailError);
+      }
+    });
+
+    return {
+      success: true,
+      message:
+        'If an account with this email exists, you will receive a password reset link shortly.',
+    };
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    return { success: false, error: 'Server error. Please try again later.' };
+  }
+}
+
+export async function resetPassword(
+  formData: ResetPasswordInput,
+): Promise<Response> {
+  let session: mongoose.ClientSession | undefined;
+
+  try {
+    await connectDb();
+    session = await mongoose.startSession();
+
+    // Validate input
+    const { success, data, error } = resetPasswordSchema.safeParse(formData);
+    if (!success) {
+      return {
+        success: false,
+        error: 'Invalid input.',
+        errors: z.flattenError(error).fieldErrors,
+      };
+    }
+
+    const hashedToken = hashToken(data.token);
+
+    let user;
+
+    await session.withTransaction(async () => {
+      const resetToken = await PasswordResetToken.findOneAndUpdate(
+        {
+          token: hashedToken,
+          expiresAt: { $gt: new Date() },
+          usedAt: null,
+        },
+        {
+          $set: { usedAt: new Date() },
+        },
+        { new: true, session },
+      );
+
+      if (!resetToken) throw new Error('INVALID_TOKEN');
+
+      user = await User.findById(resetToken.userId)
+        .select('+password')
+        .session(session ?? null);
+      if (!user) throw new Error('INVALID_TOKEN');
+
+      // Update password (pre-save hook hashes it)
+      user.password = data.newPassword;
+      await user.save({ session });
+
+      // Invalidate all other active reset tokens for this user
+      await PasswordResetToken.updateMany(
+        {
+          userId: user._id,
+          usedAt: null,
+        },
+        {
+          $set: {
+            usedAt: new Date(),
+            expiresAt: new Date(),
+          },
+        },
+        { session },
+      );
+    });
+
+    return {
+      success: true,
+      message: 'Your password has been reset successfully.',
+    };
+  } catch (error) {
+    console.error('Reset password error:', error);
+
+    if (error instanceof Error && error.message === 'INVALID_TOKEN') {
+      return {
+        success: false,
+        error: 'Invalid or expired reset link. Please request a new one.',
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Server error. Please try again later.',
+    };
+  } finally {
+    await session?.endSession();
   }
 }

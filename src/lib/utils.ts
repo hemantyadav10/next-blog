@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
+import crypto from 'node:crypto';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -55,3 +56,11 @@ export const tiptapSanitizeConfig = {
     pre: [],
   },
 };
+
+export function generateRawToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+export function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}

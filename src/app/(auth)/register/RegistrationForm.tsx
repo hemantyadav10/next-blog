@@ -32,7 +32,6 @@ import {
   Mail,
   User,
 } from 'lucide-react';
-import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -88,20 +87,15 @@ export default function SignupForm() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="w-full max-w-lg"
-    >
+    <div className="w-full max-w-lg">
       <FieldSet>
         <FieldContent className="gap-2">
           <FieldLabel className="text-2xl font-semibold">
             Create your free account
           </FieldLabel>
-          <FieldDescription>
+          <FieldDescription className="[&>a]:no-underline">
             Already have an account?{' '}
-            <Link href="/login" className="text-link">
+            <Link href="/login" className="text-link hover:underline">
               Sign in
             </Link>
           </FieldDescription>
@@ -288,13 +282,13 @@ export default function SignupForm() {
                 {isPending && <Spinner />} Create Account
               </Button>
             </Field>
-            <FieldDescription className="px-6 text-center">
+            <FieldDescription className="px-6 text-center [&>a]:no-underline">
               By clicking continue, you agree to our{' '}
-              <Link href="/terms" className="text-link">
+              <Link href="/terms" className="text-link hover:underline">
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-link">
+              <Link href="/privacy" className="text-link hover:underline">
                 Privacy Policy
               </Link>
               .
@@ -302,6 +296,6 @@ export default function SignupForm() {
           </FieldGroup>
         </form>
       </FieldSet>
-    </motion.div>
+    </div>
   );
 }
