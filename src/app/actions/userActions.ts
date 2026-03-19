@@ -27,7 +27,7 @@ import User, { UserType } from '@/models/userModel';
 import type { ActionResponse } from '@/types/api.types';
 import { UsersResponse } from '@/types/user.types';
 import jwt from 'jsonwebtoken';
-import mongoose, { FilterQuery, SortValues } from 'mongoose';
+import { FilterQuery, SortValues } from 'mongoose';
 import { cookies } from 'next/headers';
 import { after } from 'next/server';
 
@@ -447,11 +447,8 @@ export async function forgotPassword(formData: Email): Promise<Response> {
 export async function resetPassword(
   formData: ResetPasswordInput,
 ): Promise<Response> {
-  let session: mongoose.ClientSession | undefined;
-
   try {
     await connectDb();
-    session = await mongoose.startSession();
 
     // Validate input
     const { success, data, error } = resetPasswordSchema.safeParse(formData);
@@ -463,49 +460,35 @@ export async function resetPassword(
       };
     }
 
+    // Hash the token received from the user
     const hashedToken = hashToken(data.token);
 
-    let user;
+    // Atomically claim the reset token to prevent race conditions or reuse
+    const resetToken = await PasswordResetToken.findOneAndUpdate(
+      {
+        token: hashedToken,
+        expiresAt: { $gt: new Date() },
+        usedAt: null,
+      },
+      { $set: { usedAt: new Date() } },
+      { new: true },
+    );
+    if (!resetToken) throw new Error('INVALID_TOKEN');
 
-    await session.withTransaction(async () => {
-      const resetToken = await PasswordResetToken.findOneAndUpdate(
-        {
-          token: hashedToken,
-          expiresAt: { $gt: new Date() },
-          usedAt: null,
-        },
-        {
-          $set: { usedAt: new Date() },
-        },
-        { new: true, session },
-      );
+    const user = await User.findById(resetToken.userId).select('+password');
+    if (!user) throw new Error('INVALID_TOKEN');
 
-      if (!resetToken) throw new Error('INVALID_TOKEN');
+    // Update password (pre-save hook hashes it)
+    user.password = data.newPassword;
+    await user.save();
 
-      user = await User.findById(resetToken.userId)
-        .select('+password')
-        .session(session ?? null);
-      if (!user) throw new Error('INVALID_TOKEN');
-
-      // Update password (pre-save hook hashes it)
-      user.password = data.newPassword;
-      await user.save({ session });
-
-      // Invalidate all other active reset tokens for this user
-      await PasswordResetToken.updateMany(
-        {
-          userId: user._id,
-          usedAt: null,
-        },
-        {
-          $set: {
-            usedAt: new Date(),
-            expiresAt: new Date(),
-          },
-        },
-        { session },
-      );
-    });
+    // Cleanup: remove all other active reset tokens for this user
+    // Non-critical step: if it fails, it won't block the user
+    try {
+      await PasswordResetToken.deleteMany({ userId: user._id });
+    } catch (cleanupError) {
+      console.error('Token cleanup failed:', cleanupError);
+    }
 
     return {
       success: true,
@@ -525,7 +508,5 @@ export async function resetPassword(
       success: false,
       error: 'Server error. Please try again later.',
     };
-  } finally {
-    await session?.endSession();
   }
 }
