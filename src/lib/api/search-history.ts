@@ -1,11 +1,9 @@
+import { clientConfig } from '@/config/clientConfig';
 import { SearchHistoryApiResponseSchema } from '@/types/search-history.types';
 
 export async function fetchSearchHistory() {
   try {
-    const url = new URL(
-      `/api/search-history`,
-      process.env.NEXT_PUBLIC_BASE_URL,
-    );
+    const url = new URL(`/api/search-history`, clientConfig.baseUrl);
 
     const res = await fetch(url);
 

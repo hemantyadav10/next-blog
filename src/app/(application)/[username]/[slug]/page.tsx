@@ -7,21 +7,30 @@ import { getBlogPost } from '@/lib/blog';
 import { APP_NAME } from '@/lib/constants';
 import { getMyHtml } from '@/lib/generate-html';
 import { formatDate } from 'date-fns';
-import { Calendar, Clock, Edit3Icon, Folder, TagIcon } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Edit3Icon,
+  EyeIcon,
+  Folder,
+  TagIcon,
+} from 'lucide-react';
 import { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import RelatedBlogsSkeleton from '@/components/skeletons/RelatedBlogsSkeleton';
+import { config } from '@/config/config';
 import { extractToc } from '@/lib/toc';
+import Image from 'next/image';
 import AuthorInfo from './components/AuthorInfo';
 import {
   BlogActionsDesktop,
   BlogActionsMobile,
 } from './components/blog-detail/blog-actions-nav';
 import BlogBreadcrumbs from './components/BlogBreadcrumbs';
+import { BlogViewTracker } from './components/BlogViewTracker';
 import CommentSection from './components/comments/CommentSection';
 import MoreFromAuthor from './components/MoreFromAuthor';
 import MoreFromAuthorSkeleton from './components/MoreFromAuthorSkeleton';
@@ -40,9 +49,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!blog || blog.authorId.username !== username) {
     notFound();
   }
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/${username}/${slug}`;
+  const url = `${config.NEXT_PUBLIC_BASE_URL}/${username}/${slug}`;
   const ogImage =
-    blog.banner || `${process.env.NEXT_PUBLIC_BASE_URL}/default-og.jpg`;
+    blog.banner || `${config.NEXT_PUBLIC_BASE_URL}/default-og.jpg`;
 
   return {
     title: blog.title,
@@ -100,6 +109,9 @@ async function page({ params }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl justify-center gap-8 px-4 py-8 pb-26 md:px-8 md:py-12">
+      {/* Component to track view */}
+      <BlogViewTracker blogId={blog._id.toString()} />
+
       {/* Blog Actions */}
       <BlogActionsMobile
         isBookmarked={isBookmarked}
@@ -185,12 +197,6 @@ async function page({ params }: Props) {
                   </span>
                 )}
 
-                {/* read time */}
-                <span className="flex items-center gap-1">
-                  <Clock className="size-3.5" />
-                  {blog.readTime} min read
-                </span>
-
                 {/* category */}
                 <Link
                   href={`/category/${blog.categoryId.slug}`}
@@ -199,6 +205,21 @@ async function page({ params }: Props) {
                   <Folder className="size-3.5" />
                   {blog.categoryId.name}
                 </Link>
+
+                {/* read time */}
+                <span className="flex items-center gap-1">
+                  <Clock className="size-3.5" />
+                  {blog.readTime} min read
+                </span>
+
+                {/* View count */}
+                <span className="flex items-center gap-1">
+                  <EyeIcon className="size-3.5" />
+                  <span>{blog.views}</span>
+                  <span className="sr-only">
+                    {blog.views === 1 ? 'view' : 'views'}
+                  </span>
+                </span>
               </div>
 
               {/* Post Actions */}
@@ -210,6 +231,7 @@ async function page({ params }: Props) {
                 />
               )}
             </div>
+
             {/* banner */}
             {blog.banner && (
               <Image
@@ -270,7 +292,7 @@ async function page({ params }: Props) {
         </div>
 
         {/* Author Sidebar */}
-        <div className="scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent flex-1 space-y-8 overflow-y-auto pb-4 xl:sticky xl:top-28 xl:h-[calc(100vh-136px)]">
+        <div className="scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent flex-1 space-y-8 overflow-y-auto xl:sticky xl:top-28 xl:h-[calc(100vh-136px)] xl:pb-4">
           {/* Author Info */}
           <AuthorInfo
             username={blog.authorId.username}

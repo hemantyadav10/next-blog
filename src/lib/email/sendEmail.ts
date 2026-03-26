@@ -1,7 +1,8 @@
+import { config } from '@/config/config';
 import { Resend } from 'resend';
 import { EMAIL_FROM } from '../constants';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(config.RESEND_API_KEY);
 
 type SendEmailOptions = {
   to: string;

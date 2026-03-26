@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { formatDate } from 'date-fns';
+import Image from 'next/image';
 import Link from 'next/link';
-import BlogCardImage from './BlogCardImage';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 type BlogCardProps = {
@@ -42,12 +42,29 @@ export default function BlogCard({
           : 'gap-x-4',
       )}
     >
-      <BlogCardImage
-        banner={banner}
-        blurDataUrl={blurDataUrl}
-        title={title}
-        orientation={orientation}
-      />
+      <div
+        className={cn(
+          'aspect-3/2 w-full overflow-hidden',
+          orientation === 'vertical' ? 'col-span-full' : 'col-span-4',
+        )}
+      >
+        <div className={cn('overflow-hidden')}>
+          {banner ? (
+            <Image
+              src={banner}
+              alt={title}
+              width={368}
+              height={245}
+              className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+              placeholder={blurDataUrl ? 'blur' : 'empty'}
+              blurDataURL={blurDataUrl || ''}
+            />
+          ) : (
+            <div className="bg-muted h-full w-full" />
+          )}
+        </div>
+      </div>
+
       <div
         className={cn(
           'space-y-2 md:space-y-3',
@@ -55,7 +72,7 @@ export default function BlogCard({
         )}
       >
         <div className="space-y-2">
-          <h3 className="group-hover:text-primary line-clamp-3 font-medium transition-colors duration-300 md:line-clamp-2 md:text-xl">
+          <h3 className="text-primary line-clamp-3 font-medium transition-colors duration-300 md:line-clamp-2 md:text-lg">
             <span className="from-primary to-primary bg-gradient-to-r bg-[length:0px_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover:bg-[length:100%_2px]">
               {title}
             </span>

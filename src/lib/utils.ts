@@ -1,6 +1,9 @@
+import { clientConfig } from '@/config/clientConfig';
 import { clsx, type ClassValue } from 'clsx';
 import crypto from 'node:crypto';
 import { twMerge } from 'tailwind-merge';
+
+const BASE_URL = clientConfig.baseUrl;
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -64,3 +67,21 @@ export function generateRawToken(): string {
 export function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
+
+export const getSafeRedirect = (raw: string | null): string => {
+  if (!raw) return '/';
+
+  try {
+    const decoded = decodeURIComponent(raw);
+
+    const url = new URL(decoded, BASE_URL);
+    const base = new URL(BASE_URL);
+    console.log({ decoded, url, base });
+
+    if (url.origin !== base.origin) return '/';
+
+    return decoded;
+  } catch {
+    return '/';
+  }
+};

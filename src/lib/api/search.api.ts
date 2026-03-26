@@ -1,10 +1,11 @@
+import { clientConfig } from '@/config/clientConfig';
 import { searchResultsApiResponseSchema } from '@/types/search.type';
 
 export async function fetchSearchResults(q: string) {
   try {
     const url = new URL(
       `/api/search?q=${encodeURIComponent(q)}`,
-      process.env.NEXT_PUBLIC_BASE_URL,
+      clientConfig.baseUrl,
     );
 
     const res = await fetch(url);

@@ -1,3 +1,4 @@
+import { config } from '@/config/config';
 import User from '@/models/userModel';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
@@ -46,7 +47,7 @@ export function generateTokens({
       role,
       type: 'access',
     },
-    process.env.JWT_ACCESS_SECRET as string,
+    config.JWT_ACCESS_SECRET,
     { expiresIn: '1h' },
   );
 
@@ -55,7 +56,7 @@ export function generateTokens({
       userId: _id,
       type: 'refresh',
     },
-    process.env.JWT_REFRESH_SECRET as string,
+    config.JWT_REFRESH_SECRET,
     { expiresIn: '7d' },
   );
 
@@ -73,7 +74,7 @@ export async function verifyToken(
   }
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string);
+    const payload = jwt.verify(token, config.JWT_ACCESS_SECRET);
 
     if (typeof payload === 'string' || !payload?.userId) {
       return { success: false, error: 'Invalid token' };

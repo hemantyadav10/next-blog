@@ -458,7 +458,7 @@ const CommentItem = ({
               )}
             </div>
           </div>
-          <div className="flex-1 space-y-2">
+          <div className="min-w-0 flex-1 space-y-2">
             {isEditing && isOwner ? (
               <div className="ml-2 flex-1">
                 <RichTextCommentEditor

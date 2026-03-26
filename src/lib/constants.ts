@@ -1,6 +1,7 @@
 export const COOKIE_NAMES = {
   ACCESS_TOKEN: 'accessToken',
   REFRESH_TOKEN: 'refreshToken',
+  ANONYMOUS_TOKEN: 'anon_token',
 } as const;
 
 export const ENV = process.env.NODE_ENV;

@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
+import { config } from '@/config/config';
 import { APP_NAME } from '@/lib/constants';
 import Providers from '@/provider';
 import type { Metadata } from 'next';
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   },
   description:
     'A modern blogging platform for writers to share knowledge and insights.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL!),
+  metadataBase: new URL(config.NEXT_PUBLIC_BASE_URL),
 };
 
 export default function RootLayout({
@@ -50,7 +51,7 @@ export default function RootLayout({
               height={2.5}
               showForHashAnchor={false}
             />
-            <Toaster />
+            <Toaster richColors />
             <main>{children}</main>
           </ThemeProvider>
         </Providers>

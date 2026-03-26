@@ -1,3 +1,4 @@
+import { clientConfig } from '@/config/clientConfig';
 import {
   CommentApiResponseSchema,
   CommentResponse,
@@ -10,6 +11,8 @@ export type FetchRepliesParams = {
   commentId: string;
 };
 
+const baseUrl = clientConfig.baseUrl;
+
 export type FetchCommentsParams = Omit<FetchRepliesParams, 'commentId'>;
 
 export async function fetchComments({
@@ -18,10 +21,7 @@ export async function fetchComments({
   limit = 10,
 }: FetchCommentsParams): Promise<CommentResponse> {
   try {
-    const url = new URL(
-      `/api/blogs/${blogId}/comments`,
-      process.env.NEXT_PUBLIC_BASE_URL,
-    );
+    const url = new URL(`/api/blogs/${blogId}/comments`, baseUrl);
 
     url.searchParams.set('limit', limit.toString());
     if (cursor) url.searchParams.set('cursor', cursor);
@@ -58,7 +58,7 @@ export async function fetchReplies({
   try {
     const url = new URL(
       `/api/blogs/${blogId}/comments/${commentId}/replies`,
-      process.env.NEXT_PUBLIC_BASE_URL,
+      baseUrl,
     );
 
     url.searchParams.set('limit', limit.toString());

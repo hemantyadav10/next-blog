@@ -274,14 +274,14 @@
     }
 
     & pre {
-      @apply bg-muted/50 text-foreground scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent my-4 max-w-full min-w-0 overflow-x-auto rounded-md p-4 select-all;
+      @apply bg-muted/50 text-foreground scrollbar-thin my-4 max-w-full min-w-0 overflow-x-auto rounded-md p-4 text-xs;
 
       & code {
         @apply bg-transparent p-0 leading-6 whitespace-pre;
         display: inline-block;
         min-width: 100%;
         padding-right: 1rem;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: monospace;
       }
     }
 

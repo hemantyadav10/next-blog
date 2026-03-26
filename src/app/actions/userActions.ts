@@ -2,6 +2,7 @@
 import bcrypt from 'bcrypt';
 import * as z from 'zod';
 
+import { config } from '@/config/config';
 import { generateTokens, verifyAuth } from '@/lib/auth';
 import connectDb from '@/lib/connectDb';
 import { COOKIE_NAMES, IS_DEV, IS_PROD } from '@/lib/constants';
@@ -33,7 +34,7 @@ import { after } from 'next/server';
 
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
+  secure: IS_PROD,
   sameSite: 'lax' as const,
   path: '/',
 };
@@ -207,10 +208,7 @@ export async function logoutUser(): Promise<ResponseState> {
 
     if (accessToken) {
       try {
-        const payload = jwt.verify(
-          accessToken,
-          process.env.JWT_ACCESS_SECRET as string,
-        );
+        const payload = jwt.verify(accessToken, config.JWT_ACCESS_SECRET);
 
         if (typeof payload !== 'string' && payload && 'userId' in payload) {
           await connectDb();
@@ -417,7 +415,7 @@ export async function forgotPassword(formData: Email): Promise<Response> {
       expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 mins
     });
 
-    const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${rawToken}`;
+    const resetLink = `${config.NEXT_PUBLIC_BASE_URL}/reset-password?token=${rawToken}`;
 
     // TODO: replace after() with queue
     after(async function () {

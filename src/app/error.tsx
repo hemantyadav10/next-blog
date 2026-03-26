@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
+import { IS_DEV } from '@/lib/constants';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -43,7 +44,7 @@ export default function Error({
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {process.env.NODE_ENV === 'development' && (
+          {IS_DEV && (
             <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-4">
               <p className="text-destructive mb-2 text-sm font-medium">
                 Error Details (Development Only):

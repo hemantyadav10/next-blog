@@ -112,7 +112,7 @@ export default function Search({ userId }: { userId?: string }) {
     <div className="relative w-full" ref={containerRef}>
       <Command
         shouldFilter={false}
-        className="dark:bg-background border-input focus-within:border-ring focus-within:ring-ring/50 hidden h-9 border bg-transparent focus-within:ring-[2px] lg:flex lg:min-w-md"
+        className="dark:bg-background border-input focus-within:border-ring focus-within:ring-ring/50 hidden h-9 border bg-transparent focus-within:ring-[2px] lg:flex lg:min-w-sm xl:min-w-md"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             setOpen(false);

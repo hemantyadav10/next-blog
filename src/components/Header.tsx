@@ -97,7 +97,7 @@ function Header({ user }: { user: AuthResult }) {
 
       <header
         className={cn(
-          'bg-background/95 border-border sticky top-0 z-50 h-16 border-b backdrop-blur-sm md:transform-none',
+          'bg-background/95 border-border sticky top-0 z-50 h-16 border-b shadow-md backdrop-blur-sm md:transform-none',
           'dark:bg-card/90 dark:backdrop-blur-lg',
         )}
       >
@@ -170,7 +170,7 @@ function Header({ user }: { user: AuthResult }) {
           </nav>
 
           {/* Right: Theme Toggle + Auth */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Search */}
             <Search userId={userDetails?.userId} />
 
@@ -271,8 +271,11 @@ function Header({ user }: { user: AuthResult }) {
               </DropdownMenu>
             ) : (
               <>
-                <Button variant="outline" asChild>
-                  <Link href="/login">Sign In</Link>
+                <Button asChild variant={'outline'} className="hidden sm:flex">
+                  <Link href="/register">Sign up</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/login">Log in</Link>
                 </Button>
               </>
             )}

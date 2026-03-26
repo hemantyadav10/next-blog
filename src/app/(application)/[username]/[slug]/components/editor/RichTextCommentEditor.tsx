@@ -75,7 +75,7 @@ const RichTextCommentEditor = ({
     editorProps: {
       attributes: {
         class:
-          'prose prose-sm dark:prose-invert focus:outline-none min-h-16 max-h-[50vh] custom_scrollbar overflow-y-auto w-full px-3 max-w-none py-2 text-sm break-words [&_a]:break-all',
+          'prose prose-sm dark:prose-invert focus:outline-none min-h-16 max-h-[50vh] scrollbar-thin overflow-y-auto w-full px-3 max-w-none py-2 text-sm break-words [&_a]:break-all',
       },
     },
     onUpdate: () => {

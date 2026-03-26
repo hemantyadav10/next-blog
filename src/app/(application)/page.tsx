@@ -12,7 +12,7 @@ export default function Home() {
       <Suspense fallback={<FeaturedBlogsSkeleton />}>
         <FeaturedBlogs />
       </Suspense>
-      <div className="grid grid-cols-12 gap-x-6 gap-y-12 md:gap-y-16">
+      <div className="grid grid-cols-12 gap-y-12 md:gap-y-16 lg:gap-x-6">
         <Suspense fallback={<RecentBlogsSkeleton />}>
           <RecentBlogs />
         </Suspense>

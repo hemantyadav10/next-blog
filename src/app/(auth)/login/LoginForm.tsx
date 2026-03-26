@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { LoginInput, loginSchema } from '@/lib/schema/userSchema';
+import { getSafeRedirect } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircleIcon, Eye, EyeOff, LockIcon, Mail } from 'lucide-react';
 import Link from 'next/link';
@@ -52,7 +53,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawRedirect = searchParams.get('redirect');
-  const redirectPath = rawRedirect ? decodeURIComponent(rawRedirect) : '/';
+  const redirectPath = getSafeRedirect(rawRedirect);
 
   async function handleFormAction(data: LoginInput) {
     setError('');

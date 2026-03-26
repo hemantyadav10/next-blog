@@ -1,3 +1,4 @@
+import { clientConfig } from '@/config/clientConfig';
 import {
   type GetReadingListResult,
   ReadingListApiResponseSchema,
@@ -13,7 +14,7 @@ export async function fetchReadingList({
   limit,
 }: ReadingListParams = {}): Promise<GetReadingListResult> {
   try {
-    const url = new URL(`/api/reading-list`, process.env.NEXT_PUBLIC_BASE_URL);
+    const url = new URL(`/api/reading-list`, clientConfig.baseUrl);
 
     if (limit) url.searchParams.set('limit', limit.toString());
     if (cursor) url.searchParams.set('cursor', cursor);

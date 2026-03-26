@@ -1,3 +1,4 @@
+import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { verifyAuth } from '@/lib/auth';
 
@@ -11,7 +12,8 @@ export default async function RootLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Header user={authResult} />
-      {children}
+      <section className="flex-1">{children}</section>
+      <Footer />
     </div>
   );
 }

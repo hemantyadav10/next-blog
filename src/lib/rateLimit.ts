@@ -1,3 +1,4 @@
+import { config } from '@/config/config';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { headers } from 'next/headers';
@@ -7,8 +8,8 @@ type Unit = 'ms' | 's' | 'm' | 'h' | 'd';
 type Duration = `${number} ${Unit}` | `${number}${Unit}`;
 
 export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  url: config.UPSTASH_REDIS_REST_URL,
+  token: config.UPSTASH_REDIS_REST_TOKEN,
 });
 
 export function createRateLimiter(requests: number, duration: Duration) {

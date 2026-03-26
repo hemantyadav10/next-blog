@@ -9,9 +9,11 @@ import {
 } from '@/lib/blog';
 import { deleteFromCloudinary, uploadOnCloudinary } from '@/lib/cloudinary';
 import connectDb from '@/lib/connectDb';
+import { COOKIE_NAMES, IS_PROD } from '@/lib/constants';
+import { getIP } from '@/lib/rateLimit';
 import { CreateBlogInput, createBlogSchema } from '@/lib/schema/blogSchema';
 import { isMongoError } from '@/lib/utils';
-import { Blog, Category, Tag } from '@/models';
+import { Blog, BlogView, Category, Tag } from '@/models';
 import { BlogDocument } from '@/models/blogModel';
 import { ActionResponse } from '@/types/api.types';
 import {
@@ -28,6 +30,9 @@ import {
   SortValues,
   Types,
 } from 'mongoose';
+import { cookies, headers } from 'next/headers';
+import { userAgent } from 'next/server';
+import crypto from 'node:crypto';
 import * as z from 'zod';
 
 // Authenticates user and creates a blog post
@@ -746,3 +751,84 @@ export const getFollowingPosts = async ({
     };
   }
 };
+
+async function createViewRecord(data: {
+  blogId: string;
+  userId?: string;
+  anonymousToken?: string;
+  ipAddress: string;
+  userAgent: string;
+}) {
+  try {
+    await BlogView.create(data);
+    try {
+      await Blog.findByIdAndUpdate(data.blogId, { $inc: { views: 1 } });
+    } catch (error) {
+      console.error('Failed to increment view counter:', { ...data, error });
+    }
+  } catch (error) {
+    console.error('Failed to create BlogView document:', { ...data, error });
+  }
+}
+
+export async function recordBlogView(blogId: string): Promise<void> {
+  await connectDb();
+
+  const { isAuthenticated, user } = await verifyAuth();
+  const cookieStore = await cookies();
+  const ipAddress = await getIP();
+  const { ua } = userAgent({ headers: await headers() });
+  const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  if (isAuthenticated && user) {
+    // 1: Authenticated user
+    const { userId } = user;
+    const viewExists = await BlogView.exists({
+      blogId,
+      userId,
+      createdAt: { $gt: last24Hours },
+    });
+
+    if (!viewExists) {
+      await createViewRecord({ blogId, userId, ipAddress, userAgent: ua });
+    }
+  } else {
+    // 2 & 3: Guest user — identify by anonymous token.
+    let anonymousToken = cookieStore.get(COOKIE_NAMES.ANONYMOUS_TOKEN)?.value;
+
+    if (!anonymousToken) {
+      // First-time visitor: issue a new identity token.
+      anonymousToken = crypto.randomUUID();
+      cookieStore.set(COOKIE_NAMES.ANONYMOUS_TOKEN, anonymousToken, {
+        httpOnly: true,
+        secure: IS_PROD,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 365 * 24 * 60 * 60,
+      });
+
+      await createViewRecord({
+        blogId,
+        anonymousToken,
+        ipAddress,
+        userAgent: ua,
+      });
+    } else {
+      // Returning guest: check the 24h window before counting.
+      const viewExists = await BlogView.exists({
+        blogId,
+        anonymousToken,
+        createdAt: { $gt: last24Hours },
+      });
+
+      if (!viewExists) {
+        await createViewRecord({
+          blogId,
+          anonymousToken,
+          ipAddress,
+          userAgent: ua,
+        });
+      }
+    }
+  }
+}

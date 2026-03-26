@@ -37,7 +37,11 @@ async function FollowingSection({
         </EmptyHeader>
         <EmptyContent>
           <Button asChild>
-            <Link href={`/login?redirect=/explore/following`}>Sign In</Link>
+            <Link
+              href={`/login?redirect=${encodeURIComponent('/explore/following')}`}
+            >
+              Sign In
+            </Link>
           </Button>
         </EmptyContent>
       </Empty>

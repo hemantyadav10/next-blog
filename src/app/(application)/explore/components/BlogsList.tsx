@@ -17,11 +17,11 @@ type BlogListProps = {
   sortOrder?: string;
   queryKey: string[];
   fetchFn: (params: {
-    query?: string | undefined;
-    sortBy?: string | undefined;
-    sortOrder?: string | undefined;
-    limit?: number | undefined;
-    page?: number | undefined;
+    query?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    limit?: number;
+    page?: number;
   }) => Promise<ActionResponse<BlogsResponse>>;
 };
 

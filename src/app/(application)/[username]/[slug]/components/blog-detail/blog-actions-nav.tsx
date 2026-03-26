@@ -1,5 +1,6 @@
 'use client';
 
+import { clientConfig } from '@/config/clientConfig';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { ShareButton } from '../ShareButton';
@@ -29,7 +30,7 @@ function BlogActionsDesktop({
   isAuthenticated,
 }: BlogActionProps) {
   const pathname = usePathname();
-  const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
+  const url = new URL(pathname, clientConfig.baseUrl).href;
 
   return (
     <>
@@ -61,7 +62,7 @@ function BlogActionsMobile({
   isAuthenticated,
 }: BlogActionProps) {
   const pathname = usePathname();
-  const url = new URL(pathname, process.env.NEXT_PUBLIC_BASE_URL).href;
+  const url = new URL(pathname, clientConfig.baseUrl).href;
 
   return (
     <div
