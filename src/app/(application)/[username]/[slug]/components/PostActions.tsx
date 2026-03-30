@@ -31,9 +31,10 @@ interface PostActionProps {
   title: string;
   slug: string;
   authorUsername: string;
+  blogId: string;
 }
 
-function PostActions({ title, authorUsername, slug }: PostActionProps) {
+function PostActions({ title, authorUsername, slug, blogId }: PostActionProps) {
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -56,9 +57,11 @@ function PostActions({ title, authorUsername, slug }: PostActionProps) {
               Edit
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <BarChart3Icon />
-            Stats
+          <DropdownMenuItem asChild>
+            <Link href={`/dashboard/posts/${blogId}/stats`}>
+              <BarChart3Icon />
+              Stats
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

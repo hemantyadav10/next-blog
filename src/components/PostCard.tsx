@@ -76,8 +76,9 @@ function PostCard({ post, user }: PostCardProps) {
           size={'sm'}
           variant={'ghost'}
           className="font-normal"
+          asChild
         >
-          Stats
+          <Link href={`/dashboard/posts/${post._id}/stats`}>Stats</Link>
         </Button>
       </ItemActions>
       <ItemFooter className="text-xs">

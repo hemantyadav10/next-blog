@@ -300,7 +300,7 @@ export async function updateBlog(
           generateMetaDescription(blogData.description),
         readTime: calculateReadTime(blogData.content),
         publishedAt:
-          blogData.status === 'published' && existingBlog.status === 'draft'
+          blogData.status === 'published' && !existingBlog.publishedAt
             ? new Date()
             : existingBlog.publishedAt,
         isEdited: true,

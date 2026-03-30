@@ -228,6 +228,7 @@ async function page({ params }: Props) {
                   title={blog.title}
                   authorUsername={blog.authorId.username}
                   slug={blog.slug}
+                  blogId={blog._id.toString()}
                 />
               )}
             </div>
