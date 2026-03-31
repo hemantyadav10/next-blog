@@ -2,11 +2,8 @@
 
 import * as React from 'react';
 
-import {
-  DropdownMenuItemIndicator,
-  type DropdownMenuProps,
-} from '@radix-ui/react-dropdown-menu';
 import type { TElement } from 'platejs';
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
 import {
   CheckIcon,
@@ -94,7 +91,9 @@ export const turnIntoItems = [
   // },
 ];
 
-export function TurnIntoToolbarButton(props: DropdownMenuProps) {
+export function TurnIntoToolbarButton(
+  props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>,
+) {
   const editor = useEditorRef();
   const [open, setOpen] = React.useState(false);
 
@@ -144,9 +143,9 @@ export function TurnIntoToolbarButton(props: DropdownMenuProps) {
               value={itemValue}
             >
               <span className="pointer-events-none absolute right-2 flex size-3.5 items-center justify-center">
-                <DropdownMenuItemIndicator>
+                <DropdownMenuPrimitive.DropdownMenuItemIndicator>
                   <CheckIcon />
-                </DropdownMenuItemIndicator>
+                </DropdownMenuPrimitive.DropdownMenuItemIndicator>
               </span>
               {icon}
               {label}

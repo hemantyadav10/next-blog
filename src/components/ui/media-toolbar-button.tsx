@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
 import { PlaceholderPlugin } from '@platejs/media/react';
 import {
@@ -80,7 +80,9 @@ const MEDIA_CONFIG: Record<
 export function MediaToolbarButton({
   nodeType,
   ...props
-}: DropdownMenuProps & { nodeType: string }) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Root> & {
+  nodeType: string;
+}) {
   const currentConfig = MEDIA_CONFIG[nodeType];
 
   const editor = useEditorRef();

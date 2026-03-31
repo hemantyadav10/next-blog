@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import type { Alignment } from '@platejs/basic-styles';
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
 import { TextAlignPlugin } from '@platejs/basic-styles/react';
 import {
@@ -43,7 +43,9 @@ const items = [
   },
 ];
 
-export function AlignToolbarButton(props: DropdownMenuProps) {
+export function AlignToolbarButton(
+  props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>,
+) {
   const { editor, tf } = useEditorPlugin(TextAlignPlugin);
   const value =
     useSelectionFragmentProp({

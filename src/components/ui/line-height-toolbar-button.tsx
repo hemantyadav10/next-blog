@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
 import { LineHeightPlugin } from '@platejs/basic-styles/react';
-import { DropdownMenuItemIndicator } from '@radix-ui/react-dropdown-menu';
+
 import { CheckIcon, WrapText } from 'lucide-react';
 import { useEditorRef, useSelectionFragmentProp } from 'platejs/react';
 
@@ -19,7 +19,9 @@ import {
 
 import { ToolbarButton } from './toolbar';
 
-export function LineHeightToolbarButton(props: DropdownMenuProps) {
+export function LineHeightToolbarButton(
+  props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>,
+) {
   const editor = useEditorRef();
   const { defaultNodeValue, validNodeValues: values = [] } =
     editor.getInjectProps(LineHeightPlugin);
@@ -56,9 +58,9 @@ export function LineHeightToolbarButton(props: DropdownMenuProps) {
               value={value}
             >
               <span className="pointer-events-none absolute right-2 flex size-3.5 items-center justify-center">
-                <DropdownMenuItemIndicator>
+                <DropdownMenuPrimitive.DropdownMenuItemIndicator>
                   <CheckIcon />
-                </DropdownMenuItemIndicator>
+                </DropdownMenuPrimitive.DropdownMenuItemIndicator>
               </span>
               {value}
             </DropdownMenuRadioItem>

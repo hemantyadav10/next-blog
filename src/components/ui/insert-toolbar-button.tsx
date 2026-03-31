@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
+import { type DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
 import {
   FileCodeIcon,
@@ -202,7 +202,9 @@ const groups: Group[] = [
   },
 ];
 
-export function InsertToolbarButton(props: DropdownMenuProps) {
+export function InsertToolbarButton(
+  props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>,
+) {
   const editor = useEditorRef();
   const [open, setOpen] = React.useState(false);
 

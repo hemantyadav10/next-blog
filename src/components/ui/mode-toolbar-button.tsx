@@ -2,12 +2,9 @@
 
 import * as React from 'react';
 
-import {
-  type DropdownMenuProps,
-  DropdownMenuItemIndicator,
-} from '@radix-ui/react-dropdown-menu';
 import { CheckIcon, EyeIcon, PenIcon } from 'lucide-react';
 import { useEditorRef, usePlateState } from 'platejs/react';
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
 import {
   DropdownMenu,
@@ -19,7 +16,9 @@ import {
 
 import { ToolbarButton } from './toolbar';
 
-export function ModeToolbarButton(props: DropdownMenuProps) {
+export function ModeToolbarButton(
+  props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>,
+) {
   const editor = useEditorRef();
   const [readOnly, setReadOnly] = usePlateState('readOnly');
   const [open, setOpen] = React.useState(false);
@@ -118,9 +117,9 @@ export function ModeToolbarButton(props: DropdownMenuProps) {
 function Indicator() {
   return (
     <span className="pointer-events-none absolute right-2 flex size-3.5 items-center justify-center">
-      <DropdownMenuItemIndicator>
+      <DropdownMenuPrimitive.DropdownMenuItemIndicator>
         <CheckIcon />
-      </DropdownMenuItemIndicator>
+      </DropdownMenuPrimitive.DropdownMenuItemIndicator>
     </span>
   );
 }
