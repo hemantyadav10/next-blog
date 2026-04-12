@@ -46,7 +46,7 @@ async function RecentBlogs() {
 
   if (blogs.length === 0) {
     return (
-      <section className="col-span-12 space-y-6 lg:col-span-9">
+      <section className="col-span-12 space-y-6 lg:col-span-8">
         <h2 className="text-2xl font-medium">Latest Posts</h2>
         <Empty className="border border-dashed">
           <EmptyHeader>
@@ -70,7 +70,7 @@ async function RecentBlogs() {
   }
 
   return (
-    <section className="col-span-12 space-y-6 lg:col-span-9">
+    <section className="col-span-12 space-y-6 lg:col-span-8">
       <h2 className="text-2xl font-medium">Latest Posts</h2>
       <div className="space-y-4">
         {blogs.map((blog) => {
@@ -99,7 +99,7 @@ async function RecentBlogs() {
                 banner={banner}
                 authorProfilePicture={authorId.profilePicture}
               />
-              <Separator />
+              <Separator className="last:hidden" />
             </React.Fragment>
           );
         })}
@@ -107,8 +107,7 @@ async function RecentBlogs() {
       <div className="text-center">
         <Button
           variant={'outline'}
-          className="w-full max-w-[200px] rounded-full"
-          size={'lg'}
+          className="w-full rounded-full sm:max-w-[200px]"
           asChild
         >
           <Link href={'/explore'}>View all</Link>

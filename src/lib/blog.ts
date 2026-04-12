@@ -6,6 +6,7 @@ import type {
   PopulatedCategory,
   PopulatedTag,
   RelatedBlogs,
+  TrendingBlog,
 } from '@/types/blog.types';
 import { isValidObjectId, PipelineStage, SortValues, Types } from 'mongoose';
 import { nanoid } from 'nanoid';
@@ -291,4 +292,137 @@ export const getRelatedBlogs = async (blogId: string, limit = 6) => {
   ]);
 
   return relatedBlogs;
+};
+
+export const fetchTrendingBlogs = async (): Promise<TrendingBlog[]> => {
+  await connectDb();
+
+  // 1. Set the time window for "Trending" (last 7 days)
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const trendingBlogs = await Blog.aggregate<TrendingBlog>([
+    // STAGE 1: Filter only public posts
+    { $match: { status: 'published' } },
+
+    // STAGE 2: Preliminary project
+    {
+      $project: {
+        title: 1,
+        banner: 1,
+        publishedAt: 1,
+        readTime: 1,
+        blurDataUrl: 1,
+        authorId: 1,
+        slug: 1,
+      },
+    },
+
+    // STAGE 3: Join with 'blogviews' to count recent views
+    {
+      $lookup: {
+        as: 'views',
+        from: 'blogviews',
+        foreignField: 'blogId',
+        localField: '_id',
+        pipeline: [
+          { $match: { createdAt: { $gte: sevenDaysAgo } } },
+          { $project: { createdAt: 1 } },
+        ],
+      },
+    },
+
+    // STAGE 4: Join with 'likes' to count recent likes
+    {
+      $lookup: {
+        as: 'likes',
+        from: 'likes',
+        foreignField: 'blogId',
+        localField: '_id',
+        pipeline: [
+          { $match: { createdAt: { $gte: sevenDaysAgo } } },
+          { $project: { createdAt: 1 } },
+        ],
+      },
+    },
+
+    // STAGE 5: Join with 'comments' to count recent comments
+    {
+      $lookup: {
+        as: 'comments',
+        from: 'comments',
+        foreignField: 'blogId',
+        localField: '_id',
+        pipeline: [
+          { $match: { createdAt: { $gte: sevenDaysAgo } } },
+          { $project: { createdAt: 1 } },
+        ],
+      },
+    },
+
+    // STAGE 6: Convert arrays from lookups into simple numeric counts
+    {
+      $addFields: {
+        views: { $size: '$views' },
+        likes: { $size: '$likes' },
+        comments: { $size: '$comments' },
+      },
+    },
+
+    // STAGE 7: Calculate the Trending Score
+    // Weighting: Views (1x), Likes (2x), Comments (3x)
+    {
+      $addFields: {
+        trendingScore: {
+          $add: [
+            '$views',
+            { $multiply: ['$likes', 2] },
+            { $multiply: ['$comments', 3] },
+          ],
+        },
+      },
+    },
+
+    // STAGE 8: Sort by score (Primary), then by engagement (Secondary tie-breakers)
+    {
+      $sort: {
+        trendingScore: -1,
+        comments: -1,
+        likes: -1,
+        views: -1,
+        publishedAt: -1,
+      },
+    },
+
+    // STAGE 9: Limit to Top 5
+    { $limit: 5 },
+
+    // STAGE 10: Fetch Author details for only the top 5 results
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'authorId',
+        foreignField: '_id',
+        as: 'author',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              firstName: 1,
+              lastName: 1,
+              username: 1,
+              profilePicture: 1,
+            },
+          },
+        ],
+      },
+    },
+
+    // STAGE 11: Flatten the author array into a single object
+    { $unwind: '$author' },
+
+    // STAGE 12: Clean up final output
+    { $project: { authorId: 0, views: 0, likes: 0, comments: 0 } },
+  ]);
+
+  return trendingBlogs;
 };

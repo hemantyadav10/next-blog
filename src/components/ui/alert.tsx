@@ -68,4 +68,4 @@ function AlertDescription({
   );
 }
 
-export { Alert, AlertDescription, AlertTitle };
+export { Alert, AlertDescription, AlertTitle, alertVariants };

@@ -3,7 +3,9 @@ import HeroSection from '@/components/HeroSection';
 import RecentBlogs from '@/components/RecentBlogs';
 import { FeaturedBlogsSkeleton } from '@/components/skeletons/FeaturedBlogsSkeleton';
 import { RecentBlogsSkeleton } from '@/components/skeletons/RecentBlogsSkeleton';
+import { TrendingBlogsSkeleton } from '@/components/skeletons/TrendingBlogsSkeleton';
 import { Suspense } from 'react';
+import TrendingBlogs from './component/TrendingBlogs';
 
 export default function Home() {
   return (
@@ -12,9 +14,12 @@ export default function Home() {
       <Suspense fallback={<FeaturedBlogsSkeleton />}>
         <FeaturedBlogs />
       </Suspense>
-      <div className="grid grid-cols-12 gap-y-12 md:gap-y-16 lg:gap-x-6">
+      <div className="grid grid-cols-12 gap-y-12 md:gap-y-16 lg:gap-x-12">
         <Suspense fallback={<RecentBlogsSkeleton />}>
           <RecentBlogs />
+        </Suspense>
+        <Suspense fallback={<TrendingBlogsSkeleton />}>
+          <TrendingBlogs />
         </Suspense>
       </div>
     </div>

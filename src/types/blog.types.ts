@@ -76,6 +76,20 @@ type RelatedBlogs = Pick<
   | 'banner'
 > & { authorId: BlogAuthor };
 
+type TrendingBlog = Pick<
+  BlogDocument,
+  | '_id'
+  | 'title'
+  | 'banner'
+  | 'publishedAt'
+  | 'readTime'
+  | 'blurDataUrl'
+  | 'slug'
+> & {
+  author: BlogAuthor;
+  trendingScore: number;
+};
+
 export type {
   AuthorBlogsResponse,
   BlogAuthor,
@@ -87,4 +101,5 @@ export type {
   PopulatedCategory,
   PopulatedTag,
   RelatedBlogs,
+  TrendingBlog,
 };

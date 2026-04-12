@@ -3,7 +3,7 @@ import BlogCardSkeleton from './BlogCardSkeleton';
 
 export function RecentBlogsSkeleton() {
   return (
-    <section className="col-span-12 space-y-6 lg:col-span-9">
+    <section className="col-span-12 space-y-6 lg:col-span-8">
       {/* Header */}
       <h2 className="text-2xl font-medium">Latest Posts</h2>
 
