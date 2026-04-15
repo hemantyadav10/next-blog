@@ -61,7 +61,7 @@ const RichTextCommentEditor = ({
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [1] } }),
+      StarterKit.configure({ heading: { levels: [3] } }),
       Underline,
       Link.configure({
         openOnClick: false,
@@ -75,7 +75,7 @@ const RichTextCommentEditor = ({
     editorProps: {
       attributes: {
         class:
-          'prose prose-sm dark:prose-invert focus:outline-none min-h-16 max-h-[50vh] scrollbar-thin overflow-y-auto w-full px-3 max-w-none py-2 text-sm break-words [&_a]:break-all',
+          'focus:outline-none min-h-16 max-h-[50vh] overflow-y-auto w-full px-3 max-w-none py-2 text-sm',
       },
     },
     onUpdate: () => {
@@ -129,14 +129,13 @@ const RichTextCommentEditor = ({
       {showLoader && (!editor || !isEditorReady) ? (
         <Skeleton className="h-[65.5px] w-full" />
       ) : (
-        <Field>
+        <Field className="w-full min-w-0">
           <div
             key="editor"
             aria-invalid={!!error}
             className={cn(
               'border-input dark:bg-input/30 hover:border-ring/70 min-w-0 flex-1 overflow-hidden rounded-md border bg-transparent shadow-xs transition-[color,box-shadow] outline-none',
-              'selection:bg-primary selection:text-primary-foreground',
-              'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[2px]',
+              'focus-within:border-ring focus-within:ring-ring/50 focus-within:dark:bg-background focus-within:ring-[2px]',
               'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
             )}
           >

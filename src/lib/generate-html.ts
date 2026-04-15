@@ -1,23 +1,38 @@
-import { BaseEditorKit } from '@/components/editor-base-kit';
-import { EditorStatic } from '@/components/ui/editor-static';
-import { createSlateEditor, Value } from 'platejs';
-import { serializeHtml } from 'platejs/static';
+import { serverEditorExtensions } from '@/components/editor/extenstions';
+import { generateHTML } from '@tiptap/html';
+import type { JSONContent } from '@tiptap/react';
+import hljs from 'highlight.js';
 import sanitizeHtml from 'sanitize-html';
 
-export async function getMyHtml({ value }: { value: Value }) {
-  // Create a server-side editor instance with components
-  const editor = createSlateEditor({
-    plugins: [...BaseEditorKit],
-    value: value,
-  });
+export function getMyHtml({ value }: { value: JSONContent }) {
+  // 1. Generate base HTML
+  const rawHtml = generateHTML(value, serverEditorExtensions);
 
-  const html = await serializeHtml(editor, {
-    editorComponent: EditorStatic,
-    props: { variant: 'none' },
-  });
+  // 2. Highlighting Pass (Essential since generateHTML isn't doing it)
+  const html = rawHtml.replace(
+    /<code class="language-(\w+)">([\s\S]*?)<\/code>/g,
+    (_, lang, encoded) => {
+      // Unescape entities so hljs can read the actual symbols
+      const code = encoded
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
 
-  const cleanHtml = sanitizeHtml(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      try {
+        const highlighted = hljs.highlight(code, { language: lang }).value;
+        return `<code class="hljs language-${lang}">${highlighted}</code>`;
+      } catch {
+        return `<code class="hljs language-${lang}">${encoded}</code>`;
+      }
+    },
+  );
+
+  // 3. Final Sanitation
+  return sanitizeHtml(html, {
+    allowedTags: [
+      ...sanitizeHtml.defaults.allowedTags,
       'img',
       'h1',
       'h2',
@@ -35,29 +50,42 @@ export async function getMyHtml({ value }: { value: Value }) {
       'div',
       'section',
       'article',
-    ]),
+      'pre',
+      'code',
+    ],
     allowedAttributes: {
       ...sanitizeHtml.defaults.allowedAttributes,
-      '*': ['class', 'id', 'style'],
+      '*': ['class', 'id', 'style', 'data-*'],
       img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
       a: ['href', 'name', 'target', 'rel'],
-      iframe: ['src', 'width', 'height', 'frameborder', 'allowfullscreen'],
-      video: ['src', 'controls', 'width', 'height'],
-      audio: ['src', 'controls'],
-      source: ['src', 'type'],
+      iframe: ['src', 'width', 'height', 'allowfullscreen', 'sandbox', 'allow'],
+      // CRITICAL: Span needs class to hold the highlighter colors
+      span: ['class'],
+      code: ['class'],
     },
+    // CRITICAL: Explicitly allow the hljs token classes
+    allowedClasses: {
+      span: ['hljs-*'],
+      code: ['hljs', 'language-*'],
+      pre: ['not-prose'],
+    },
+    allowedIframeHostnames: [
+      'www.youtube.com',
+      'player.vimeo.com',
+      'youtube.com',
+    ],
     allowedStyles: {
       '*': {
-        // Allow common CSS properties
-        color: [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/],
-        'text-align': [/^left$/, /^right$/, /^center$/],
-        'background-color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/],
+        color: [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/, /^oklch\(/],
+        'text-align': [/^left$/, /^right$/, /^center$/, /^justify$/],
+        'background-color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/, /^oklch\(/],
         'font-weight': [/^\d+$/, /^bold$/, /^normal$/],
         'font-style': [/^italic$/, /^normal$/],
         'text-decoration': [/^underline$/, /^line-through$/, /^none$/],
       },
     },
+    transformTags: {
+      pre: sanitizeHtml.simpleTransform('pre', { class: 'not-prose' }),
+    },
   });
-
-  return cleanHtml;
 }

@@ -25,7 +25,7 @@ function TOC({ toc, collapsible = false }: TOCProps) {
     if (!toc.length) return;
 
     const headings = toc
-      .map((item) => document.getElementById(item.id))
+      .map((item) => document.querySelector(`[data-id="${item.id}"]`))
       .filter(Boolean) as HTMLElement[];
 
     if (!headings.length) return;
@@ -35,10 +35,13 @@ function TOC({ toc, collapsible = false }: TOCProps) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const id = entry.target.getAttribute('data-id');
+          if (!id) return;
+
           if (entry.isIntersecting) {
-            visibleHeadings.set(entry.target.id, entry);
+            visibleHeadings.set(id, entry);
           } else {
-            visibleHeadings.delete(entry.target.id);
+            visibleHeadings.delete(id);
           }
         });
 
@@ -48,7 +51,7 @@ function TOC({ toc, collapsible = false }: TOCProps) {
           (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
         )[0];
 
-        setActiveId(topMost.target.id);
+        setActiveId(topMost.target.getAttribute('data-id'));
       },
       {
         rootMargin: '-72px 0px -70% 0px',
@@ -60,27 +63,58 @@ function TOC({ toc, collapsible = false }: TOCProps) {
     return () => observer.disconnect();
   }, [toc]);
 
+  const scrollToHeading = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    id: string,
+  ) => {
+    e.preventDefault();
+    const element = document.querySelector(`[data-id="${id}"]`);
+    if (element) {
+      const offset = 80;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   if (toc.length < 2) return null;
+
+  const minLevel =
+    toc.length > 0 ? Math.min(...toc.map((item) => item.level)) : 2;
 
   const list = (
     <ul className="text-sm">
       {toc.map((item) => {
         const isActive = activeId === item.id;
+
+        // Calculate relative depth
+        // If minLevel is 3, then a level 3 item gets 0 padding, level 4 gets pl-4, etc.
+        const depth = item.level - minLevel;
+
         return (
           <li
             key={item.id}
             className={cn(
-              'relative border-l transition-colors',
-              item.level === 3 && 'pl-4',
+              'relative line-clamp-2 border-l transition-colors',
+              depth === 1 && 'pl-4',
+              depth === 2 && 'pl-8',
+              depth >= 3 && 'pl-12',
               isActive
                 ? 'border-primary text-primary bg-primary/5 font-medium'
                 : 'hover:border-muted-foreground text-muted-foreground hover:text-foreground',
             )}
           >
             <a
+              title={item.text}
               href={`#${item.id}`}
-              className={cn('block rounded-r-sm px-3 py-1')}
-              onClick={() => collapsible && setAccordionValue('')}
+              className={cn('block rounded-r-sm px-4 py-1')}
+              onClick={(e) => scrollToHeading(e, item.id)}
             >
               {item.text}
             </a>

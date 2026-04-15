@@ -11,9 +11,9 @@ export default function BlogPageSkeleton() {
         <Skeleton className="size-10" />
       </div>
 
-      <div className="flex w-full max-w-3xl flex-col gap-8 xl:max-w-full xl:flex-row">
+      <div className="flex w-full max-w-3xl min-w-0 flex-col gap-8 xl:max-w-full xl:flex-row">
         {/* Blog Content */}
-        <div className="w-full flex-col gap-8 xl:max-w-3xl">
+        <div className="flex w-full min-w-0 flex-col gap-8 xl:max-w-3xl">
           <div className="space-y-6">
             {/* Breadcrumb */}
             <div className="flex items-center gap-6 py-1">
@@ -69,7 +69,7 @@ export default function BlogPageSkeleton() {
         <div className="block h-px xl:hidden" />
 
         {/* Author Sidebar */}
-        <div className="flex-1 space-y-8">
+        <div className="space-y-8 xl:w-80 xl:shrink-0">
           {/* Author Info */}
           <div className="space-y-4 sm:flex sm:items-start xl:flex-col">
             <div className="flex w-full items-start gap-4 sm:flex-1">

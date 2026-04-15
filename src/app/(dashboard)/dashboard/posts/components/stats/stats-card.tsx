@@ -117,7 +117,7 @@ function ChangeLabel({
 
   return (
     <p
-      className={`flex items-center gap-1 text-xs ${isUp ? 'text-emerald-500' : 'text-destructive'}`}
+      className={`flex items-center gap-1 text-xs ${isUp ? 'text-success' : 'text-destructive'}`}
     >
       {isUp ? (
         <ArrowUp className="size-3 shrink-0" />

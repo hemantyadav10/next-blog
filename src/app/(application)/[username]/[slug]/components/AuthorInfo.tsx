@@ -28,7 +28,7 @@ function AuthorInfo({
             <Avatar className="size-14">
               <AvatarImage src={profilePicture} alt={firstName} />
               <AvatarFallback className="uppercase">
-                {firstName.charAt(0)} {lastName.charAt(0)}
+                {firstName.charAt(0)}
               </AvatarFallback>
             </Avatar>
           </Link>

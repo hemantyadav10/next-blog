@@ -76,12 +76,32 @@ export const getSafeRedirect = (raw: string | null): string => {
 
     const url = new URL(decoded, BASE_URL);
     const base = new URL(BASE_URL);
-    console.log({ decoded, url, base });
 
     if (url.origin !== base.origin) return '/';
 
     return decoded;
   } catch {
     return '/';
+  }
+};
+
+export const validateUrl = (value: string): string | null => {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const normalized = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+
+  try {
+    const parsed = new URL(normalized);
+
+    if (['https:', 'http'].includes(parsed.protocol)) return null;
+
+    return 'Only HTTP/HTTPS URLs are allowed';
+  } catch (error) {
+    console.error(error);
+
+    return 'Please enter a valid URL';
   }
 };

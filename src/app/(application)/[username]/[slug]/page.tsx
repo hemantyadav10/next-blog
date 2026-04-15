@@ -1,11 +1,15 @@
+import ScrollToTopButton from '@/components/ScrollToTopButton';
 import CommentSectionSkeleton from '@/components/skeletons/CommentSectionSkeleton';
+import RelatedBlogsSkeleton from '@/components/skeletons/RelatedBlogsSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { config } from '@/config/config';
 import { verifyAuth } from '@/lib/auth';
 import { getBlogPost } from '@/lib/blog';
 import { APP_NAME } from '@/lib/constants';
 import { getMyHtml } from '@/lib/generate-html';
+import { extractToc } from '@/lib/toc';
 import { formatDate } from 'date-fns';
 import {
   Calendar,
@@ -16,14 +20,10 @@ import {
   TagIcon,
 } from 'lucide-react';
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-
-import RelatedBlogsSkeleton from '@/components/skeletons/RelatedBlogsSkeleton';
-import { config } from '@/config/config';
-import { extractToc } from '@/lib/toc';
-import Image from 'next/image';
 import AuthorInfo from './components/AuthorInfo';
 import {
   BlogActionsDesktop,
@@ -36,7 +36,6 @@ import MoreFromAuthor from './components/MoreFromAuthor';
 import MoreFromAuthorSkeleton from './components/MoreFromAuthorSkeleton';
 import PostActions from './components/PostActions';
 import RelatedBlogs from './components/RelatedBlogs';
-import ScrollToTopButton from './components/ScrollToTopButton';
 import TOC from './components/TOC';
 
 type Props = {
@@ -100,7 +99,7 @@ async function page({ params }: Props) {
   const isBookmarked = blog.isBookmarked;
   const isLiked = blog.isLiked;
 
-  const html = await getMyHtml({ value: blog.content });
+  const html = getMyHtml({ value: blog.content });
 
   const toc = extractToc(blog.content);
 
@@ -136,9 +135,9 @@ async function page({ params }: Props) {
         />
       </div>
 
-      <div className="flex w-full max-w-3xl flex-col gap-8 xl:max-w-full xl:flex-row">
+      <div className="flex w-full max-w-3xl min-w-0 flex-col gap-8 xl:max-w-full xl:flex-row">
         {/* Blog Content */}
-        <div className="flex w-full max-w-3xl flex-col gap-8">
+        <div className="flex w-full max-w-3xl min-w-0 flex-col gap-8">
           <div className="space-y-6">
             {/* Blog Breadcrums */}
             <BlogBreadcrumbs
@@ -255,7 +254,10 @@ async function page({ params }: Props) {
             )}
 
             {/* main content */}
-            <div dangerouslySetInnerHTML={{ __html: html }} />
+            <div
+              dangerouslySetInnerHTML={{ __html: html }}
+              className="tiptap-preview min-w-0"
+            />
 
             {/* tags */}
             <div className="flex flex-wrap items-center gap-2">
@@ -293,7 +295,7 @@ async function page({ params }: Props) {
         </div>
 
         {/* Author Sidebar */}
-        <div className="scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent flex-1 space-y-8 overflow-y-auto xl:sticky xl:top-28 xl:h-[calc(100vh-136px)] xl:pb-4">
+        <div className="scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent space-y-8 overflow-y-auto xl:sticky xl:top-28 xl:h-[calc(100vh-136px)] xl:w-80 xl:shrink-0 xl:pb-4">
           {/* Author Info */}
           <AuthorInfo
             username={blog.authorId.username}

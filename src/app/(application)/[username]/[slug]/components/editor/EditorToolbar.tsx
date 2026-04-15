@@ -61,8 +61,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
       id: 'heading',
       label: 'Heading',
       icon: <Heading />,
-      onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      isActive: () => editor.isActive('heading', { level: 1 }),
+      onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+      isActive: () => editor.isActive('heading', { level: 3 }),
     },
     {
       id: 'codeBlock',

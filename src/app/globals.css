@@ -239,7 +239,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground break-words;
   }
   button:not([disabled]),
   [role='button']:not([disabled]) {
@@ -253,50 +253,107 @@
     @apply font-semibold;
   }
 
+  .ProseMirror {
+    min-height: 100vh;
+
+    & .ProseMirror-widget * {
+      margin-top: auto;
+    }
+  }
+
+  .ProseMirror-selectednode,
+  .ProseMirror-selectednoderange {
+    position: relative;
+    isolation: isolate;
+
+    &::before {
+      position: absolute;
+      pointer-events: none;
+      z-index: -1;
+      content: '';
+      inset: 0;
+      background-color: color-mix(in srgb, var(--color-brand) 13%, transparent);
+    }
+  }
+
   .tiptap,
   .tiptap-preview {
-    @apply w-full outline-none;
+    @apply leading-relaxed outline-none;
 
-    & p {
-      @apply my-2 leading-relaxed whitespace-pre-line;
+    & > * + * {
+      margin-top: 0.75rem;
     }
 
-    & h1 {
-      @apply mt-4 mb-2 text-xl font-bold;
+    & li > p {
+      margin: 0;
+      min-height: auto;
+    }
+
+    & p:empty {
+      min-height: 1.25em;
+    }
+
+    & li + li {
+      margin-top: 0.25em;
+    }
+
+    & ul,
+    & ol {
+      @apply py-0 pl-6;
     }
 
     & ul {
-      @apply my-2 list-disc pl-5;
+      list-style: disc;
     }
 
-    & blockquote {
-      @apply my-4 border-l-4 pl-4 italic;
+    & ol {
+      list-style: decimal;
+    }
+
+    & h2 {
+      @apply mt-7 mb-3 scroll-mt-20 text-2xl font-semibold tracking-tight;
+    }
+
+    & h3 {
+      @apply mt-5 mb-2 scroll-mt-20 text-xl font-semibold tracking-tight;
+    }
+
+    & h4 {
+      @apply mt-3 mb-1 scroll-mt-20 text-lg font-semibold tracking-tight;
     }
 
     & pre {
-      @apply bg-muted/50 text-foreground scrollbar-thin my-4 max-w-full min-w-0 overflow-x-auto rounded-md p-4 text-xs;
-
+      @apply relative my-4 overflow-auto rounded-sm border bg-[#151b23] p-4 font-mono text-sm text-[#e6edf3] [tab-size:2] print:break-inside-avoid;
       & code {
-        @apply bg-transparent p-0 leading-6 whitespace-pre;
-        display: inline-block;
-        min-width: 100%;
-        padding-right: 1rem;
-        font-family: monospace;
+        @apply m-0 block min-w-max;
       }
     }
 
     & :not(pre) > code {
-      @apply bg-muted rounded px-1.5 py-1 text-[13px] font-medium;
+      @apply bg-muted text-foreground rounded border-none px-[0.3em] py-[0.15em] font-mono text-sm text-[80%] font-normal whitespace-pre-wrap;
     }
 
     & p.is-editor-empty:first-child::before {
-      @apply text-muted-foreground pointer-events-none float-left h-0;
+      @apply text-muted-foreground/80 pointer-events-none float-left h-0;
       content: attr(data-placeholder);
     }
-  }
 
-  .custom_scrollbar {
-    @apply scrollbar-thin scrollbar-thumb-foreground/30 scrollbar-track-transparent;
+    & .is-empty::before {
+      @apply text-muted-foreground/80 pointer-events-none float-left h-0;
+      content: attr(data-placeholder);
+    }
+
+    & a {
+      @apply text-link cursor-pointer underline;
+    }
+
+    & blockquote {
+      @apply border-l-4 pl-5 italic;
+    }
+
+    & mark {
+      @apply bg-highlight/30 text-inherit;
+    }
   }
 }
 

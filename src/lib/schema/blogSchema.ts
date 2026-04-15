@@ -1,8 +1,6 @@
-import { Value } from 'platejs';
-import { Node } from 'slate';
+import { JSONContent } from '@tiptap/react';
 import * as z from 'zod';
 
-// File type whitelist
 const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
   'image/png',
@@ -10,6 +8,13 @@ const ALLOWED_IMAGE_TYPES = [
   'image/jpg',
 ];
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+const MAX_CONTENT_LENGTH = 100_000;
+
+const getTiptapText = (node: JSONContent): string => {
+  if (node.text) return node.text;
+  if (!node.content) return '';
+  return node.content.map(getTiptapText).join(' ');
+};
 
 const fileSchema = z
   .instanceof(File, { message: 'Banner image is required' })
@@ -47,24 +52,17 @@ export const createBlogSchema = z.object({
   metaDescription: z
     .string()
     .trim()
-    .max(160, 'Meta Description must be at most 160 characters')
+    .max(160, 'Meta description must be at most 160 characters')
     .optional(),
 
-  content: z.custom<Value>(
-    (val) => {
-      if (!Array.isArray(val) || val.length === 0) return false;
-
-      if (val.length > 1000) return false;
-
-      const textContent = val.map((n) => Node.string(n)).join('');
-      if (textContent.trim().length === 0) return false;
-
-      if (textContent.length > 100000) return false;
-
-      return true;
-    },
-    { message: 'Content is required and must be valid' },
-  ),
+  content: z
+    .custom<JSONContent>()
+    .refine((val) => val?.content && getTiptapText(val).trim().length > 0, {
+      message: 'Content is required and cannot be empty',
+    })
+    .refine((val) => getTiptapText(val).length <= MAX_CONTENT_LENGTH, {
+      message: `Content is too long (max ${MAX_CONTENT_LENGTH.toLocaleString()} characters)`,
+    }),
 
   tags: z
     .array(

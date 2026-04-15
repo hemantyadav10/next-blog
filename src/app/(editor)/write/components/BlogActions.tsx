@@ -19,7 +19,6 @@ import { CreateBlogInput } from '@/lib/schema/blogSchema';
 import { cn } from '@/lib/utils';
 import { CategoryListItem } from '@/types/category.types';
 import { PanelRight, Save, Send } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
 import { useTransition } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -30,11 +29,12 @@ interface BlogActionsProps {
   categories: CategoryListItem[];
   blogId?: string;
   slug?: string;
+  username: string;
 }
 
-function BlogActions({ categories, blogId, slug }: BlogActionsProps) {
+function BlogActions({ categories, blogId, slug, username }: BlogActionsProps) {
   const router = useRouter();
-  const isDesktop = useMediaQuery('(min-width : 1024px)');
+  const isDesktop = useMediaQuery('(min-width : 1280px)');
 
   return (
     <div className="flex items-center gap-3">
@@ -47,7 +47,9 @@ function BlogActions({ categories, blogId, slug }: BlogActionsProps) {
           Cancel
         </Button>
       )}
-      {isDesktop && <BlogActionButton blogId={blogId} slug={slug} />}
+      {isDesktop && (
+        <BlogActionButton blogId={blogId} slug={slug} username={username} />
+      )}
 
       <ModeToggle allOptions={false} />
 
@@ -71,13 +73,17 @@ function BlogActions({ categories, blogId, slug }: BlogActionsProps) {
                 <SheetTitle>Post Settings</SheetTitle>
               </SheetHeader>
               <Separator />
-              <div className="custom_scrollbar h-full overflow-y-auto">
+              <div className="h-full overflow-y-auto">
                 <EditorSidebar categories={categories} />
               </div>
               <Separator />
               <SheetFooter>
                 <div className="flex justify-end gap-2">
-                  <BlogActionButton blogId={blogId} slug={slug} />
+                  <BlogActionButton
+                    blogId={blogId}
+                    slug={slug}
+                    username={username}
+                  />
 
                   <SheetClose asChild>
                     <Button variant="outline">Close</Button>
@@ -98,13 +104,13 @@ function BlogActionButton({
   className,
   blogId,
   slug,
+  username,
 }: {
   className?: string;
   blogId?: string;
   slug?: string;
+  username: string;
 }) {
-  const path = usePathname();
-  const username = path.split('/')[1];
   const { handleSubmit, watch, setError, reset } =
     useFormContext<CreateBlogInput>();
   const [isPending, startTransition] = useTransition();

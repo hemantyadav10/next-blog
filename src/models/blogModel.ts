@@ -47,12 +47,10 @@ const blogSchema = new Schema(
       trim: true,
       maxlength: 160,
     },
-    content: [
-      {
-        type: Schema.Types.Mixed,
-        required: true,
-      },
-    ],
+    content: {
+      type: Schema.Types.Mixed,
+      required: true,
+    },
     tags: {
       type: [Schema.Types.ObjectId],
       ref: MODEL_NAMES.TAG,

@@ -65,8 +65,7 @@ async function BlogStats({ params, searchParams }: BlogStatsProps) {
             <Badge
               className={cn(
                 'capitalize',
-                blog.status === 'published' &&
-                  'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300',
+                blog.status === 'published' && 'text-success bg-success/10',
                 blog.status === 'draft' &&
                   'bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300',
               )}

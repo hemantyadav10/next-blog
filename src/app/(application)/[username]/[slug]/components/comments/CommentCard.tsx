@@ -528,7 +528,7 @@ const CommentItem = ({
                     <div
                       ref={contentRef}
                       className={cn(
-                        'prose prose-sm dark:prose-invert tiptap w-full max-w-none px-2 text-sm break-words [&_a]:break-all',
+                        'tiptap-preview w-full max-w-none px-2 text-sm',
                         // !isExpanded && 'line-clamp-4',
                       )}
                       dangerouslySetInnerHTML={{ __html: cleanCommentContent }}

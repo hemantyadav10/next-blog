@@ -269,7 +269,7 @@ function Dropzone() {
               : 'border-input',
           isFileDialogActive && 'border-brand/50 bg-brand/15',
           !(isDragActive || isDragReject || isFileDialogActive || hasError) &&
-            'hover:bg-input/20 dark:hover:bg-input/40 dark:bg-input/30',
+            'hover:bg-muted/50',
           croppedImage && 'p-0',
         )}
         {...getRootProps()}

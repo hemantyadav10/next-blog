@@ -1,12 +1,14 @@
 import BlogForm from '@/app/(editor)/write/components/BlogForm';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { verifyAuth } from '@/lib/auth';
 import connectDb from '@/lib/connectDb';
 import { CreateBlogInput } from '@/lib/schema/blogSchema';
 import Category from '@/models/categoryModel';
 import { CategoryListItem } from '@/types/category.types';
 import { AlertCircleIcon } from 'lucide-react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 async function getCategories(): Promise<CategoryListItem[]> {
   await connectDb();
@@ -26,6 +28,12 @@ export default async function BlogEditor({
   blogData?: CreateBlogInput & { _id: string };
   slug?: string;
 }) {
+  const { user, isAuthenticated } = await verifyAuth();
+
+  if (!isAuthenticated) {
+    redirect('/login');
+  }
+
   let categories;
   let error = null;
 
@@ -75,5 +83,12 @@ export default async function BlogEditor({
     );
   }
 
-  return <BlogForm categories={categories} blogData={blogData} slug={slug} />;
+  return (
+    <BlogForm
+      categories={categories}
+      blogData={blogData}
+      slug={slug}
+      username={user.username}
+    />
+  );
 }

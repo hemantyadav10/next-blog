@@ -54,6 +54,7 @@ function Header({ user }: { user: AuthResult }) {
   const { isAuthenticated, user: userDetails } = user;
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
+  const redirectUrl = encodeURIComponent(pathname);
   const router = useRouter();
   const [toggleMenu, setToggleMenu] = useState(false);
 
@@ -275,7 +276,7 @@ function Header({ user }: { user: AuthResult }) {
                   <Link href="/register">Sign up</Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/login">Log in</Link>
+                  <Link href={`/login?redirect=${redirectUrl}`}>Log in</Link>
                 </Button>
               </>
             )}

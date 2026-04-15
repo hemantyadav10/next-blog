@@ -33,7 +33,7 @@ function BlogCard({
         width={72}
         className="shrink-0"
       />
-      <div className="flex-1 space-y-1">
+      <div className="min-w-0 flex-1 space-y-1">
         <h3 className="group-hover:text-link line-clamp-2 transition-colors duration-300">
           <span className="from-link to-link bg-gradient-to-r bg-[length:0px_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover:bg-[length:100%_2px]">
             {title}

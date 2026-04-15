@@ -1,3 +1,4 @@
+import { serverEditorExtensions } from '@/components/editor/extenstions';
 import { verifyAuth } from '@/lib/auth';
 import { Blog, Bookmark, Like } from '@/models';
 import type {
@@ -8,11 +9,11 @@ import type {
   RelatedBlogs,
   TrendingBlog,
 } from '@/types/blog.types';
+import { generateText } from '@tiptap/core';
+import { JSONContent } from '@tiptap/react';
 import { isValidObjectId, PipelineStage, SortValues, Types } from 'mongoose';
 import { nanoid } from 'nanoid';
-import { Value } from 'platejs';
 import { cache } from 'react';
-import { Node } from 'slate';
 import slugify from 'slugify';
 import connectDb from './connectDb';
 
@@ -37,35 +38,36 @@ export function generateSimpleSlug(title: string): string {
   });
 }
 
-export function calculateReadTime(blocks: Value): number {
-  const plainText = blocks
-    .map((n) => Node.string(n))
-    .join('\n')
-    .trim();
+export function calculateReadTime(content: JSONContent): number {
+  const safeContent = JSON.parse(JSON.stringify(content));
 
-  // Count words using regex
-  const wordCount = plainText
+  const text = generateText(safeContent, serverEditorExtensions);
+
+  const wordCount = text
+    .replace(/\u00A0/g, ' ')
     .split(/\s+/)
-    .filter((word) => word.length > 0).length;
+    .filter(Boolean).length;
 
-  const wordsPerMinute = 225;
-  const minutes = wordCount / wordsPerMinute;
-
-  // Always at least 1 min
-  return Math.max(1, Math.ceil(minutes));
+  return Math.max(1, Math.ceil(wordCount / 225));
 }
 
 // Generates a meta description from content
-export function generateMetaDescription(content: string, maxLength = 160) {
-  // Strip HTML tags if needed
-  const text = content
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+export function generateMetaDescription(
+  content: JSONContent | string,
+  maxLength = 160,
+) {
+  // Get the raw text
+  const text =
+    typeof content === 'string'
+      ? content.replace(/\s+/g, ' ').trim()
+      : generateText(content, serverEditorExtensions)
+          .replace(/\s+/g, ' ')
+          .trim();
+
   if (text.length <= maxLength) return text;
 
-  // Cut at the last full word before maxLength
-  return text.slice(0, maxLength).replace(/\s+\S*$/, '');
+  // Cut at the last full word
+  return text.slice(0, maxLength).replace(/\s+\S*$/, '') + '...';
 }
 
 // TODO: implement the logic to fetch popular blogs of a category

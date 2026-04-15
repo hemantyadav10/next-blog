@@ -16,8 +16,7 @@ function fillDates(
   days: number,
   timezone: string,
 ) {
-  // calculate actual number of days to fill
-  const today = new Date();
+  const today = new Date(Date.now());
   const actualDays =
     days === 9999
       ? Math.ceil(
@@ -27,36 +26,41 @@ function fillDates(
 
   const filled: { date: string; value: number }[] = [];
   for (let i = actualDays; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toLocaleDateString('en-CA', { timeZone: timezone });
+    const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    const dateStr = date.toLocaleDateString('en-CA', {
+      timeZone: timezone,
+    });
     filled.push({ date: dateStr, value: dataMap.get(dateStr) ?? 0 });
   }
   return filled;
 }
 
-// -- calculate start date based on range
-function getStartDate(publishedAt: Date, days: number): Date {
-  const startDate = new Date();
+// normalize to start of day in user's timezone
+function getStartDate(publishedAt: Date, days: number, timezone: string): Date {
   if (days === 9999) {
-    startDate.setTime(publishedAt.getTime());
-  } else {
-    startDate.setDate(startDate.getDate() - days);
+    return new Date(publishedAt.getTime());
   }
-  return startDate;
+
+  const now = new Date();
+  const targetTime = new Date(now.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
+
+  const dateStr = targetTime.toLocaleDateString('en-CA', {
+    timeZone: timezone,
+  });
+  return new Date(dateStr + 'T00:00:00');
 }
 
-// fetch likes count grouped by date for a blog post in the given time range and timezone
-export async function getBlogLikesChartData({
+// fetch views count grouped by date for a blog post in the given time range and timezone
+export async function getBlogViewChartData({
   blogId,
   days,
   timezone,
   publishedAt,
 }: BlogStatsOptions): Promise<{ date: string; value: number }[]> {
   await connectDb();
-  const startDate = getStartDate(publishedAt, days);
+  const startDate = getStartDate(publishedAt, days, timezone);
 
-  const result = await Like.aggregate([
+  const result = await BlogView.aggregate([
     {
       $match: {
         blogId: new Types.ObjectId(blogId),
@@ -82,18 +86,17 @@ export async function getBlogLikesChartData({
   return fillDates(dataMap, startDate, days, timezone);
 }
 
-// fetch views count grouped by date for a blog post in the given time range and timezone
-export async function getBlogViewChartData({
+// fetch likes count grouped by date for a blog post in the given time range and timezone
+export async function getBlogLikesChartData({
   blogId,
   days,
   timezone,
   publishedAt,
 }: BlogStatsOptions): Promise<{ date: string; value: number }[]> {
   await connectDb();
-  const startDate = getStartDate(publishedAt, days);
+  const startDate = getStartDate(publishedAt, days, timezone);
 
-  // aggregate views grouped by date in the author's timezone
-  const result = await BlogView.aggregate([
+  const result = await Like.aggregate([
     {
       $match: {
         blogId: new Types.ObjectId(blogId),
@@ -127,7 +130,7 @@ export async function getBlogCommentsChartData({
   publishedAt,
 }: BlogStatsOptions): Promise<{ date: string; value: number }[]> {
   await connectDb();
-  const startDate = getStartDate(publishedAt, days);
+  const startDate = getStartDate(publishedAt, days, timezone);
 
   const result = await Comment.aggregate([
     {
