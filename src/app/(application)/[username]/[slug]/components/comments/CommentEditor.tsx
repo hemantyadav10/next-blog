@@ -39,8 +39,9 @@ function CommentEditor({ user, blogId }: CommentEditorProps) {
       if (response.success) {
         toast.success('Comment posted');
 
-        // Clear comment and
+        // Clear comment and close editor
         editorRef.current?.clearContent();
+        editorRef.current?.closeEditor();
 
         // Update cache
         queryClient.setQueryData<InfiniteData<CommentResponse>>(

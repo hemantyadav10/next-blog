@@ -7,9 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import { cn } from '@/lib/utils';
-import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
-import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Ref, useImperativeHandle, useState } from 'react';
@@ -19,6 +17,7 @@ export interface RichTextCommentEditorRef {
   focus: () => void;
   getContent: () => string;
   clearContent: () => void;
+  closeEditor: () => void;
 }
 
 export interface RichTextCommentEditorProps {
@@ -62,13 +61,6 @@ const RichTextCommentEditor = ({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [3] } }),
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-link underline cursor-pointer',
-        },
-      }),
       Placeholder.configure({ placeholder: placeholder }),
     ],
     immediatelyRender: false,
@@ -103,6 +95,7 @@ const RichTextCommentEditor = ({
       clearContent: () => {
         editor?.commands.clearContent();
       },
+      closeEditor: () => setShow(false),
     }),
     [editor],
   );

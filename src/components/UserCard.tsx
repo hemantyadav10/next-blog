@@ -1,7 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { AtSign } from 'lucide-react';
-import Link from 'next/link';
 import {
   Item,
   ItemActions,
@@ -9,7 +7,9 @@ import {
   ItemDescription,
   ItemMedia,
   ItemTitle,
-} from '../../item';
+} from '@/components/ui/item';
+import { AtSign } from 'lucide-react';
+import Link from 'next/link';
 
 type UserProps = {
   name: string;

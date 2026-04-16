@@ -44,7 +44,7 @@ export function ErrorState({
   }
 
   return (
-    <Alert className={cn(alertVariants({ variant }), 'rounded-2xl')}>
+    <Alert variant={variant} className={cn('rounded-2xl')}>
       <AlertCircleIcon className="h-4 w-4" />
       <AlertTitle>Unable to load {resource}</AlertTitle>
       <AlertDescription className="space-y-3">

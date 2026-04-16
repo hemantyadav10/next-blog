@@ -40,7 +40,7 @@ export default function TrendingBlogCard({ blog }: { blog: TrendingBlog }) {
         </div>
 
         {/* Title */}
-        <p className="text-foreground group-hover:text-primary line-clamp-2 text-base font-medium transition-colors duration-300">
+        <p className="text-foreground group-hover:text-primary line-clamp-2 text-sm font-medium transition-colors duration-300 md:text-base">
           <span className="from-primary to-primary bg-gradient-to-r bg-[length:0px_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover:bg-[length:100%_2px]">
             {blog.title}
           </span>

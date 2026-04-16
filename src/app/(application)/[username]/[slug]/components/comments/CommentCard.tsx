@@ -92,6 +92,10 @@ const CommentItem = ({
   const [isPending, startTransition] = useTransition();
   const queryClient = useQueryClient();
 
+  // Local state for mutable display fields
+  const [localContent, setLocalContent] = useState(comment.content);
+  const [localIsEdited, setLocalIsEdited] = useState(comment.isEdited);
+
   // TODO: Implement read more commment content functionality
   // With the current approach read more only shows for replies, not for top level comments
 
@@ -143,10 +147,7 @@ const CommentItem = ({
   const descendantCount = comment.visibleDescendantCount || 0;
   const hasReplies = descendantCount > 0;
 
-  const cleanCommentContent = sanitizeHtml(
-    comment.content,
-    tiptapSanitizeConfig,
-  );
+  const cleanCommentContent = sanitizeHtml(localContent, tiptapSanitizeConfig);
 
   const handleCopyLink = async () => {
     const fullUrl = `${window.location.origin}${commentPath}`;
@@ -329,7 +330,7 @@ const CommentItem = ({
   };
 
   const handleEditComment = () => {
-    const content = editorRef.current?.getContent() ?? comment.content;
+    const content = editorRef.current?.getContent() ?? localContent;
 
     startTransition(async () => {
       const response = await updateComment({
@@ -340,6 +341,10 @@ const CommentItem = ({
       if (response.success) {
         toast.success('Comment updated');
         setIsEditing(false);
+
+        // Update local state so the single-comment page reflects the edit immediately
+        setLocalContent(content);
+        setLocalIsEdited(true);
 
         // Check if this is a reply or top-level comment
         if (comment.parentId) {
@@ -469,7 +474,7 @@ const CommentItem = ({
                   placeholder="Edit your comment here..."
                   blogId={blogId}
                   parentCommentId={comment._id}
-                  content={comment.content}
+                  content={localContent}
                   onSubmit={handleEditComment}
                   isLoading={isPending}
                   submitLabel="Save Changes"
@@ -502,7 +507,7 @@ const CommentItem = ({
                         {commentCreatedAt}
                       </Link>
                     )}
-                    {comment.isEdited && (
+                    {localIsEdited && (
                       <span className="text-muted-foreground font-normal">
                         (Edited)
                       </span>

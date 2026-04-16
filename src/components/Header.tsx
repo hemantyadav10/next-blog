@@ -98,8 +98,8 @@ function Header({ user }: { user: AuthResult }) {
 
       <header
         className={cn(
-          'bg-background/95 border-border sticky top-0 z-50 h-16 border-b shadow-md backdrop-blur-sm md:transform-none',
-          'dark:bg-card/90 dark:backdrop-blur-lg',
+          'bg-background border-border sticky top-0 z-50 h-16 border-b shadow-md md:transform-none',
+          'dark:bg-card',
         )}
       >
         {/* Left: App Name */}
