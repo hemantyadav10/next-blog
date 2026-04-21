@@ -108,7 +108,7 @@ function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} · Built by{' '}
+            &copy; 2026 · Built by{' '}
             <Link
               href="https://github.com/hemantyadav10"
               target="_blank"

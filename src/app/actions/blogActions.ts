@@ -134,6 +134,10 @@ export async function createBlog(
       blurDataUrl = `data:image/webp;base64,${base64}`;
     }
 
+    const slug: string = await generateUniqueSlug(
+      blogData.slug ?? blogData.title,
+    );
+
     // Store blog data along with image URLs and blurDataURL in database
     const newBlog = await Blog.create({
       ...blogData,
@@ -142,7 +146,7 @@ export async function createBlog(
       bannerPublicId: coverImagePublicId,
       blurDataUrl: blurDataUrl,
       metaDescription: generateMetaDescription(blogData.description),
-      slug: generateUniqueSlug(blogData.title),
+      slug,
       readTime: calculateReadTime(blogData.content),
       authorId: user.userId,
       publishedAt: blogData.status === 'published' ? new Date() : undefined,
@@ -156,12 +160,11 @@ export async function createBlog(
   } catch (error) {
     console.error('Blog creation failed:', error);
 
-    // Handle duplicate blog title error gracefully
+    // Handle unique constraint violation (duplicate slug)
     if (isMongoError(error) && error.code === 11000) {
       return {
         success: false,
-        error:
-          'A blog with this title already exists. Please choose a different title.',
+        error: 'Failed to create the post. Please try again in a moment.',
       };
     }
 
@@ -286,6 +289,20 @@ export async function updateBlog(
     }
     // If banner is a string and matches existing, no change needed
 
+    // Record first publish date only; never overwrite once set
+    const publishedAt =
+      blogData.status === 'published' && !existingBlog.publishedAt
+        ? new Date()
+        : existingBlog.publishedAt;
+
+    // Slug is locked once published; if draft, use author-provided slug or keep existing
+    const everPublished: boolean = Boolean(existingBlog.publishedAt);
+    const slug = everPublished
+      ? existingBlog.slug
+      : blogData.slug
+        ? await generateUniqueSlug(blogData.slug, blogId)
+        : existingBlog.slug;
+
     // Update the blog
     const updatedBlog = await Blog.findByIdAndUpdate(
       blogId,
@@ -299,12 +316,10 @@ export async function updateBlog(
           blogData.metaDescription ||
           generateMetaDescription(blogData.description),
         readTime: calculateReadTime(blogData.content),
-        publishedAt:
-          blogData.status === 'published' && !existingBlog.publishedAt
-            ? new Date()
-            : existingBlog.publishedAt,
+        publishedAt,
         isEdited: true,
         editedAt: new Date(),
+        slug,
       },
       { new: true },
     );
@@ -324,12 +339,11 @@ export async function updateBlog(
   } catch (error) {
     console.error('Blog update failed:', error);
 
-    // Handle duplicate blog title error
+    // Handle unique constraint violation (duplicate slug)
     if (isMongoError(error) && error.code === 11000) {
       return {
         success: false,
-        error:
-          'A blog with this title already exists. Please choose a different title.',
+        error: 'Failed to save the post. Please try again in a moment.',
       };
     }
 

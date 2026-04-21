@@ -1,6 +1,7 @@
 import { clientConfig } from '@/config/clientConfig';
 import { clsx, type ClassValue } from 'clsx';
 import crypto from 'node:crypto';
+import slugify from 'slugify';
 import { twMerge } from 'tailwind-merge';
 
 const BASE_URL = clientConfig.baseUrl;
@@ -104,4 +105,12 @@ export const validateUrl = (value: string): string | null => {
 
     return 'Please enter a valid URL';
   }
+};
+
+export const generateSlug = (value: string): string => {
+  return slugify(value, {
+    strict: true,
+    trim: true,
+    lower: true,
+  });
 };

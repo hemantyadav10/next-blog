@@ -28,6 +28,8 @@ async function EditPost({ params }: EditPostProps) {
     categoryId: blog.categoryId._id.toString(),
     metaDescription: blog.metaDescription ?? undefined,
     isCommentsEnabled: blog.isCommentsEnabled,
+    slug: blog.slug,
+    publishedAt: blog.publishedAt?.toISOString() ?? null,
   };
 
   return <BlogEditor blogData={blogData} slug={slug} />;

@@ -1,6 +1,8 @@
 'use client';
 
 import TagsInput from '@/components/TagsInput';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Field,
@@ -13,7 +15,11 @@ import {
   FieldSeparator,
   FieldSet,
 } from '@/components/ui/field';
-import { InputGroup, InputGroupTextarea } from '@/components/ui/input-group';
+import {
+  InputGroup,
+  InputGroupInput,
+  InputGroupTextarea,
+} from '@/components/ui/input-group';
 import {
   Select,
   SelectContent,
@@ -21,11 +27,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { CreateBlogInput } from '@/lib/schema/blogSchema';
+import { generateSlug } from '@/lib/utils';
 import { CategoryListItem } from '@/types/category.types';
+import { AlertTriangleIcon, InfoIcon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
-  const { control } = useFormContext();
+function EditorSidebar({
+  categories,
+  blogData,
+}: {
+  categories: CategoryListItem[];
+  blogData?: CreateBlogInput & { _id: string; publishedAt: string | null };
+}) {
+  const { control } = useFormContext<CreateBlogInput>();
+
+  const isSlugLocked = !!blogData?.publishedAt;
 
   return (
     <div className="px-4 py-4 lg:py-0">
@@ -40,7 +57,7 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
             name="description"
             control={control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field>
                 <FieldLabel htmlFor={field.name}>Description</FieldLabel>
                 <InputGroup>
                   <InputGroupTextarea
@@ -67,7 +84,7 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
             name="metaDescription"
             control={control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field>
                 <FieldLabel htmlFor={field.name}>
                   SEO Description (Optional)
                 </FieldLabel>
@@ -98,7 +115,7 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
               field: { name, value, onChange, onBlur, ref, disabled },
               fieldState,
             }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field>
                 <FieldLabel htmlFor={name}>Category</FieldLabel>
                 <Select name={name} value={value} onValueChange={onChange}>
                   <SelectTrigger
@@ -131,6 +148,57 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
           {/* Tags */}
           <TagsInput />
 
+          {/* Slug */}
+          <Controller
+            name="slug"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>
+                  URL slug{' '}
+                  {isSlugLocked && (
+                    <Badge variant={'secondary'} className="rounded">
+                      locked
+                    </Badge>
+                  )}
+                </FieldLabel>
+
+                <InputGroup>
+                  <InputGroupInput
+                    aria-invalid={fieldState.invalid}
+                    id={field.name}
+                    {...field}
+                    onBlur={(e) => {
+                      const slugified = generateSlug(e.target.value);
+                      field.onChange(slugified);
+                      field.onBlur();
+                    }}
+                    placeholder="your-post-slug"
+                    autoComplete="off"
+                    readOnly={isSlugLocked}
+                    className={isSlugLocked ? 'cursor-not-allowed' : ''}
+                  />
+                </InputGroup>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+                <FieldDescription>
+                  Generated from your title. A unique suffix will be appended if
+                  this slug is already in use.
+                </FieldDescription>
+
+                <Alert variant={isSlugLocked ? 'info' : 'warning'}>
+                  {isSlugLocked ? <InfoIcon /> : <AlertTriangleIcon />}
+                  <AlertDescription className="text-foreground">
+                    {isSlugLocked
+                      ? 'This post has already been published — the slug is now locked to preserve existing links.'
+                      : 'The slug is generated from your title. Once published, it will be locked to keep links stable.'}
+                  </AlertDescription>
+                </Alert>
+              </Field>
+            )}
+          />
+
           {/* Status */}
           <Controller
             control={control}
@@ -139,7 +207,7 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
               field: { name, value, onChange, onBlur, ref, disabled },
               fieldState,
             }) => (
-              <Field data-invalid={fieldState.invalid}>
+              <Field>
                 <FieldLabel htmlFor={name}>Status</FieldLabel>
                 <Select name={name} value={value} onValueChange={onChange}>
                   <SelectTrigger
@@ -152,15 +220,15 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
                     <SelectValue placeholder="Select post status..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="draft">Save as Draft</SelectItem>
+                    <SelectItem value="published">Publish</SelectItem>
                   </SelectContent>
                 </Select>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
                 <FieldDescription>
-                  Select the status of your post.
+                  Choose whether to save as a draft or publish your post.
                 </FieldDescription>
               </Field>
             )}
@@ -174,7 +242,7 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
               field: { name, value, onChange, onBlur, ref, disabled },
               fieldState,
             }) => (
-              <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+              <Field orientation="horizontal">
                 <Checkbox
                   id={name}
                   name={name}

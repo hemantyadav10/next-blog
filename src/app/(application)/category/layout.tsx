@@ -3,7 +3,7 @@ import CategoriesSkeleton from '@/components/skeletons/CategoriesSkeleton';
 import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

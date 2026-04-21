@@ -1,7 +1,7 @@
 import { Separator } from '@/components/ui/separator';
 import TabNav from './components/TabNav';
 
-export default async function SettingsLayout({
+export default function SettingsLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

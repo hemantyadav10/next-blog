@@ -9,6 +9,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { useDebouncedCallback } from '@/hooks/use-debounce';
 import { CreateBlogInput, createBlogSchema } from '@/lib/schema/blogSchema';
+import { generateSlug } from '@/lib/utils';
 import { CategoryListItem } from '@/types/category.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
@@ -25,7 +26,7 @@ function BlogForm({
   username,
 }: {
   categories: CategoryListItem[];
-  blogData?: CreateBlogInput & { _id: string };
+  blogData?: CreateBlogInput & { _id: string; publishedAt: string | null };
   slug?: string;
   username: string;
 }) {
@@ -41,6 +42,7 @@ function BlogForm({
       content: blogData?.content ?? {},
       title: blogData?.title ?? '',
       banner: blogData?.banner ?? undefined,
+      slug: blogData?.slug ?? '',
     },
   });
 
@@ -92,13 +94,13 @@ function BlogForm({
               editor={tipTapEditor}
               username={username}
             />
-            <div className="mx-auto flex w-full max-w-7xl justify-center gap-6 px-4 pt-6 pb-16">
+            <div className="mx-auto flex w-full justify-center gap-6 px-4 pt-6 pb-16">
               <Field className="max-w-4xl min-w-0 flex-1">
                 <Controller
                   name="title"
                   control={methods.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
+                    <Field>
                       <FieldLabel htmlFor={field.name} className="sr-only">
                         Title
                       </FieldLabel>
@@ -132,6 +134,14 @@ function BlogForm({
                         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                           const clean = e.target.value.replace(/[\r\n]+/g, ' ');
                           field.onChange(clean);
+
+                          // Sync slug with title only if never published
+                          if (!blogData?.publishedAt) {
+                            methods.setValue('slug', generateSlug(clean), {
+                              shouldDirty: true,
+                            });
+                          }
+
                           // Auto-resize
                           e.target.style.height = 'auto';
                           e.target.style.height = `${e.target.scrollHeight}px`;
@@ -157,8 +167,8 @@ function BlogForm({
                 <BlogEditor editor={tipTapEditor} />
               </Field>
 
-              <div className="bg-background sticky top-[145px] hidden max-h-[calc(100vh-169px)] w-sm self-start overflow-y-auto py-6 xl:block">
-                <EditorSidebar categories={categories} />
+              <div className="bg-background sticky top-[145px] hidden max-h-[calc(100vh-169px)] w-md self-start overflow-y-auto py-6 xl:block">
+                <EditorSidebar categories={categories} blogData={blogData} />
               </div>
             </div>
           </div>

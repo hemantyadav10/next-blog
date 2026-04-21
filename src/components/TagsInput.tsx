@@ -59,7 +59,7 @@ function TagsInput() {
             }
           };
           return (
-            <Field data-invalid={fieldState.invalid}>
+            <Field>
               <FieldLabel
                 htmlFor="tags"
                 onClick={() => {

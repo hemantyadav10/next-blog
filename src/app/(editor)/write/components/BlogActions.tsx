@@ -168,8 +168,8 @@ function BlogActionButton({
       } else {
         // Redirect logic
         if (isEditing) {
-          if (isPublishing && username && slug) {
-            router.replace(`/${username}/${slug}`);
+          if (isPublishing && username) {
+            router.replace(`/${username}/${result.data.slug}`);
           } else {
             router.replace('/dashboard/posts');
           }
@@ -189,6 +189,18 @@ function BlogActionButton({
 
   const status = watch('status');
 
+  const isDraft = status === 'draft';
+
+  const label = isDraft
+    ? isEditing
+      ? 'Update Draft'
+      : 'Save Draft'
+    : isEditing
+      ? 'Update & Publish'
+      : 'Publish';
+
+  const loadingLabel = isDraft ? 'Saving...' : 'Publishing...';
+
   return (
     <Button
       size="sm"
@@ -199,18 +211,12 @@ function BlogActionButton({
       {isPending ? (
         <>
           <Spinner />
-          {status === 'draft' ? 'Saving...' : 'Publishing...'}
+          {loadingLabel}
         </>
       ) : (
         <>
-          {status === 'draft' ? <Save /> : <Send />}
-          {status === 'draft'
-            ? isEditing
-              ? 'Update Draft'
-              : 'Save Draft'
-            : isEditing
-              ? 'Update Post'
-              : 'Publish'}
+          {isDraft ? <Save /> : <Send />}
+          {label}
         </>
       )}
     </Button>

@@ -1,6 +1,7 @@
 import { serverEditorExtensions } from '@/components/editor/extenstions';
 import { verifyAuth } from '@/lib/auth';
 import { Blog, Bookmark, Like } from '@/models';
+import { BlogDocument } from '@/models/blogModel';
 import type {
   MyBlogs,
   PopulatedAuthor,
@@ -11,23 +12,59 @@ import type {
 } from '@/types/blog.types';
 import { generateText } from '@tiptap/core';
 import { JSONContent } from '@tiptap/react';
-import { isValidObjectId, PipelineStage, SortValues, Types } from 'mongoose';
+import {
+  FilterQuery,
+  isValidObjectId,
+  PipelineStage,
+  SortValues,
+  Types,
+} from 'mongoose';
 import { nanoid } from 'nanoid';
 import { cache } from 'react';
 import slugify from 'slugify';
 import connectDb from './connectDb';
+import { generateSlug } from './utils';
 
-// Generates a unique URL-friendly slug from title with random suffix
-export function generateUniqueSlug(title: string): string {
-  const baseSlug = slugify(title, {
-    lower: true,
-    strict: true,
-    trim: true,
+// Generates a unique slug from title, appending a suffix if already taken
+export async function generateUniqueSlug(
+  title: string,
+  excludeId?: string,
+): Promise<string> {
+  const baseSlug: string = generateSlug(title) || 'untitled';
+
+  const query: FilterQuery<BlogDocument> = {
+    ...(excludeId && { _id: { $ne: excludeId } }),
+  };
+
+  // Check base slug first
+  const baseExists = await Blog.exists({
+    slug: baseSlug,
+    ...query,
   });
 
-  const id = nanoid(8);
+  if (!baseExists) return baseSlug;
 
-  return `${baseSlug}-${id}`;
+  // Batch check numbered variants
+  const numberedSlugs = Array.from(
+    { length: 9 },
+    (_, i) => `${baseSlug}-${i + 2}`,
+  );
+
+  // Check all numbered slugs in single query
+  const existingSlugs: string[] = await Blog.distinct('slug', {
+    slug: { $in: numberedSlugs },
+    ...query,
+  });
+
+  // Find first available numbered slug
+  for (const candidate of numberedSlugs) {
+    if (!existingSlugs.includes(candidate)) {
+      return candidate;
+    }
+  }
+
+  // fallback: timestamp + random
+  return `${baseSlug}-${nanoid(8)}`;
 }
 
 export function generateSimpleSlug(title: string): string {

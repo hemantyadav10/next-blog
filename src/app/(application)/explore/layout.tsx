@@ -6,7 +6,7 @@ import SearchResultsHeader from './components/SearchResultsHeader';
 import SearchSection from './components/SearchSection';
 import SortingSection from './components/SortingSection';
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

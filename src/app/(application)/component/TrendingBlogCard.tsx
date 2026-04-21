@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { TrendingBlog } from '@/types/blog.types';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDate } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -50,9 +50,7 @@ export default function TrendingBlogCard({ blog }: { blog: TrendingBlog }) {
         <div className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
           <span>
             {blog.publishedAt &&
-              formatDistanceToNow(new Date(blog.publishedAt), {
-                addSuffix: true,
-              })}
+              formatDate(new Date(blog.publishedAt), 'MMM d, yyyy')}
           </span>
           •<span>{blog.readTime} min read</span>
         </div>

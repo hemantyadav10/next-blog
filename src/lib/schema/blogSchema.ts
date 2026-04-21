@@ -88,6 +88,17 @@ export const createBlogSchema = z.object({
     .regex(/^[0-9a-fA-F]{24}$/, 'Invalid category ObjectId'),
 
   isCommentsEnabled: z.boolean().optional(),
+
+  slug: z
+    .string()
+    .trim()
+    .min(1, 'Slug is required')
+    .max(200, 'Slug must be at most 200 characters')
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      'Slug can only contain lowercase letters, numbers, and hyphens',
+    )
+    .optional(),
 });
 
 export type CreateBlogInput = z.infer<typeof createBlogSchema>;

@@ -25,7 +25,7 @@ export default async function BlogEditor({
   blogData,
   slug,
 }: {
-  blogData?: CreateBlogInput & { _id: string };
+  blogData?: CreateBlogInput & { _id: string; publishedAt: string | null };
   slug?: string;
 }) {
   const { user, isAuthenticated } = await verifyAuth();

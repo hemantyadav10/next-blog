@@ -33,9 +33,15 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { use } from 'react';
 
-async function AuthorDetailsSection({ username }: { username: string }) {
-  const user = await getUserDetails(username);
+function AuthorDetailsSection({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const { username } = use(params);
+  const user = use(getUserDetails(username));
 
   if (!user) return notFound();
 
