@@ -1,3 +1,4 @@
+import { CreateBlogInput } from '@/lib/schema/blogSchema';
 import { BlogDocument } from '@/models/blogModel';
 import { CategoryDocument } from '@/models/categoryModel';
 import { TagDocument } from '@/models/tagModel';
@@ -90,9 +91,15 @@ type TrendingBlog = Pick<
   trendingScore: number;
 };
 
+type BlogData = CreateBlogInput & {
+  _id: string;
+  publishedAt: string | null;
+};
+
 export type {
   AuthorBlogsResponse,
   BlogAuthor,
+  BlogData,
   BlogListItem,
   BlogsResponse,
   CategoryBlogsResponse,

@@ -3,8 +3,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { verifyAuth } from '@/lib/auth';
 import connectDb from '@/lib/connectDb';
-import { CreateBlogInput } from '@/lib/schema/blogSchema';
 import Category from '@/models/categoryModel';
+import type { BlogData } from '@/types/blog.types';
 import { CategoryListItem } from '@/types/category.types';
 import { AlertCircleIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ export default async function BlogEditor({
   blogData,
   slug,
 }: {
-  blogData?: CreateBlogInput & { _id: string; publishedAt: string | null };
+  blogData?: BlogData;
   slug?: string;
 }) {
   const { user, isAuthenticated } = await verifyAuth();

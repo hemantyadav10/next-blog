@@ -32,25 +32,21 @@ import { generateSlug } from '@/lib/utils';
 import { CategoryListItem } from '@/types/category.types';
 import { AlertTriangleIcon, InfoIcon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useBlogData } from './BlogForm';
 
-function EditorSidebar({
-  categories,
-  blogData,
-}: {
-  categories: CategoryListItem[];
-  blogData?: CreateBlogInput & { _id: string; publishedAt: string | null };
-}) {
+function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
   const { control } = useFormContext<CreateBlogInput>();
+  const blogData = useBlogData();
 
   const isSlugLocked = !!blogData?.publishedAt;
 
   return (
-    <div className="px-4 py-4 lg:py-0">
+    <div className="px-4 py-4 xl:py-0">
       <FieldSet>
-        <FieldLegend className="hidden text-2xl lg:block">
+        <FieldLegend className="hidden text-2xl xl:block">
           Post Settings
         </FieldLegend>
-        <FieldSeparator className="hidden lg:block" />
+        <FieldSeparator className="hidden xl:block" />
         <FieldGroup>
           {/* Description */}
           <Controller
