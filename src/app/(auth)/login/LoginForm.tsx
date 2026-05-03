@@ -1,6 +1,7 @@
 'use client';
 
-import { GoogleIcon } from '@/components/icons/google-icon';
+import { OAuthError } from '@/components/OAuthError';
+import SocialButton from '@/components/SocialButton';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,10 +21,13 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
+import { useGoogleAuth } from '@/hooks/use-google-auth';
+import { useOAuthError } from '@/hooks/use-oauth-error';
+import { saveAuthMethod } from '@/lib/authMethod';
 import { LoginInput, loginSchema } from '@/lib/schema/userSchema';
 import { getSafeRedirect } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircleIcon, Eye, EyeOff, LockIcon, Mail } from 'lucide-react';
+import { AlertCircleIcon, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'nextjs-toploader/app';
@@ -34,9 +38,13 @@ import { loginUser } from '../../actions/userActions';
 
 function LoginForm() {
   const [isPending, startTransition] = useTransition();
+  const oauthError = useOAuthError();
+  const { isGoogleLoading, handleGoogleAuth } = useGoogleAuth('login');
+  const isFormDisabled = isPending || isGoogleLoading;
   const {
     handleSubmit,
     reset,
+    resetField,
     control,
     setError: setFormFieldError,
   } = useForm<LoginInput>({
@@ -46,17 +54,17 @@ function LoginForm() {
     },
     resolver: zodResolver(loginSchema),
     mode: 'onTouched',
-    disabled: isPending,
+    disabled: isFormDisabled,
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string>('');
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawRedirect = searchParams.get('redirect');
   const redirectPath = getSafeRedirect(rawRedirect);
 
   async function handleFormAction(data: LoginInput) {
-    setError('');
+    setFormError('');
     startTransition(async () => {
       const { success, error, errors } = await loginUser(data);
 
@@ -65,9 +73,13 @@ function LoginForm() {
         reset();
         router.push(redirectPath);
         router.refresh();
+        saveAuthMethod('email');
       } else if (error) {
         // Set error message
-        setError(error);
+        setFormError(error);
+
+        // Clear password field
+        resetField('password');
 
         // Set form field errors
         if (errors) {
@@ -89,130 +101,125 @@ function LoginForm() {
           <FieldLabel className="mx-auto text-2xl font-semibold">
             Sign in to your account
           </FieldLabel>
-          <FieldDescription>
-            Enter your email below to login to your account
-          </FieldDescription>
         </FieldContent>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit(handleFormAction)} noValidate>
-          <FieldGroup>
-            {/* Error callout */}
-            {error && (
-              <Alert variant={'destructive'}>
-                <AlertCircleIcon />
-                <AlertTitle>{error}</AlertTitle>
-              </Alert>
-            )}
+        <FieldGroup>
+          <OAuthError error={oauthError} />
 
-            {/* Email */}
-            <Controller
-              control={control}
-              name="email"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      id={field.name}
-                      type="email"
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="example@email.com"
-                    />
-                    <InputGroupAddon>
-                      <Mail />
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+          {/* Social login button */}
+          <Field>
+            <SocialButton
+              provider="google"
+              showLastUsed
+              onClick={handleGoogleAuth}
+              loading={isGoogleLoading}
+              disabled={isFormDisabled}
             />
+            <SocialButton
+              provider="github"
+              showLastUsed
+              disabled={isFormDisabled}
+            />
+          </Field>
 
-            {/* Password */}
-            <Controller
-              name="password"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <div className="flex items-center">
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                    <Link
-                      href="/forgot-password"
-                      className="text-link ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <InputGroup>
-                    <InputGroupInput
-                      id={field.name}
-                      type={showPassword ? 'text' : 'password'}
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                      placeholder="********"
-                    />
-                    <InputGroupAddon>
-                      <LockIcon />
-                    </InputGroupAddon>
-                    <InputGroupAddon align={'inline-end'}>
-                      <InputGroupButton
-                        aria-label="Toggle password"
-                        title="Toggle password"
-                        size="icon-xs"
-                        onClick={() => {
-                          setShowPassword(!showPassword);
-                        }}
+          <FieldSeparator>or</FieldSeparator>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit(handleFormAction)} noValidate>
+            <FieldGroup>
+              {/* Error callout */}
+              {formError && (
+                <Alert variant={'destructive'}>
+                  <AlertCircleIcon />
+                  <AlertTitle>{formError}</AlertTitle>
+                </Alert>
+              )}
+
+              {/* Email */}
+              <Controller
+                control={control}
+                name="email"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id={field.name}
+                        type="email"
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="example@email.com"
+                      />
+                    </InputGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              {/* Password */}
+              <Controller
+                name="password"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="flex items-center">
+                      <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                      <Link
+                        href="/forgot-password"
+                        className="text-link ml-auto text-sm underline-offset-4 hover:underline"
                       >
-                        {showPassword ? <Eye /> : <EyeOff />}
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+                        Forgot password?
+                      </Link>
+                    </div>
 
-            {/* Login Button */}
-            <Field>
-              <Button
-                disabled={isPending}
-                type="submit"
-                size={'lg'}
-                variant={'raised'}
-              >
-                {isPending && <Spinner />} Login
-              </Button>
-            </Field>
+                    <InputGroup>
+                      <InputGroupInput
+                        id={field.name}
+                        type={showPassword ? 'text' : 'password'}
+                        {...field}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="********"
+                      />
+                      <InputGroupAddon align={'inline-end'}>
+                        <InputGroupButton
+                          type="button"
+                          aria-label="Toggle password"
+                          title="Toggle password"
+                          size="icon-xs"
+                          onClick={() => {
+                            setShowPassword(!showPassword);
+                          }}
+                        >
+                          {showPassword ? <Eye /> : <EyeOff />}
+                        </InputGroupButton>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-            <FieldSeparator>Or continue with</FieldSeparator>
+              {/* Login Button */}
+              <Field>
+                <Button disabled={isFormDisabled} type="submit" size={'lg'}>
+                  {isPending && <Spinner />} Login
+                </Button>
+              </Field>
+            </FieldGroup>
+          </form>
 
-            {/* Google login button */}
-            <Field>
-              <Button
-                variant="secondary"
-                type="button"
-                size={'lg'}
-                onClick={() => toast.info('Google login coming soon!')}
-              >
-                <GoogleIcon className="size-5" />
-                Login with Google
-              </Button>
-            </Field>
-
-            {/* Sign up link */}
-            <FieldDescription className="text-center [&>a]:no-underline">
-              Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-link hover:underline">
-                Sign up
-              </Link>
-            </FieldDescription>
-          </FieldGroup>
-        </form>
+          {/* Sign up link */}
+          <FieldDescription className="text-center text-sm [&>a]:no-underline">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-link hover:underline">
+              Sign up
+            </Link>
+          </FieldDescription>
+        </FieldGroup>
       </FieldSet>
     </div>
   );

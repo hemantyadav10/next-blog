@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import * as z from 'zod';
 
 import { config } from '@/config/config';
-import { generateTokens, verifyAuth } from '@/lib/auth';
+import { cookieOptions, generateTokens, verifyAuth } from '@/lib/auth';
 import connectDb from '@/lib/connectDb';
 import { COOKIE_NAMES, IS_DEV, IS_PROD } from '@/lib/constants';
 import { sendPasswordResetEmail } from '@/lib/email/templates';
@@ -31,13 +31,6 @@ import jwt from 'jsonwebtoken';
 import { FilterQuery, SortValues } from 'mongoose';
 import { cookies } from 'next/headers';
 import { after } from 'next/server';
-
-const cookieOptions = {
-  httpOnly: true,
-  secure: IS_PROD,
-  sameSite: 'lax' as const,
-  path: '/',
-};
 
 export type SafeUser = {
   id: string;
@@ -79,7 +72,7 @@ export async function registerUser(
       const errorDetails = z.flattenError(error).fieldErrors;
       return {
         success: false,
-        error: 'Validation failed',
+        error: 'Please check the form for errors',
         errors: errorDetails,
       };
     }
@@ -137,17 +130,22 @@ export async function loginUser(formData: LoginInput): Promise<ResponseState> {
       const errorDetails = z.flattenError(error).fieldErrors;
       return {
         success: false,
-        error: 'Validation failed',
+        error: 'Please check the form for errors',
         errors: errorDetails,
       };
     }
 
     // Find user and verify password
     const user = await User.findOne({ email: data.email }).select('+password');
-    if (!user) return { success: false, error: 'Invalid credentials' };
+    if (!user) return { success: false, error: 'Invalid email or password' };
+
+    // User registered with social login (Google/GitHub) and has no password set
+    if (!user.password) {
+      return { success: false, error: 'Invalid email or password' };
+    }
 
     const isMatch = await bcrypt.compare(data.password, user.password);
-    if (!isMatch) return { success: false, error: 'Invalid credentials' };
+    if (!isMatch) return { success: false, error: 'Invalid email or password' };
 
     // Generate JWT tokens
     const { accessToken, refreshToken } = generateTokens({
@@ -164,7 +162,10 @@ export async function loginUser(formData: LoginInput): Promise<ResponseState> {
       { new: true },
     );
     if (!authenticatedUser)
-      return { success: false, error: 'Invalid credentials' };
+      return {
+        success: false,
+        error: 'Unable to create session. Please try again.',
+      };
 
     // Set secure httpOnly cookies
     const cookieStore = await cookies();
@@ -172,14 +173,14 @@ export async function loginUser(formData: LoginInput): Promise<ResponseState> {
     cookieStore.set({
       name: COOKIE_NAMES.ACCESS_TOKEN,
       value: accessToken,
-      maxAge: 1 * 60 * 60, // 1 hour
+      maxAge: config.JWT_ACCESS_EXPIRY,
       ...cookieOptions,
     });
 
     cookieStore.set({
       name: COOKIE_NAMES.REFRESH_TOKEN,
       value: refreshToken,
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: config.JWT_REFRESH_EXPIRY,
       ...cookieOptions,
     });
 
@@ -196,7 +197,10 @@ export async function loginUser(formData: LoginInput): Promise<ResponseState> {
     return { success: true, user: userObject };
   } catch (error) {
     console.error('Authentication failed:', error);
-    return { success: false, error: 'Something went wrong. Please try again.' };
+    return {
+      success: false,
+      error: 'Unable to sign in. Please try again later.',
+    };
   }
 }
 
@@ -330,7 +334,7 @@ export async function changePassword(
     if (!success) {
       return {
         success: false,
-        error: 'Validation failed',
+        error: 'Please check the form for errors',
         errors: z.flattenError(error).fieldErrors,
       };
     }
@@ -338,6 +342,14 @@ export async function changePassword(
     // Fetch user with password field (excluded by default)
     const user = await User.findById(currentUser.userId).select('+password');
     if (!user) return { success: false, error: 'User not found' };
+
+    // User registered with social login (Google/GitHub) and has no password set
+    if (!user.password) {
+      return {
+        success: false,
+        error: 'Your account uses social login and has no password set.',
+      };
+    }
 
     // Verify current password matches
     const isMatch = await bcrypt.compare(data.currentPassword, user.password);

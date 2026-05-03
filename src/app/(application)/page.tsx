@@ -1,6 +1,7 @@
 import FeaturedBlogs from '@/components/FeaturedBlogs';
 import HeroSection from '@/components/HeroSection';
 import RecentBlogs from '@/components/RecentBlogs';
+import { SaveAuthMethod } from '@/components/SaveAuthMethod';
 import { FeaturedBlogsSkeleton } from '@/components/skeletons/FeaturedBlogsSkeleton';
 import { RecentBlogsSkeleton } from '@/components/skeletons/RecentBlogsSkeleton';
 import { TrendingBlogsSkeleton } from '@/components/skeletons/TrendingBlogsSkeleton';
@@ -10,6 +11,9 @@ import TrendingBlogs from './component/TrendingBlogs';
 export default function Home() {
   return (
     <div className="mx-auto w-full max-w-7xl flex-1 space-y-12 px-4 py-12 md:space-y-16 md:px-8 md:py-16">
+      <Suspense>
+        <SaveAuthMethod />
+      </Suspense>
       <HeroSection />
       <Suspense fallback={<FeaturedBlogsSkeleton />}>
         <FeaturedBlogs />

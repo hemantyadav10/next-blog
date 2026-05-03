@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from 'clsx';
 import crypto from 'node:crypto';
 import slugify from 'slugify';
 import { twMerge } from 'tailwind-merge';
+import { OAUTH_ERROR_MESSAGES, OAUTH_ERRORS } from './constants';
 
 const BASE_URL = clientConfig.baseUrl;
 
@@ -114,3 +115,9 @@ export const generateSlug = (value: string): string => {
     lower: true,
   });
 };
+
+export function isOAuthErrorCode(
+  value: string,
+): value is (typeof OAUTH_ERRORS)[keyof typeof OAUTH_ERRORS] {
+  return value in OAUTH_ERROR_MESSAGES;
+}

@@ -55,7 +55,7 @@ function DeleteAccountForm() {
           <FieldContent>
             <Input
               placeholder="DELETE"
-              className="bg-background max-w-fit font-mono"
+              className="bg-background h-8 max-w-fit font-mono"
               disabled
             />
             <FieldDescription>
@@ -67,12 +67,7 @@ function DeleteAccountForm() {
 
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button
-            variant="destructive"
-            size="lg"
-            disabled
-            className="max-w-fit"
-          >
+          <Button variant="destructive" disabled className="max-w-fit">
             <Trash2 />
             Delete Account
           </Button>

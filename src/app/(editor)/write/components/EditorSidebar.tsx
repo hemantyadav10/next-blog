@@ -1,7 +1,7 @@
 'use client';
 
 import TagsInput from '@/components/TagsInput';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -185,11 +185,11 @@ function EditorSidebar({ categories }: { categories: CategoryListItem[] }) {
 
                 <Alert variant={isSlugLocked ? 'info' : 'warning'}>
                   {isSlugLocked ? <InfoIcon /> : <AlertTriangleIcon />}
-                  <AlertDescription className="text-foreground">
+                  <AlertTitle className="text-sm font-normal">
                     {isSlugLocked
                       ? 'This post has already been published — the slug is now locked to preserve existing links.'
                       : 'The slug is generated from your title. Once published, it will be locked to keep links stable.'}
-                  </AlertDescription>
+                  </AlertTitle>
                 </Alert>
               </Field>
             )}

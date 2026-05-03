@@ -14,7 +14,6 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 8,
       select: false,
     },
@@ -43,8 +42,15 @@ const userSchema = new Schema(
       enum: ['user', 'admin'],
     },
 
-    phoneNumber: String,
+    googleId: {
+      type: String,
+      default: null,
+      unique: true,
+      sparse: true,
+    },
+
     profilePicture: String,
+    phoneNumber: String,
     bio: String,
     socialLinks: {
       website: String,
@@ -105,6 +111,7 @@ export type UserType = InferSchemaType<typeof userSchema> & {
 
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
+  if (!this.password) return;
 
   const saltRounds = 10;
   this.password = await bcrypt.hash(this.password, saltRounds);

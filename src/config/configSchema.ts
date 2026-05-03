@@ -8,6 +8,12 @@ export const configSchema = z.object({
   // Auth
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
+  JWT_ACCESS_EXPIRY: z.coerce.number().int().positive(),
+  JWT_REFRESH_EXPIRY: z.coerce.number().int().positive(),
+
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  GOOGLE_REDIRECT_URI: z.url(),
 
   // App
   NEXT_PUBLIC_BASE_URL: z.url(),

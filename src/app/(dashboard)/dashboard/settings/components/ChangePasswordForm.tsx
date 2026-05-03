@@ -226,7 +226,6 @@ function ChangePasswordForm() {
         <Button
           type="submit"
           disabled={isPending}
-          size={'lg'}
           className="max-w-fit disabled:cursor-not-allowed"
         >
           {isPending && <Spinner />} Change Password

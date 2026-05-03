@@ -8,8 +8,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex min-h-screen">
-      <div className="flex flex-1 flex-col gap-8 px-4 py-8 md:px-8">
+    <div className="grid min-h-screen lg:grid-cols-2">
+      <div className="flex flex-col gap-8 px-4 py-8 md:px-8">
         <Logo textClassName="block" />
         {/* Left Side - Login Form */}
         <div className="flex flex-1 flex-col items-center justify-center gap-6">
@@ -18,17 +18,19 @@ export default function RootLayout({
       </div>
 
       {/* Right Side - Image */}
-      <div className="relative hidden w-1/2 md:block">
-        <Image
-          src={authImage}
-          alt="Login page illustration"
-          fill
-          className="object-cover"
-          placeholder="blur"
-          quality={100}
-          priority
-          sizes="50vw"
-        />
+      <div className="sticky top-0 hidden h-screen p-4 lg:block">
+        <div className="relative h-full w-full overflow-hidden rounded-xl">
+          <Image
+            src={authImage}
+            alt="Login page illustration"
+            fill
+            className="object-cover"
+            placeholder="blur"
+            quality={100}
+            priority
+            sizes="50vw"
+          />
+        </div>
       </div>
     </div>
   );

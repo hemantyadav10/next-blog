@@ -1,5 +1,5 @@
 import { ErrorState } from '@/components/error-state';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { fetchComments } from '@/lib/api/comments.api';
 import { verifyAuth } from '@/lib/auth';
@@ -74,10 +74,10 @@ async function CommentSection({
       {!isCommentsEnabled && (
         <Alert variant={'warning'}>
           <AlertTriangleIcon />
-          <AlertDescription className="text-foreground">
+          <AlertTitle className="font-normal">
             Commenting is currently turned off for this post. You can still view
             existing comments, but new comments cannot be added.
-          </AlertDescription>
+          </AlertTitle>
         </Alert>
       )}
 
