@@ -18,4 +18,9 @@ export const changePasswordSchema = z
     },
   );
 
+export const setPasswordSchema = changePasswordSchema.omit({
+  currentPassword: true,
+});
+
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type SetPasswordInput = z.infer<typeof setPasswordSchema>;

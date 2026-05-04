@@ -11,6 +11,8 @@ import { emailLimiter, getIP } from '@/lib/rateLimit';
 import {
   ChangePasswordInput,
   changePasswordSchema,
+  SetPasswordInput,
+  setPasswordSchema,
 } from '@/lib/schema/authSchema';
 import {
   Email,
@@ -518,5 +520,58 @@ export async function resetPassword(
       success: false,
       error: 'Server error. Please try again later.',
     };
+  }
+}
+
+export async function setPassword(
+  formData: SetPasswordInput,
+): Promise<Response<{ updated: true }>> {
+  try {
+    // Connect to databasse
+    await connectDb();
+
+    // Verify user is authenticated and get user ID
+    const {
+      error: authenticationError,
+      isAuthenticated,
+      user: currentUser,
+    } = await verifyAuth();
+    if (!isAuthenticated)
+      return { success: false, error: authenticationError || 'Unauthorized' };
+
+    // Validate input with Zod schema
+    const { success, data, error } = setPasswordSchema.safeParse(formData);
+    if (!success) {
+      return {
+        success: false,
+        error: 'Please check the form for errors',
+        errors: z.flattenError(error).fieldErrors,
+      };
+    }
+
+    // Fetch user with password field (excluded by default)
+    const user = await User.findById(currentUser.userId).select('+password');
+    if (!user) return { success: false, error: 'User not found' };
+
+    // Only allow if user does NOT already have a password
+    if (user.password) {
+      return {
+        success: false,
+        error: 'Password already exists. Please use change password instead.',
+      };
+    }
+
+    // Set new password (pre-save hook handles hashing)
+    user.password = data.newPassword;
+    await user.save();
+
+    return {
+      success: true,
+      message: 'Password set successfully',
+      data: { updated: true },
+    };
+  } catch (error) {
+    console.error('Set password failed:', error);
+    return { success: false, error: 'Server error. Please try again later.' };
   }
 }

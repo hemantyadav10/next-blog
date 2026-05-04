@@ -44,7 +44,6 @@ function ChangePasswordForm() {
       newPassword: '',
     },
     resolver: zodResolver(changePasswordSchema),
-    mode: 'onTouched',
     disabled: isPending,
   });
   const [error, setError] = useState('');
