@@ -289,11 +289,16 @@ export async function exchangeGoogleCode(
 
 export async function verifyGoogleIdToken(
   idToken: string,
+  expectedNonce: string,
 ): Promise<GoogleIdTokenPayload> {
   const { payload } = await jwtVerify(idToken, GOOGLE_JWKS, {
     audience: config.GOOGLE_CLIENT_ID,
     issuer: ['https://accounts.google.com', 'accounts.google.com'],
   });
+
+  // Prevent replay attacks by validating nonce against the original request.
+  if (payload.nonce !== expectedNonce)
+    throw new GoogleOAuthError(OAUTH_ERRORS.INVALID_NONCE);
 
   return googleIdTokenPayloadSchema.parse(payload);
 }
@@ -301,6 +306,7 @@ export async function verifyGoogleIdToken(
 export function clearOAuthCookies(response: NextResponse) {
   response.cookies.delete(COOKIE_NAMES.OAUTH_STATE);
   response.cookies.delete(COOKIE_NAMES.OAUTH_INTENT);
+  response.cookies.delete(COOKIE_NAMES.OAUTH_NONCE);
 }
 
 export async function getHasPassword(userId: string): Promise<boolean> {

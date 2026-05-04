@@ -4,6 +4,7 @@ export const COOKIE_NAMES = {
   ANONYMOUS_TOKEN: 'anon_token',
   OAUTH_STATE: 'oauth_state',
   OAUTH_INTENT: 'intent',
+  OAUTH_NONCE: 'oauth_nonce',
 } as const;
 
 export const ENV = process.env.NODE_ENV;
@@ -38,6 +39,7 @@ export const OAUTH_ERRORS = {
   TOKEN_EXCHANGE_FAILED: 'token_exchange_failed',
   EMAIL_REQUIRED: 'email_required',
   SERVER_ERROR: 'server_error',
+  INVALID_NONCE: 'invalid_nonce',
 } as const;
 
 export const OAUTH_ERROR_MESSAGES: Record<
@@ -53,4 +55,5 @@ export const OAUTH_ERROR_MESSAGES: Record<
     'Unable to complete Google authentication. Please try again.',
   email_required: 'Your Google account did not provide an email address.',
   server_error: 'Something went wrong. Please try again.',
+  invalid_nonce: 'Security validation failed. Please try again.',
 };

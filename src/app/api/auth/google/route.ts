@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
       : 'login';
 
   const state = crypto.randomUUID();
+  const nonce = crypto.randomUUID();
 
   const searchParams = new URLSearchParams({
     response_type: 'code',
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     scope: 'openid profile email',
     redirect_uri: config.GOOGLE_REDIRECT_URI,
     state,
-    nonce: crypto.randomUUID(),
+    nonce,
     access_type: 'offline',
   });
 
@@ -39,6 +40,7 @@ export async function GET(request: NextRequest) {
   // Store the state in a secure, HTTP-only cookie to verify it later in the callback
   response.cookies.set(COOKIE_NAMES.OAUTH_STATE, state, COOKIE_OPTIONS);
   response.cookies.set(COOKIE_NAMES.OAUTH_INTENT, intent, COOKIE_OPTIONS);
+  response.cookies.set(COOKIE_NAMES.OAUTH_NONCE, nonce, COOKIE_OPTIONS);
 
   return response;
 }

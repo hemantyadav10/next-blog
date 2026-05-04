@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
       : 'login';
 
   try {
-    const code = validateOAuthCallback(request);
+    const { code, oauthNonce } = validateOAuthCallback(request);
     const tokenData = await exchangeGoogleCode(code);
-    const payload = await verifyGoogleIdToken(tokenData.id_token);
+    const payload = await verifyGoogleIdToken(tokenData.id_token, oauthNonce);
     const user = await findOrCreateGoogleUser(payload);
 
     return createAuthResponse(user, request, 'google');
@@ -48,7 +48,10 @@ function redirectWithError(
   return response;
 }
 
-function validateOAuthCallback(request: NextRequest): string {
+function validateOAuthCallback(request: NextRequest): {
+  code: string;
+  oauthNonce: string;
+} {
   const { searchParams } = request.nextUrl;
 
   const error = searchParams.get('error');
@@ -61,15 +64,18 @@ function validateOAuthCallback(request: NextRequest): string {
   const code = searchParams.get('code');
   const state = searchParams.get('state');
   const oauthState = request.cookies.get(COOKIE_NAMES.OAUTH_STATE)?.value;
+  const oauthNonce = request.cookies.get(COOKIE_NAMES.OAUTH_NONCE)?.value;
 
   if (!code || !state) throw new GoogleOAuthError(OAUTH_ERRORS.MISSING_PARAMS);
 
-  // OAuth state must exist to confirm this callback belongs to an active session.
+  // OAuth state and OAuth nonce must exist to confirm this callback belongs to an active session.
   if (!oauthState) throw new GoogleOAuthError(OAUTH_ERRORS.SESSION_EXPIRED);
+
+  if (!oauthNonce) throw new GoogleOAuthError(OAUTH_ERRORS.SESSION_EXPIRED);
 
   // Prevent CSRF by validating callback state against the original request.
   if (state !== oauthState)
     throw new GoogleOAuthError(OAUTH_ERRORS.INVALID_STATE);
 
-  return code;
+  return { code, oauthNonce };
 }
