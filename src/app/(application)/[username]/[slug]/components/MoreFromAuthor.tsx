@@ -54,7 +54,7 @@ async function MoreFromAuthor({
                 blog.publishedAt?.toISOString() || blog.createdAt.toISOString()
               }
               banner={blog.banner}
-              blurDataUrl={blog.blurDataUrl}
+              blurDataUrl={blog.blurDataUrl ?? ''}
               slug={blog.slug}
               username={authorUsername}
             />
